@@ -19,30 +19,30 @@ import userinterface.View;
 import userinterface.ViewFactory;
 import model.Worker;
 import model.WorkerCollection;
-import model.Person;
-import model.PersonCollection;
 
-/** The class containing the ModifyWorkerTransaction for the KSSPE application */
+/** The class containing the RemoveWorkerTransaction for the KSSPE application */
 //==============================================================
-public class UpdateWorkerTransaction extends Transaction
+public class RemoveWorkerTransaction extends Transaction
 {
 	private String errorMessage = "";
 	private Receptionist myReceptionist;
 	private Worker myWorker;
 	private WorkerCollection myWorkerList;
 
-	public UpdateWorkerTransaction() throws Exception
+	//----------------------------------------------------------------
+	public RemoveWorkerTransaction() throws Exception
 	{
 		super();
 	}
 
+	//----------------------------------------------------------------
 	public void processTransaction(Properties props)
 	{
 		myWorkerList = new WorkerCollection();
 		
 		if (props.getProperty("BannerId") != null)
 		{
-			String bannerId= props.getProperty("BannerId");
+			String bannerId = props.getProperty("BannerId");
 			myWorkerList.findByBannerId(bannerId);
 		}
 		else if(props.getProperty("FirstName") != null || props.getProperty("LastName") != null)
@@ -86,6 +86,10 @@ public class UpdateWorkerTransaction extends Transaction
 		{
 			return errorMessage;
 		}
+		else if (key.equals("Alert") == true)
+		{
+			return true;
+		}
 		else if (key.equals("WorkerList") == true)
 		{
 			return myWorkerList;
@@ -114,10 +118,6 @@ public class UpdateWorkerTransaction extends Transaction
 		{
 			return myWorker.getState("Credential");
 		}
-		else if (key.equals("Password") == true)
-		{
-			return myWorker.getState("Password");
-		}
 		else
 			return null;
 	}
@@ -139,21 +139,8 @@ public class UpdateWorkerTransaction extends Transaction
 		if (key.equals("WorkerSelected") == true)
 		{
 			myWorker = myWorkerList.retrieve((String)value);
-
-			try
-			{
-				Scene newScene = createModifyWorkerView();
-				swapToView(newScene);
-			}
-			catch (Exception ex)
-			{
-				new Event(Event.getLeafLevelClassName(this), "processTransaction",
-						"Error in creating ModifyWorkerView", Event.ERROR);
-			}
-		}
-		if (key.equals("WorkerData") == true)
-		{
-			modifyWorkerHelper((Properties)value);
+			
+			removeWorkerHelper();
 		}
 		if (key.equals("CancelWorkerList") == true)
 		{
@@ -169,41 +156,26 @@ public class UpdateWorkerTransaction extends Transaction
         notifyObservers(errorMessage);
 	}
 	
-	
-	
-	private void modifyWorkerHelper(Properties props)
+	//------------------------------------------------------------------------
+	private void removeWorkerHelper()
 	{
-		myWorker.stateChangeRequest("FirstName", props.getProperty("FirstName"));
-		myWorker.stateChangeRequest("LastName", props.getProperty("LastName"));
-		myWorker.stateChangeRequest("Email", props.getProperty("Email"));
-		myWorker.stateChangeRequest("Credential", props.getProperty("Credential"));
-		myWorker.stateChangeRequest("Password", props.getProperty("Password"));
-		myWorker.stateChangeRequest("PhoneNumber", props.getProperty("PhoneNumber"));
+		myWorker.stateChangeRequest("Status", "Inactive");
 		myWorker.stateChangeRequest("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 		myWorker.save();
+		
 		errorMessage = (String)myWorker.getState("UpdateStatusMessage");
+		
+		if(errorMessage.startsWith("ERR") == false)
+		{
+			if (myWorkerList != null)
+			{
+				myWorkerList.remove((String)myWorker.getState("BannerId"));
+			}
+			errorMessage = errorMessage.replace("updated", "removed");
+		}
 	}
 	
-	protected Scene createModifyWorkerView()
-	{
-		Scene currentScene = myViews.get("UpdateWorkerView");
-
-		if (currentScene == null)
-		{
-			View newView = ViewFactory.createView("UpdateWorkerView", this);
-			currentScene = new Scene(newView);
-			myViews.put("UpdateWorkerView", currentScene);
-
-			return currentScene;
-		}
-		else
-		{
-			return currentScene;
-		}
-
-	}
-	
-	
+	//--------------------------------------------------------------------------
 	protected Scene createWorkerCollectionView()
 	{
 		Scene currentScene;

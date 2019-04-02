@@ -45,6 +45,10 @@ public class TransactionFactory
 		{
 			retValue = new UpdateCategoryTransaction();
 		} 
+		if (transType.equals("RemoveWorker") == true)
+		{
+			retValue = new RemoveWorkerTransaction();
+		}
 		if (transType.equals("RemoveCategory") == true)
 		{
 			retValue = new RemoveCategoryTransaction();
