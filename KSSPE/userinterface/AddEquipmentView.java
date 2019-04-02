@@ -506,7 +506,6 @@ public class AddEquipmentView extends View implements Observer
 				while(entries.hasMoreElements() == true)
 				{
 					Category c = (Category)entries.nextElement();
-					System.out.println(c.getName());
 					category.getItems().add(c);
 				}
 			} 
