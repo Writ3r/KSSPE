@@ -52,6 +52,10 @@ public class TransactionFactory
 		if (transType.equals("RemoveBorrower") == true)
 		{
 			retValue = new RemoveBorrowerTransaction();
+		}
+		if (transType.equals("AddEquipment") == true)
+		{
+			retValue = new AddEquipmentTransaction();
 		} 
 		return retValue;
 	}
