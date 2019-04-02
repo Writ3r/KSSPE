@@ -195,20 +195,20 @@ public class Worker extends EntityBase
 	public Vector<String> getEntryListView()
 	{
 		Vector<String> v = new Vector<String>();
-
-		v.addElement(persistentState.getProperty("BannerId"));
-		v.addElement(persistentState.getProperty("FirstName"));
-		v.addElement(persistentState.getProperty("LastName"));
-		v.addElement(persistentState.getProperty("PhoneNumber"));
-		v.addElement(persistentState.getProperty("Email"));
-		v.addElement(persistentState.getProperty("Status"));
-
+		
+		v.addElement((String)this.getState("BannerId"));
+		v.addElement((String)this.getState("FirstName"));
+		v.addElement((String)this.getState("LastName"));
+		
 		return v;
 	}
 	
-	public static int compare(Worker w1, Worker w2)
+	public static int compare(Worker a, Worker b)
 	{
-		return 1;
+		String aVal = (String)a.getState("BannerId");
+		String bVal = (String)b.getState("BannerId");
+
+		return aVal.compareTo(bVal);
 	}
 
 	//------------------------------------------------------------------
@@ -232,7 +232,14 @@ public class Worker extends EntityBase
 	
 	public void stateChangeRequest(String key, Object value)
 	{
-		persistentState.setProperty(key, (String)value);
+		if(key.equals("BannerId") || key.equals("Password") || key.equals("Credential") || key.equals("Status") || key.equals("DateAdded") || key.equals("DateLastUpdated"))
+		{
+			persistentState.setProperty(key, (String)value);
+		}
+		else if(key.equals("FirstName") || key.equals("LastName") || key.equals("Email") || key.equals("PhoneNumber") || key.equals("BannerId"))
+		{
+			myPerson.stateChangeRequest(key, value);
+		}
 	}
 	
 	//------------------------------------------------------------------
