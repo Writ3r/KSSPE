@@ -99,6 +99,7 @@ public class Category extends EntityBase
 		
 	}
 	
+	//---------------------------------------------------------------------------------------
 	public Vector<String> getEntryListView()
 	{
 		Vector<String> v = new Vector<String>();
@@ -114,8 +115,8 @@ public class Category extends EntityBase
 	//-----------------------------------------------------------------------------------
 	public static int compare(Category a, Category b)
 	{
-		String aVal = (String)a.getState("BarcodePrefix");
-		String bVal = (String)b.getState("BarcodePrefix");
+		String aVal = (String)a.getState("Name");
+		String bVal = (String)b.getState("Name");
 
 		return aVal.compareTo(bVal);
 	}
