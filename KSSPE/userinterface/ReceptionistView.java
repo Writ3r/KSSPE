@@ -72,7 +72,7 @@ public class ReceptionistView extends View implements Observer
 	private Button modifyEquipmentButton;
 	private Button removeEquipmentButton;
 	
-	private Button licenceButton;
+	private Button licenseButton;
 
 	private Button reserveButton;
 	private MenuButton reportsButton;
@@ -277,7 +277,7 @@ public class ReceptionistView extends View implements Observer
 		removeWorkerButton = new Button("Remove", icon);
 			removeWorkerButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
 			removeWorkerButton.setOnAction((ActionEvent e) -> {
-				myController.stateChangeRequest("RemoveArticleType", null);
+				myController.stateChangeRequest("RemoveWorker", null);
 			});
 			removeWorkerButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
 				removeWorkerButton.setEffect(shadow);
@@ -518,7 +518,7 @@ public class ReceptionistView extends View implements Observer
         equipCont.setAlignment(Pos.CENTER);
 		container.getChildren().add(equipCont);
 
-		//------------------------------------------------- logout/licencebox start
+		//------------------------------------------------- logout/licensebox start
 
 		HBox doneCont = new HBox(10);
 		doneCont.setAlignment(Pos.CENTER);
@@ -547,24 +547,24 @@ public class ReceptionistView extends View implements Observer
 		icon = new ImageView(new Image("/images/log.png"));
 		icon.setFitHeight(15);
 		icon.setFitWidth(15);
-		licenceButton = new Button("License",icon);
-		licenceButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
-		licenceButton.setOnAction((ActionEvent e) -> {
+		licenseButton = new Button("License",icon);
+		licenseButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
+		licenseButton.setOnAction((ActionEvent e) -> {
 			Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Licensing");
 				alert.setHeaderText("Copyright (c): Dream Team");
 				alert.setContentText("Members: Lucas Wing, Nicholas Barnard, Matthew Fritschi, Liam Allport \n\nLicensed to: The College At Brockport \nFor: Commercial use, Non-commercial use, Modification.");
 				alert.showAndWait();
 		});
-		licenceButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-			licenceButton.setEffect(shadow);
+		licenseButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+			licenseButton.setEffect(shadow);
                         statusLog.displayInfoMessage("License for software use");
 		});
-		licenceButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-			licenceButton.setEffect(null);
+		licenseButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+			licenseButton.setEffect(null);
                         clearErrorMessage();
 		});
-		doneCont.getChildren().add(licenceButton);
+		doneCont.getChildren().add(licenseButton);
 		
 		
 		

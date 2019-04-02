@@ -167,10 +167,6 @@ public class SearchWorkerView extends View implements Observer
 			
 		bannerId = new TextField();
 			bannerId.setMinWidth(150);
-			bannerId.setOnKeyTyped(event ->{
-				//if(bannerId.getText().length() > GlobalVariables.BARCODEPREFIX_LENGTH - 1)
-					//event.consume();
-			});
 			bannerId.addEventFilter(KeyEvent.KEY_RELEASED, event->{
 				clearErrorMessage();
 			});
@@ -300,11 +296,45 @@ public class SearchWorkerView extends View implements Observer
 			}
 			
 		}
-		else if(!FirstName.equals("") && !LastName.equals(""))
+		else if(!FirstName.equals("") || !LastName.equals("")) //if search by first or last name
 		{
-			if(Utilities.checkName(FirstName))
+			if(!FirstName.equals("") && !LastName.equals(""))
 			{
-				props.setProperty("FirstName", FirstName);
+				if(Utilities.checkName(FirstName))
+				{
+					if(Utilities.checkName(LastName))
+					{
+						props.setProperty("FirstName", FirstName);
+						props.setProperty("LastName", LastName);
+						myController.stateChangeRequest("SearchWorker", props);
+					}
+					else
+					{
+						displayErrorMessage("Please enter a valid last name.");
+						lastName.requestFocus();
+					}					
+				}
+				else
+				{
+					displayErrorMessage("Please enter a valid first name.");
+					firstName.requestFocus();
+				}
+			}
+			else if(!FirstName.equals(""))
+			{
+				if(Utilities.checkName(FirstName))
+				{
+					props.setProperty("FirstName", FirstName);
+					myController.stateChangeRequest("SearchWorker", props);
+				}
+				else
+				{
+					displayErrorMessage("Please enter a valid first name.");
+					firstName.requestFocus();
+				}
+			}
+			else
+			{
 				if(Utilities.checkName(LastName))
 				{
 					props.setProperty("LastName", LastName);
@@ -314,14 +344,7 @@ public class SearchWorkerView extends View implements Observer
 				{
 					displayErrorMessage("Please enter a valid last name.");
 					lastName.requestFocus();
-				}
-
-				myController.stateChangeRequest("SearchWorker", props);						
-			}
-			else
-			{
-				displayErrorMessage("Please enter a valid first name.");
-				firstName.requestFocus();
+				}	
 			}
 		}
 		else
@@ -402,7 +425,3 @@ public class SearchWorkerView extends View implements Observer
 	}
 
 }
-
-//---------------------------------------------------------------
-//	Revision History:
-//

@@ -7,69 +7,45 @@ import javafx.beans.property.SimpleStringProperty;
 //==============================================================================
 public class WorkerTableModel
 {
-	private final SimpleStringProperty bannerId;
-	private final SimpleStringProperty credential;
-	private final SimpleStringProperty password;
-	private final SimpleStringProperty status;
-	private final SimpleStringProperty dateAdded;
-	private final SimpleStringProperty dateLastUpdated;
-
+	private final SimpleStringProperty BannerId;
+	private final SimpleStringProperty FirstName;
+	private final SimpleStringProperty LastName;
 
 	//----------------------------------------------------------------------------
 	public WorkerTableModel(Vector<String> atData)
 	{
-		bannerId =  new SimpleStringProperty(atData.elementAt(0));
-		credential =  new SimpleStringProperty(atData.elementAt(1));
-		password =  new SimpleStringProperty(atData.elementAt(2));
-		status =  new SimpleStringProperty(atData.elementAt(3));
-		dateAdded =  new SimpleStringProperty(atData.elementAt(4));
-		dateLastUpdated =  new SimpleStringProperty(atData.elementAt(5));
+		BannerId =  new SimpleStringProperty(atData.elementAt(0));
+		FirstName =  new SimpleStringProperty(atData.elementAt(1));
+		LastName =  new SimpleStringProperty(atData.elementAt(2));
 	}
 
 	//----------------------------------------------------------------------------
 	public String getBannerId() {
-		return bannerId.get();
+		return BannerId.get();
 	}
 
 	//----------------------------------------------------------------------------
-	public String getCredential() {
-		return credential.get();
+	public void setBannerId(String pref) {
+		BannerId.set(pref);
 	}
 
 	//----------------------------------------------------------------------------
-	public String getPassword() {
-		return password.get();
+	public String getFirstName() {
+		return FirstName.get();
 	}
 
 	//----------------------------------------------------------------------------
-	public String getStatus() {
-		return status.get();
+	public void setFirstName(String desc) {
+		FirstName.set(desc);
 	}
 
 	//----------------------------------------------------------------------------
-	public String getDateAdded() {
-		return dateAdded.get();
+	public String getLastName() {
+		return LastName.get();
 	}
 
 	//----------------------------------------------------------------------------
-	public String getDateLastUpdated() {
-		return dateLastUpdated.get();
-	}
-
-	//----------------------------------------------------------------------------
-	public void setCredential(String cred) {
-		credential.set(cred);
-	}
-
-	//----------------------------------------------------------------------------
-	public void setStatus(String stat)
-	{
-		status.set(stat);
-	}
-
-	//----------------------------------------------------------------------------
-	public void setDateLastUpdated(String date)
-	{
-		dateLastUpdated.set(date);
+	public void setLastName(String desc) {
+		LastName.set(desc);
 	}
 }
