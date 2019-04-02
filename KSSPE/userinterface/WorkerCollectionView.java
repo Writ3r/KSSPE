@@ -195,7 +195,7 @@ private Node createTitle()
 		tableOfWorkers.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
 		TableColumn bannerIdColumn = new TableColumn("Banner Id") ;
-		bannerIdColumn.setMinWidth(175);
+		bannerIdColumn.setMinWidth(116.6);
 		bannerIdColumn.setStyle(" -fx-alignment: CENTER;");
 		bannerIdColumn.setCellValueFactory(
 				new PropertyValueFactory<WorkerTableModel, String>("BannerId"));
@@ -270,7 +270,7 @@ private Node createTitle()
 		btnContainer.getChildren().add(submitButton);
 		btnContainer.getChildren().add(cancelButton);
 
-		tableOfWorkers.setPrefHeight(275);
+		tableOfWorkers.setPrefHeight(250);
         tableOfWorkers.setMaxWidth(350);
 		
 		vbox.getChildren().add(tableOfWorkers);

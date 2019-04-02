@@ -380,6 +380,7 @@ public class AddBorrowerView extends View implements Observer
 		return vbox;
 	}
 
+	//---------------------------------------------------------------------------------------------------
 	protected void sendToController()
 	{
 		clearErrorMessage();

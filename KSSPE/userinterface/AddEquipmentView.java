@@ -392,6 +392,7 @@ public class AddEquipmentView extends View implements Observer
 		return vbox;
 	}
 
+	//-----------------------------------------------------------------------------------
 	private void sendToController()
 	{
 		clearErrorMessage();
@@ -489,13 +490,14 @@ public class AddEquipmentView extends View implements Observer
 		return statusLog;
 	}
 
+	//--------------------------------------------------------------------------------------
 	public void fillCategoryComboBox()
 	{
 
 		try
 		{
 			CategoryCollection categoryCollection = new CategoryCollection();
-			System.out.println(categoryCollection);
+		
 			categoryCollection.findAll();
 			Vector entryList = (Vector)categoryCollection.getState("Categories");
 
@@ -506,7 +508,8 @@ public class AddEquipmentView extends View implements Observer
 				while(entries.hasMoreElements() == true)
 				{
 					Category c = (Category)entries.nextElement();
-					category.getItems().add(c);
+					String categoryName = (String)c.getState("Name");
+					category.getItems().add(categoryName);
 				}
 			} 
 		}
