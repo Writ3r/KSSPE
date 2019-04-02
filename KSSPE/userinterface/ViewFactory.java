@@ -63,6 +63,10 @@ public class ViewFactory {
 		{
 			return new UpdateCategoryView(t);
 		}
+		else if(viewName.equals("AddEquipmentView") == true)
+		{
+			return new AddEquipmentView(t);
+		}
 		else
 			return null;
 	}
