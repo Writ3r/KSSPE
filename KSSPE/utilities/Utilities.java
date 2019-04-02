@@ -54,6 +54,90 @@ public class Utilities
 			return false;
 	}
 	
+	//Input check for equipment view.
+	public static boolean checkEquipmentName(String equipmentName)
+	{
+		if(equipmentName.length() != 0 && equipmentName.length() < GlobalVariables.EQUIPMENT_NAME_LENGTH)
+			return true;
+		else
+			return false;
+	}
+	public static boolean checkBarcode(String barcode)
+	{
+		if(barcode.length() == GlobalVariables.BARCODE_LENGTH && barcode.matches("\\d+"))
+			return true;
+		else
+			return false;
+	}
+	public static boolean checkPoorCount(String poorCount)
+	{
+		if(poorCount.length() != 0)
+		{
+			try {
+				int num = Integer.parseInt(poorCount);
+
+				if(num < GlobalVariables.EQUIPMENT_COUNT_LENGTH)
+					return true;
+				else
+					return false;
+			}
+			catch(NumberFormatException e)
+			{
+				return false;
+			}
+		}
+		else
+			return false;
+	}
+	public static boolean checkFairCount(String fairCount)
+	{
+		if(fairCount.length() != 0)
+		{
+			try {
+				int num = Integer.parseInt(fairCount);
+
+				if(num < GlobalVariables.EQUIPMENT_COUNT_LENGTH)
+					return true;
+				else
+					return false;
+			}
+			catch(NumberFormatException e)
+			{
+				return false;
+			}
+		}
+		else
+			return false;
+	}
+	public static boolean checkGoodCount(String goodCount)
+	{
+		if(goodCount.length() != 0)
+		{
+			try {
+				int num = Integer.parseInt(goodCount);
+
+				if(num < GlobalVariables.EQUIPMENT_COUNT_LENGTH)
+					return true;
+				else
+					return false;
+			}
+			catch(NumberFormatException e)
+			{
+				return false;
+			}
+		}
+		else
+			return false;
+	}
+	public static boolean checkNotes(String note)
+	{
+		if(note.length() < GlobalVariables.NOTE_LENGTH)
+			return true;
+		else
+			return false;
+	}
+	//----------------------------------------------------------
+	
 	//category view
 	public static boolean checkBarcodePrefix(String barcodePrefix)
 	{
