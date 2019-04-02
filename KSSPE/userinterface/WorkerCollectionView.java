@@ -78,6 +78,8 @@ public class WorkerCollectionView extends View implements Observer
 		getChildren().add(container);
 		
 		populateFields();
+
+		myController.addObserver(this);
 		
 		tableOfWorkers.getSelectionModel().select(0); //autoselect first element
 	}
@@ -196,16 +198,22 @@ private Node createTitle()
 		bannerIdColumn.setMinWidth(175);
 		bannerIdColumn.setStyle(" -fx-alignment: CENTER;");
 		bannerIdColumn.setCellValueFactory(
-				new PropertyValueFactory<WorkerTableModel, String>("bannerId"));
+				new PropertyValueFactory<WorkerTableModel, String>("BannerId"));
 
 
-		// TableColumn firstNameColumn = new TableColumn("First Name") ;
-		// firstNameColumn.setMinWidth(175);
-		// firstNameColumn.setStyle(" -fx-alignment: CENTER;");
-		// firstNameColumn.setCellValueFactory(
-		// 		new PropertyValueFactory<WorkerTableModel, String>("firstName"));
+		TableColumn firstNameColumn = new TableColumn("First Name") ;
+		firstNameColumn.setMinWidth(116.6);
+		firstNameColumn.setStyle(" -fx-alignment: CENTER;");
+		firstNameColumn.setCellValueFactory(
+				new PropertyValueFactory<WorkerTableModel, String>("FirstName"));
+		
+		TableColumn lastNameColumn = new TableColumn("Last Name") ;
+		lastNameColumn.setMinWidth(116.6);
+		lastNameColumn.setStyle(" -fx-alignment: CENTER;");
+		lastNameColumn.setCellValueFactory(
+				new PropertyValueFactory<WorkerTableModel, String>("LastName"));
 
-		tableOfWorkers.getColumns().addAll(bannerIdColumn);
+		tableOfWorkers.getColumns().addAll(bannerIdColumn, firstNameColumn, lastNameColumn);
 
 		tableOfWorkers.setOnMousePressed((MouseEvent event) -> {
 			if (event.isPrimaryButtonDown() && event.getClickCount() >=2 ){
@@ -280,7 +288,6 @@ private Node createTitle()
 
 		if(selectedItem != null)
 		{
-			System.out.println("Processing selected worker. WorkerCollectionView:283");
 			String selectedBannerId = selectedItem.getBannerId();
 
 			myController.stateChangeRequest("WorkerSelected", selectedBannerId);
@@ -290,7 +297,8 @@ private Node createTitle()
 	private void displayRemoveAlert(){
 		clearErrorMessage();
 		Alert alert = new Alert(Alert.AlertType.ERROR,"BannerId: "+tableOfWorkers.getSelectionModel().getSelectedItem().getBannerId()
-				+"\nName: ",ButtonType.YES, ButtonType.NO);
+				+"\nFirstName: "+tableOfWorkers.getSelectionModel().getSelectedItem().getFirstName()
+				+"\nLastName: "+tableOfWorkers.getSelectionModel().getSelectedItem().getLastName(), ButtonType.YES, ButtonType.NO);
 		alert.setHeaderText(null);
 		alert.setTitle("Remove Worker");
 		alert.setHeaderText("Are you sure want to remove this Worker?");
@@ -298,17 +306,7 @@ private Node createTitle()
 		alert.showAndWait();
 
 		if (alert.getResult() == ButtonType.YES) {
-			processWorkerSelected();
-			String val = (String)myController.getState("Error");
-			if (val.startsWith("ERR") == true)
-			{
-				statusLog.displayErrorMessage(val);
-			}
-			else
-			{
-				displayMessage(val);
-				getEntryTableModelValues();
-			}		
+			processWorkerSelected();	
 		}
 	}
        
@@ -329,10 +327,12 @@ private Node createTitle()
 		if (val.startsWith("ERR") == true)
 		{
 			displayErrorMessage(val);
+			getEntryTableModelValues();
 		}
 		else
 		{
 			displayMessage(val);
+			getEntryTableModelValues();
 		}
 	}
 	/**
