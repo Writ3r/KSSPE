@@ -66,25 +66,33 @@ public class WorkerCollection extends EntityBase
 	//-----------------------------------------------------------
 	public void findByBannerId(String bannerId)
 	{
-		String query = "SELECT * FROM " + myTableName + " WHERE ((Status = 'Active') AND (BannerId = '" + bannerId + "'))";
+		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Worker.Status = 'Active') AND (Worker.BannerId = '" + bannerId + "') AND (Worker.BannerId = Person.BannerId))";
 		populateCollectionHelper(query);
 	}
 
-	//-----------------------------------------------------------
+	public void findByFirstName(String firstname)
+	{
+		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Worker.Status  = 'Active') AND (FirstName LIKE '%" + firstname + "%') AND (Worker.BannerId = Person.BannerId))";
+		populateCollectionHelper(query);
+	}
+	
+	public void findByLastName(String lastname)
+	{
+		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Worker.Status  = 'Active') AND (LastName LIKE '%" + lastname + "%') AND (Worker.BannerId = Person.BannerId))";
+		populateCollectionHelper(query);
+	}
+	
+	public void findByFirstAndLast(Properties props)
+	{
+		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Worker.Status  = 'Active') AND (LastName LIKE '%" + props.getProperty("LastName") + "%') AND (FirstName LIKE '%" + props.getProperty("FirstName") + "%') AND (Worker.BannerId = Person.BannerId))";
+		populateCollectionHelper(query);
+	}
+
 	public void findAll()
 	{
-		String query = "SELECT * FROM " + myTableName + " WHERE (Status = 'Active')";
+		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Worker.BannerId = Person.BannerId) AND (Worker.Status = 'Active'))";
 		populateCollectionHelper(query);
 	}
-
-	//-----------------------------------------------------------
-	// public void findByName(String firstName, String lastName)
-	// {
-	// 	String query = "SELECT * FROM " + myTableName + " WHERE ((Status = 'Active') AND (FirstName LIKE '%" + firstName + "%')" 
-	// 	+ "AND (LastName LIKE '%" + lastName + "%'))";
-	// 	populateCollectionHelper(query);
-	// }
-
 
 	//----------------------------------------------------------------------------------
 	private void addWorker(Worker w)
@@ -149,22 +157,33 @@ public class WorkerCollection extends EntityBase
 	//----------------------------------------------------------
 	public Worker retrieve(String bannerId)
 	{
-		System.out.println("We are at least attempting to retrieve. In WorkerCollection:152");
 		Worker retValue = null;
 		for (int cnt = 0; cnt < workers.size(); cnt++)
 		{
 			Worker nextW = workers.elementAt(cnt);
 			String nextBannerId = (String)nextW.getState("BannerId");
-			System.out.println(nextBannerId);
 			if (nextBannerId.equals(bannerId) == true)
 			{
-				System.out.println("We found him!");
 				retValue = nextW;
 				return retValue;
 			}
 		}
 
 		return retValue;
+	}
+
+//----------------------------------------------------------
+	public void remove(String bannerId)
+	{
+		for (int cnt = 0; cnt < workers.size(); cnt++)
+		{
+			Worker nextW = workers.elementAt(cnt);
+			String nextBannerId = (String)nextW.getState("BannerId");
+			if (nextBannerId.equals(bannerId) == true)
+			{
+				workers.remove(cnt);
+			}
+		}
 	}
 
 
