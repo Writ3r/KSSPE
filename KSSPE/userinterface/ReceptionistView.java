@@ -464,7 +464,7 @@ public class ReceptionistView extends View implements Observer
 			addEquipmentButton.setMinWidth(65);
 			addEquipmentButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
 			addEquipmentButton.setOnAction((ActionEvent e) -> {
-				myController.stateChangeRequest("AddRequest", null);
+				myController.stateChangeRequest("AddEquipment", null);
 			});
 			addEquipmentButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
 				addEquipmentButton.setEffect(shadow);
