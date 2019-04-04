@@ -272,6 +272,10 @@ private Node createTitle()
 
 		tableOfWorkers.setPrefHeight(250);
         tableOfWorkers.setMaxWidth(350);
+
+		ScrollPane scrollPane = new ScrollPane();
+		scrollPane.setPrefSize(350, 150);
+		scrollPane.setContent(tableOfWorkers); // should we use this?
 		
 		vbox.getChildren().add(tableOfWorkers);
 		vbox.getChildren().add(btnContainer);

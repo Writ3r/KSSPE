@@ -519,6 +519,7 @@ public class AddEquipmentView extends View implements Observer
 		}
 	}
 
+	//-------------------------------------------------------------------------------------------
 	public void clearValues()
 	{
 		barcode.clear();
@@ -529,6 +530,8 @@ public class AddEquipmentView extends View implements Observer
 		notes.clear();
 		category.getSelectionModel().select(null);
 	}
+	
+	//------------------------------------------------------------------------------------------
 	private void clearValuesExceptBarcode()
 	{
 		equipmentName.clear();
@@ -539,6 +542,7 @@ public class AddEquipmentView extends View implements Observer
 		category.getSelectionModel().select(null);
 	}
 	
+	//------------------------------------------------------------------------------------------
 	private void removeDisables()
 	{
 		equipmentName.setDisable(false);
@@ -549,6 +553,7 @@ public class AddEquipmentView extends View implements Observer
 		notes.setDisable(false);
 	}
 	
+	//------------------------------------------------------------------------------------------
 	private void setDisables()
 	{
 		equipmentName.setDisable(true);
@@ -559,6 +564,7 @@ public class AddEquipmentView extends View implements Observer
 		notes.setDisable(true);
 	}
 
+	//--------------------------------------------------------------------------------------------
 	private void setOutlines()
 	{
 		barcode.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");

@@ -273,6 +273,10 @@ public class BorrowerCollectionView extends View implements Observer
 		tableOfBorrowers.setPrefHeight(275);
         tableOfBorrowers.setMaxWidth(350);
 		
+		ScrollPane scrollPane = new ScrollPane();
+		scrollPane.setPrefSize(250, 150);
+		scrollPane.setContent(tableOfBorrowers); // should we use this? (Probably not - FX tables come with their own scroll pane)
+		
 		vbox.getChildren().add(tableOfBorrowers);
 		vbox.getChildren().add(btnContainer);
 		vbox.setPadding(new Insets(10,10,10,10));
