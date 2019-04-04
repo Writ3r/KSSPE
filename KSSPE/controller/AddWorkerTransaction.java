@@ -38,9 +38,9 @@ public class AddWorkerTransaction extends Transaction
 	{
 		try
 		{
-			new Worker(props);
+			Worker w = new Worker(props);
 			
-			errorMessage = "ERROR: Worker already exists!";	
+			errorMessage = "ERROR: Worker with id: " + w.getState("BannerId") + " already exists!";	
 		}
 		catch (InvalidPrimaryKeyException ex) 
 		{
@@ -54,7 +54,7 @@ public class AddWorkerTransaction extends Transaction
 				myWorker = new Worker(props, true);
 				myWorker.save();
 				
-				errorMessage = "Worker Added Successfully";
+				errorMessage = "Worker with id: " + myWorker.getState("BannerId") + " added successfully";
 			}
 			catch (InvalidPrimaryKeyException ex2) 
 			{

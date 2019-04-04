@@ -18,7 +18,9 @@ import exception.MultiplePrimaryKeysException;
 import userinterface.View;
 import userinterface.ViewFactory;
 import model.Category;
+import model.Equipment;
 import model.CategoryCollection;
+import model.EquipmentCollection;
 
 /** The class containing the RemoveCategoryTransaction for the KSSPE application */
 //==============================================================
@@ -134,6 +136,17 @@ public class RemoveCategoryTransaction extends Transaction
 	//----------------------------------------------------------------------
 	private void removeCategoryHelper()
 	{
+		String catName = (String)myCategory.getState("Name");
+		EquipmentCollection ec = new EquipmentCollection();
+		ec.findByCategoryName(catName);
+		Vector<Equipment> v = (Vector)ec.getState("AllEquipment");
+		if ((v != null) && (v.size() > 0))
+		{
+			errorMessage = "ERROR: Category non-removable: EQUIPMENT EXISTS!";
+			return;
+		}
+		
+		
 		myCategory.stateChangeRequest("Status", "Inactive");
 		myCategory.save();
 		

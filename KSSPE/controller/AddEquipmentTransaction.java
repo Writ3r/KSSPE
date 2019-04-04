@@ -27,18 +27,20 @@ public class AddEquipmentTransaction extends Transaction
 	private Receptionist myReceptionist;
 	private Equipment myEquipment;
 
+	//----------------------------------------------------------------------------
 	public AddEquipmentTransaction() throws Exception
 	{
 		super();
 	}
 
+	//----------------------------------------------------------------------------
 	public void processTransaction(Properties props)
 	{
 		try
 		{
-			new Equipment(props);
+			Equipment e = new Equipment(props);
 			
-			errorMessage = "ERROR: Equipment already exists!";	
+			errorMessage = "ERROR: Equipment with id: " + e.getState("Barcode") + " already exists!";	
 		}
 		catch (InvalidPrimaryKeyException ex) 
 		{
@@ -51,7 +53,7 @@ public class AddEquipmentTransaction extends Transaction
 				myEquipment = new Equipment(props, true);
 				myEquipment.save();
 				
-				errorMessage = "Equipment Added Successfully";
+				errorMessage = "Equipment with id: " +  myEquipment.getState("Barcode") + " added Successfully";
 			}
 			catch (InvalidPrimaryKeyException ex2) 
 			{
@@ -72,6 +74,7 @@ public class AddEquipmentTransaction extends Transaction
 			return null;
 	}
 
+	//------------------------------------------------------------
 	public void stateChangeRequest(String key, Object value)
 	{
 		// DEBUG System.out.println("AddArticleTypeTransaction.sCR: key: " + key);

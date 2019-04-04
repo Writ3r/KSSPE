@@ -38,9 +38,9 @@ public class AddBorrowerTransaction extends Transaction
 	{
 		try
 		{
-			new Borrower(props);
+			Borrower b = new Borrower(props);
 			
-			errorMessage = "ERROR: Borrower already exists!";	
+			errorMessage = "ERROR: Borrower with id: " + b.getState("BannerId") + " already exists!";	
 		}
 		catch (InvalidPrimaryKeyException ex) 
 		{
@@ -56,7 +56,7 @@ public class AddBorrowerTransaction extends Transaction
 				myBorrower = new Borrower(props, true);
 				myBorrower.save();
 				
-				errorMessage = "Borrower Added Successfully";
+				errorMessage = "Borrower with id: " + myBorrower.getState("BannerId") + " added Successfully";
 			}
 			catch (InvalidPrimaryKeyException ex2) 
 			{
