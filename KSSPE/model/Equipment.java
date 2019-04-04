@@ -91,7 +91,7 @@ public class Equipment extends EntityBase
 			String nextKey = (String)allKeys.nextElement();
 			String nextValue = props.getProperty(nextKey);
 
-			System.out.println(nextKey + "   ----------   " + nextValue);
+			// DEBUG System.out.println(nextKey + "   ----------   " + nextValue);
 			
 			if (nextValue != null)
 			{
@@ -118,6 +118,14 @@ public class Equipment extends EntityBase
 
 	}
 	
+	//-----------------------------------------------------------------------------------
+	public static int compare(Equipment a, Equipment b)
+	{
+		String aVal = (String)a.getState("Barcode");
+		String bVal = (String)b.getState("Barcode");
+
+		return aVal.compareTo(bVal);
+	}
 	//------------------------------------------------------------------
 	public void save()
 	{
