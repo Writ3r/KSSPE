@@ -23,6 +23,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.collections.FXCollections;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ButtonType;
 
 import java.util.Properties;
 import java.util.Observer;
@@ -31,6 +32,9 @@ import java.util.Observable;
 // project imports
 import java.util.Enumeration;
 import java.util.Vector;
+
+import javafx.stage.Stage;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ComboBox;
 import javafx.scene.effect.DropShadow;
@@ -38,6 +42,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.StringConverter;
+import javafx.scene.control.Alert;
 
 import controller.Transaction;
 
@@ -175,7 +180,7 @@ public class AddCategoryView extends View implements Observer
 				clearErrorMessage();
 				if(Utilities.checkBarcodePrefix(barcodePrefix.getText()))
 				{
-					processBarcodePrefix(barcodePrefix.getText());
+					barcodePrefix.getText();
 				}
 			});
 		grid.add(barcodePrefix, 1, 1);
@@ -264,8 +269,17 @@ public class AddCategoryView extends View implements Observer
 				Properties props = new Properties();
 				props.setProperty("BarcodePrefix", BarcodePrefix);
 				props.setProperty("Name", Name);
-			
-				myController.stateChangeRequest("CategoryData", props);					
+				
+				myController.stateChangeRequest("TestCategory", props);
+				
+				String oldCategoryName = (String)myController.getState("CategoryIsInactive");
+				
+				if(oldCategoryName != null)
+				{
+					displayReinstateAlert(BarcodePrefix, oldCategoryName, props);
+				}
+				else
+					myController.stateChangeRequest("CategoryData", props);					
 						
 			}
 			else
@@ -281,13 +295,21 @@ public class AddCategoryView extends View implements Observer
 		}
 	}
 	
-	protected void processBarcodePrefix(String BarcodePrefix)
-	{
-		
-		
-		
-	}
 	
+	private void displayReinstateAlert(String barcodePrefix, String name, Properties props)
+	{
+		clearErrorMessage();
+		Alert alert = new Alert(Alert.AlertType.ERROR,"Old category with data : \nBarcode Prefix: "+ barcodePrefix + "\nName: " + name + "\nPreviously was removed.\nWould you like to reinstate it with this new name?", ButtonType.YES, ButtonType.NO);
+		alert.setHeaderText(null);
+		alert.setTitle("Reinstate Category");
+		alert.setHeaderText("Reinstate this Category?");
+		((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(new Image("images/BPT_LOGO_All-In-One_Color.png"));
+		alert.showAndWait();
+
+		if (alert.getResult() == ButtonType.YES) {
+			myController.stateChangeRequest("CategoryData", props);	
+		}
+	}
 	
 	//-------------------------------------------------------------
 	protected MessageView createStatusLog(String initialMessage)
