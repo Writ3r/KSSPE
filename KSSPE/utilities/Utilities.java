@@ -18,6 +18,7 @@ public class Utilities
 	//input checks for views. 
 	
 	//Worker/borrower views
+	//-----------------------------------------------------------------------------
 	public static boolean checkBannerId(String bannerId)
 	{
 		if(bannerId.length() == GlobalVariables.BANNERID_LENGTH && bannerId.matches("\\d+"))
@@ -25,6 +26,8 @@ public class Utilities
 		else
 			return false;
 	}
+	
+	//-----------------------------------------------------------------------------
 	public static boolean checkName(String name)
 	{
 		if(name.length() != 0 && name.length() < GlobalVariables.NAME_LENGTH)
@@ -32,6 +35,8 @@ public class Utilities
 		else
 			return false;
 	}
+	
+	//---------------------------------------------------------------------------
 	public static boolean checkEmail(String email)
 	{
 		if(email.length() != 0 && email.length() < GlobalVariables.EMAIL_LENGTH)
@@ -39,13 +44,18 @@ public class Utilities
 		else
 			return false;
 	}
+	
+	//------------------------------------------------------------------------
 	public static boolean checkPhone(String PhoneNumber)
 	{
-		if(PhoneNumber.length() != 0 && PhoneNumber.length() < GlobalVariables.PHONE_LENGTH && Utilities.checkProperPhoneNumber(PhoneNumber))
+		if(PhoneNumber.length() != 0 && PhoneNumber.length() < GlobalVariables.PHONE_LENGTH && 
+			Utilities.checkProperPhoneNumber(PhoneNumber))
 			return true;
 		else
 			return false;
 	}
+	
+	//-----------------------------------------------------------------------
 	public static boolean checkPassword(String Password)
 	{
 		if(Password.length() != 0 && Password.length() < GlobalVariables.PASSWORD_LENGTH)
@@ -55,6 +65,7 @@ public class Utilities
 	}
 	
 	//Input check for equipment view.
+	//------------------------------------------------------------------------
 	public static boolean checkEquipmentName(String equipmentName)
 	{
 		if(equipmentName.length() != 0 && equipmentName.length() < GlobalVariables.EQUIPMENT_NAME_LENGTH)
@@ -62,6 +73,8 @@ public class Utilities
 		else
 			return false;
 	}
+	
+	//-------------------------------------------------------------------------
 	public static boolean checkBarcode(String barcode)
 	{
 		if(barcode.length() == GlobalVariables.BARCODE_LENGTH && barcode.matches("\\d+"))
@@ -69,6 +82,8 @@ public class Utilities
 		else
 			return false;
 	}
+	
+	//--------------------------------------------------------------------------
 	public static boolean checkPoorCount(String poorCount)
 	{
 		if(poorCount.length() != 0)
@@ -89,6 +104,8 @@ public class Utilities
 		else
 			return false;
 	}
+	
+	//------------------------------------------------------------------------
 	public static boolean checkFairCount(String fairCount)
 	{
 		if(fairCount.length() != 0)
@@ -109,6 +126,8 @@ public class Utilities
 		else
 			return false;
 	}
+	
+	//------------------------------------------------------------
 	public static boolean checkGoodCount(String goodCount)
 	{
 		if(goodCount.length() != 0)
@@ -129,6 +148,8 @@ public class Utilities
 		else
 			return false;
 	}
+	
+	//-----------------------------------------------------------
 	public static boolean checkNotes(String note)
 	{
 		if(note.length() < GlobalVariables.NOTE_LENGTH)
@@ -146,6 +167,8 @@ public class Utilities
 		else
 			return false;
 	}
+	
+	//---------------------------------------------------------
 	public static boolean checkIsNumber(String s)
 	{
 		if(s.matches("\\d+"))
@@ -153,6 +176,8 @@ public class Utilities
 		else
 			return false;
 	}
+	
+	//---------------------------------------------------------
 	public static boolean checkCategoryName(String name)
 	{
 		if(name.length() != 0 && name.length() < GlobalVariables.CATEGORYNAME_LENGTH)
@@ -160,6 +185,8 @@ public class Utilities
 		else
 			return false;
 	}
+	
+	//------------------------------------------------------
 	public static boolean checkPenalty(String p)
 	{
 		if(p.length() < GlobalVariables.PENALTY_LENGTH)
@@ -253,7 +280,7 @@ public class Utilities
 	}
 
 	//----------------------------------------------------------
-	protected String mapMonthToString(int month)
+	protected static String mapMonthToString(int month)
 	{
 		if (month == Calendar.JANUARY)
 		{
@@ -319,7 +346,7 @@ public class Utilities
 	}
 
 	//----------------------------------------------------------
-	protected int mapMonthNameToIndex(String monthName)
+	protected static int mapMonthNameToIndex(String monthName)
 	{
 		if (monthName.equals("January") == true)
 		{
@@ -386,7 +413,7 @@ public class Utilities
 	
 	
 	//----------------------------------------------------
-   	protected boolean checkProperLetters(String value)
+   	protected static boolean checkProperLetters(String value)
    	{
    		for (int cnt = 0; cnt < value.length(); cnt++)
    		{
@@ -435,6 +462,43 @@ public class Utilities
    		
    		return true;
    	}
+	
+	// Assume the phone number comes in validated - i.e., it has only digits, (, ) and -
+	//----------------------------------------------------------------
+	public static String formatUSPhoneNumber(String phoneNum)
+	{
+		String retVal = "";
+		String intermediateNum = "";
+		
+		// remove all special characters from phone number string
+		for (int cnt = 0; cnt < phoneNum.length(); cnt++)
+		{
+			char ch = phoneNum.charAt(cnt);
+   			
+   			if ((ch >= '0') && (ch <= '9'))
+   			{
+				intermediateNum += ch;
+   			}
+		}
+		
+		// put the dashes in now
+		for (int cnt = 0; cnt < intermediateNum.length(); cnt++)
+		{
+			char ch = intermediateNum.charAt(cnt);
+			
+			if ((cnt == 2) || (cnt == 5))
+			{
+				retVal += ch + "-";
+			}
+			else
+			{
+				retVal += ch;
+			}
+		}
+		
+		return retVal;
+		
+	}
 
 }
 
