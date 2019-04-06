@@ -108,7 +108,7 @@ public class Receptionist extends Transaction
 			(key.equals("UpdateWorker") == true) || (key.equals("RemoveWorker")) || 
 			(key.equals("AddBorrower") == true) || (key.equals("ModifyBorrower") == true) ||
 			(key.equals("AddCategory") == true) || (key.equals("ModifyCategory") == true) || 
-			(key.equals("RemoveCategory") == true) || (key.equals("RemoveBorrower") == true) || (key.equals("AddEquipment") == true))
+			(key.equals("RemoveCategory") == true) || (key.equals("RemoveBorrower") == true) || (key.equals("AddEquipment") == true) || (key.equals("ReserveEquipment") == true))
 			{
 				String transType = key;
 					

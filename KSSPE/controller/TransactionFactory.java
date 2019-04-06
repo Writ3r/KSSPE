@@ -61,6 +61,10 @@ public class TransactionFactory
 		{
 			retValue = new AddEquipmentTransaction();
 		} 
+		if (transType.equals("ReserveEquipment") == true)
+		{
+			retValue = new ReserveEquipmentTransaction();
+		} 
 		return retValue;
 	}
 }
