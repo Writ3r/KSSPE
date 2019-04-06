@@ -34,7 +34,7 @@ public class Worker extends EntityBase
 			
 		String idToQuery = props.getProperty("BannerId");
 
-		String query = "SELECT * FROM " + myTableName + " WHERE (BannerId = " + idToQuery + " AND Status = 'Active')";
+		String query = "SELECT * FROM " + myTableName + " WHERE (BannerId = " + idToQuery + ")";
 
 		Vector allDataRetrieved =  getSelectQueryResult(query);
 
@@ -55,6 +55,7 @@ public class Worker extends EntityBase
 				Properties retrievedWorkerData = (Properties)allDataRetrieved.elementAt(0);
 				persistentState = new Properties();
 				myPerson = new Person(props);
+				persistentState.setProperty("BannerId", retrievedWorkerData.getProperty("BannerId"));
 				persistentState.setProperty("Credential", retrievedWorkerData.getProperty("Credential"));
 				persistentState.setProperty("Password", retrievedWorkerData.getProperty("Password"));
 				persistentState.setProperty("Status", retrievedWorkerData.getProperty("Status"));

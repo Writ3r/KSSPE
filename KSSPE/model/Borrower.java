@@ -34,7 +34,7 @@ public class Borrower extends EntityBase
 			
 		String idToQuery = props.getProperty("BannerId");
 
-		String query = "SELECT * FROM " + myTableName + " WHERE (BannerId = " + idToQuery + " AND Status = 'Active')";
+		String query = "SELECT * FROM " + myTableName + " WHERE (BannerId = " + idToQuery + ")";
 
 		Vector allDataRetrieved =  getSelectQueryResult(query);
 
@@ -120,7 +120,6 @@ public class Borrower extends EntityBase
 			persistentState.setProperty("DateAdded", props.getProperty("DateAdded"));
 			oldFlag = false;
 		}
-		
 		
 	}
 	
@@ -218,6 +217,7 @@ public class Borrower extends EntityBase
 		
 		return v;
 	}
+	
 	
 	//-------------------------------------------------------------------
 	
