@@ -170,7 +170,7 @@ public class UpdateWorkerTransaction extends Transaction
 	}
 	
 	
-	
+	//------------------------------------------------------------------------------------------------------
 	private void modifyWorkerHelper(Properties props)
 	{
 		myWorker.stateChangeRequest("FirstName", props.getProperty("FirstName"));
@@ -184,6 +184,7 @@ public class UpdateWorkerTransaction extends Transaction
 		errorMessage = (String)myWorker.getState("UpdateStatusMessage");
 	}
 	
+	//------------------------------------------------------------------------------------------------------
 	protected Scene createModifyWorkerView()
 	{
 		Scene currentScene = myViews.get("UpdateWorkerView");
@@ -203,7 +204,7 @@ public class UpdateWorkerTransaction extends Transaction
 
 	}
 	
-	
+	//-----------------------------------------------------------------------------------------------------
 	protected Scene createWorkerCollectionView()
 	{
 		Scene currentScene;
