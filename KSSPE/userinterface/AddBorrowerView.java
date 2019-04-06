@@ -392,6 +392,7 @@ public class AddBorrowerView extends View implements Observer
 		String PhoneNumber = phoneNumber.getText();
 		String Notes = notes.getText();
 		
+		// VALIDATE the data before passing it to controller - code below does that
 		if(Utilities.checkBannerId(BannerID)) 
 		{
 			if(Utilities.checkName(FirstName))
@@ -408,7 +409,7 @@ public class AddBorrowerView extends View implements Observer
 							props.setProperty("FirstName", FirstName);
 							props.setProperty("LastName", LastName);
 							props.setProperty("Email", Email);
-							props.setProperty("PhoneNumber", PhoneNumber);
+							props.setProperty("PhoneNumber", Utilities.formatUSPhoneNumber(PhoneNumber));
 							props.setProperty("Notes", Notes);
 							removeDisables();
 							myController.stateChangeRequest("WorkerData", props);
@@ -456,6 +457,7 @@ public class AddBorrowerView extends View implements Observer
 		return statusLog;
 	}
 
+	//-------------------------------------------------------------
 	public void clearValues()
 	{
 		bannerId.clear();
@@ -466,6 +468,7 @@ public class AddBorrowerView extends View implements Observer
 		notes.clear();
 	}
 	
+	//----------------------------------------------------------------------------------------
 	private void clearValuesExceptBanner()
 	{
 		firstName.clear();
@@ -475,6 +478,7 @@ public class AddBorrowerView extends View implements Observer
 		notes.clear();
 	}
 	
+	//------------------------------------------------------------------------------------------
 	private void removeDisables()
 	{
 		firstName.setDisable(false);
@@ -484,6 +488,7 @@ public class AddBorrowerView extends View implements Observer
 		notes.setDisable(false);
 	}
 	
+	//------------------------------------------------------------------------------------------
 	protected void setDisables()
 	{
 		firstName.setDisable(true);
@@ -493,6 +498,7 @@ public class AddBorrowerView extends View implements Observer
 		notes.setDisable(true);
 	}
 
+	//------------------------------------------------------------------------------------------
 	private void setOutlines()
 	{
 		bannerId.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");

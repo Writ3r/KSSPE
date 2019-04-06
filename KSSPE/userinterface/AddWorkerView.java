@@ -386,6 +386,7 @@ public class AddWorkerView extends View implements Observer
 		return vbox;
 	}
 
+	//-------------------------------------------------------------
 	private void sendToController()
 	{
 		clearErrorMessage();
@@ -398,6 +399,7 @@ public class AddWorkerView extends View implements Observer
 		String Password = password.getText();
 		String Credential;
 		
+		// VALIDATE the data before passing it to controller - code below does that
 		if(Utilities.checkBannerId(BannerID)) 
 		{
 			if(Utilities.checkName(FirstName))
@@ -419,7 +421,7 @@ public class AddWorkerView extends View implements Observer
 									props.setProperty("FirstName", FirstName);
 									props.setProperty("LastName", LastName);
 									props.setProperty("Email", Email);
-									props.setProperty("PhoneNumber", PhoneNumber);
+									props.setProperty("PhoneNumber", Utilities.formatUSPhoneNumber(PhoneNumber));
 									props.setProperty("Credential", Credential);
 									props.setProperty("Password", Password);
 									removeDisables();
@@ -480,6 +482,7 @@ public class AddWorkerView extends View implements Observer
 		return statusLog;
 	}
 
+	//-------------------------------------------------------------
 	public void clearValues()
 	{
 		bannerId.clear();
@@ -490,6 +493,7 @@ public class AddWorkerView extends View implements Observer
 		password.clear();
 	}
 	
+	//-------------------------------------------------------------
 	private void clearValuesExceptBanner()
 	{
 		firstName.clear();
@@ -499,6 +503,7 @@ public class AddWorkerView extends View implements Observer
 		password.clear();
 	}
 	
+	//-------------------------------------------------------------
 	public void removeDisables()
 	{
 		firstName.setDisable(false);
@@ -508,6 +513,7 @@ public class AddWorkerView extends View implements Observer
 		password.setDisable(false);
 	}
 	
+	//-------------------------------------------------------------
 	protected void setDisables()
 	{
 		firstName.setDisable(true);
@@ -517,6 +523,7 @@ public class AddWorkerView extends View implements Observer
 		password.setDisable(true);
 	}
 
+	//-------------------------------------------------------------
 	private void setOutlines()
 	{
 		bannerId.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");

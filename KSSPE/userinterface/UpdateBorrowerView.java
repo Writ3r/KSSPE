@@ -63,6 +63,7 @@ public class UpdateBorrowerView extends AddBorrowerView
 		return "** UPDATE BORROWER **";
 	}
 	
+	//--------------------------------------------------------------
 	public void populateFields()
 	{
 		Text penaltyLabel = new Text(" Penalty ($) : ");
@@ -165,6 +166,7 @@ public class UpdateBorrowerView extends AddBorrowerView
 		
 	}
 
+	//-----------------------------------------------------------------
 	protected void sendToController()
 	{
 		clearErrorMessage();
@@ -178,6 +180,7 @@ public class UpdateBorrowerView extends AddBorrowerView
 		String BlockStatus = blockStatus.getValue().toString();
 		String Penalty = penalty.getText();
 		
+		// VALIDATE the data before sending it to the controller
 		if(Utilities.checkBannerId(BannerID)) 
 		{
 			if(Utilities.checkName(FirstName))
@@ -194,7 +197,7 @@ public class UpdateBorrowerView extends AddBorrowerView
 								props.setProperty("FirstName", FirstName);
 								props.setProperty("LastName", LastName);
 								props.setProperty("Email", Email);
-								props.setProperty("PhoneNumber", PhoneNumber);
+								props.setProperty("PhoneNumber", Utilities.formatUSPhoneNumber(PhoneNumber));
 								props.setProperty("Notes", Notes);
 								props.setProperty("Penalty", Penalty);
 								props.setProperty("BlockStatus", BlockStatus);
@@ -244,11 +247,13 @@ public class UpdateBorrowerView extends AddBorrowerView
 		
 	}
 	
+	//----------------------------------
 	private void clearValuesExceptBanner()
 	{
 		
 	}
 	
+	//----------------------------------
 	protected void setDisables()
 	{
 		

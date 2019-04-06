@@ -47,7 +47,8 @@ import controller.Transaction;
 //==============================================================
 public class UpdateWorkerView extends AddWorkerView
 {
-	protected ComboBox<String> credential;
+	
+	// MITRA 4-4-19: Removed the declaration of ComboBox here - why did you do this?
 
 	// constructor for this class -- takes a model object
 	//----------------------------------------------------------
@@ -107,7 +108,9 @@ public class UpdateWorkerView extends AddWorkerView
 		String credentialText = (String)myController.getState("Credential");
 		if (credentialText != null)
 		{
-			//credential.setSelectedItem((String) credentialText);
+			System.out.println("Credential text = " + credentialText);
+			credential.setValue(credentialText);
+			System.out.println("Credential text set");
 		}
 
 		submitButton.setText("Update"); 
@@ -117,6 +120,7 @@ public class UpdateWorkerView extends AddWorkerView
 		submitButton.setGraphic(icon);
 	}
 
+	//-------------------------------------------------------------------------
 	protected void sendToController()
 	{
 		clearErrorMessage();
@@ -129,6 +133,7 @@ public class UpdateWorkerView extends AddWorkerView
 		String Password = password.getText();
 		String Credential = credential.getValue().toString();
 		
+		//VALIDATE the data before passing it to the controller
 		if(Utilities.checkBannerId(BannerID)) 
 		{
 			if(Utilities.checkName(FirstName))
@@ -143,7 +148,7 @@ public class UpdateWorkerView extends AddWorkerView
 								props.setProperty("FirstName", FirstName);
 								props.setProperty("LastName", LastName);
 								props.setProperty("Email", Email);
-								props.setProperty("PhoneNumber", PhoneNumber);
+								props.setProperty("PhoneNumber", Utilities.formatUSPhoneNumber(PhoneNumber));
 								props.setProperty("Password", Password);
 								props.setProperty("Credential", Credential);
 								myController.stateChangeRequest("WorkerData", props);
@@ -180,6 +185,7 @@ public class UpdateWorkerView extends AddWorkerView
 		
 	}
 
+	//---------------------------------------------------------------------
 	public void clearValues(){
 
 	}
