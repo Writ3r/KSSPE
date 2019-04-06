@@ -160,7 +160,7 @@ public class ReceptionistView extends View implements Observer
 			manageButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
             manageButton.setStyle("-fx-selection-bar:gold");
 			reserveItems.setOnAction((ActionEvent e) -> {
-				myController.stateChangeRequest("ListAvailableInventory", null);
+				myController.stateChangeRequest("ReserveEquipment", null);
 			});
 			returnItems.setOnAction((ActionEvent e) -> {
 				myController.stateChangeRequest("TopDonatorReport", null);
