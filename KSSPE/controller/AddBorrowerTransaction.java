@@ -38,9 +38,27 @@ public class AddBorrowerTransaction extends Transaction
 	{
 		try
 		{
-			Borrower b = new Borrower(props);
+			myBorrower = new Borrower(props);
 			
-			errorMessage = "ERROR: Borrower with id: " + b.getState("BannerId") + " already exists!";	
+			if(myBorrower.getState("Status").equals("Active")) //if a borrower already exists and is active
+			{
+				errorMessage = "ERROR: Borrower with id: " + myBorrower.getState("BannerId") + " already exists!";
+			}
+			else //update the borrower with the default information and set it to active again.
+			{
+				myBorrower.stateChangeRequest("Status", "Active");
+				myBorrower.stateChangeRequest("FirstName", props.getProperty("FirstName"));
+				myBorrower.stateChangeRequest("LastName", props.getProperty("LastName"));
+				myBorrower.stateChangeRequest("Email", props.getProperty("Email"));
+				myBorrower.stateChangeRequest("Penalty", "0");
+				myBorrower.stateChangeRequest("PhoneNumber", props.getProperty("PhoneNumber"));
+				myBorrower.stateChangeRequest("BlockStatus", "Unblocked");
+				myBorrower.stateChangeRequest("Notes", props.getProperty("Notes"));
+				myBorrower.stateChangeRequest("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+				myBorrower.save();
+				
+				errorMessage = "Borrower with id: " + myBorrower.getState("BannerId") + " reinstated Successfully";
+			}				
 		}
 		catch (InvalidPrimaryKeyException ex) 
 		{
@@ -77,7 +95,10 @@ public class AddBorrowerTransaction extends Transaction
 		{
 			if(myBorrower != null)
 			{
-				return true;
+				if(myBorrower.getState("Status").equals("Active"))
+					return true;
+				else
+					return false;
 			}
 			return false;
 		}
@@ -128,8 +149,23 @@ public class AddBorrowerTransaction extends Transaction
 			{
 				myBorrower = new Borrower((Properties)value);
 				
-				errorMessage = "ERROR: Borrower with Bannerid " + ((Properties)value).getProperty("BannerId") + " already exists!";
-		
+				if(myBorrower.getState("Status").equals("Active"))
+				{
+					errorMessage = "ERROR: Borrower with Bannerid " + ((Properties)value).getProperty("BannerId") + " already exists!";
+				}
+				else
+				{
+					try
+					{
+						myPerson = new Person((Properties)value);
+						
+						errorMessage = "Former Borrower with Bannerid " + ((Properties)value).getProperty("BannerId") +  " Found!";
+					}
+					catch(Exception ex2)
+					{
+						//how the hell is this even possible???????????????? 
+					}
+				}
 			}
 			catch(Exception ex)
 			{

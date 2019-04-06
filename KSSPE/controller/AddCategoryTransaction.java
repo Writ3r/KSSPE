@@ -36,9 +36,20 @@ public class AddCategoryTransaction extends Transaction
 	{
 		try
 		{
-			new Category(props);
+			myCategory = new Category(props);	
 			
-			errorMessage = "ERROR: Category already exists!";	
+			if(myCategory.getState("Status").equals("Active")) //if a category already exists and is active
+			{
+				errorMessage = "ERROR: Category already exists!";
+			}
+			else //update the category with the default information and set it to active again.
+			{
+				myCategory.stateChangeRequest("Status", "Active");
+				myCategory.stateChangeRequest("Name", props.getProperty("Name"));
+				myCategory.save();
+				
+				errorMessage = "Category with prefix: " + myCategory.getState("BarcodePrefix") + " reinstated Successfully";
+			}	
 		}
 		catch (InvalidPrimaryKeyException ex) 
 		{
@@ -66,6 +77,18 @@ public class AddCategoryTransaction extends Transaction
 		{
 			return errorMessage;
 		}
+		else if (key.equals("CategoryIsInactive") == true)
+		{
+			if(myCategory != null)
+			{
+				if(myCategory.getState("Status").equals("Inactive"))
+					return myCategory.getState("Name");
+				else
+					return null;
+			}
+			else
+				return null;
+		}
 		else
 			return null;
 	}
@@ -82,6 +105,17 @@ public class AddCategoryTransaction extends Transaction
 		if (key.equals("CategoryData") == true)
 		{
 			processTransaction((Properties)value);
+		}
+		if (key.equals("TestCategory") == true)
+		{
+			try
+			{
+				myCategory = new Category((Properties)value);	
+			}
+			catch (InvalidPrimaryKeyException ex) 
+			{
+				//do nothing, I don't care.
+			}
 		}
 		if (key.equals("CancelTransaction") == true)
 		{

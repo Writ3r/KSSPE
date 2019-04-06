@@ -38,9 +38,25 @@ public class AddWorkerTransaction extends Transaction
 	{
 		try
 		{
-			Worker w = new Worker(props);
+			myWorker = new Worker(props);
 			
-			errorMessage = "ERROR: Worker with id: " + w.getState("BannerId") + " already exists!";	
+			if(myWorker.getState("Status").equals("Active")) //if a worker already exists and is active
+			{
+				errorMessage = "ERROR: Worker with id: " + myWorker.getState("BannerId") + " already exists!";
+			}
+			else //update the borrower with the default information and set it to active again.
+			{
+				myWorker.stateChangeRequest("Status", "Active");
+				myWorker.stateChangeRequest("FirstName", props.getProperty("FirstName"));
+				myWorker.stateChangeRequest("LastName", props.getProperty("LastName"));
+				myWorker.stateChangeRequest("Email", props.getProperty("Email"));
+				myWorker.stateChangeRequest("Credential", props.getProperty("Credential"));
+				myWorker.stateChangeRequest("Password", props.getProperty("Password"));
+				myWorker.stateChangeRequest("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+				myWorker.save();
+				
+				errorMessage = "Worker with id: " + myWorker.getState("BannerId") + " reinstated Successfully";
+			}			
 		}
 		catch (InvalidPrimaryKeyException ex) 
 		{
@@ -75,7 +91,10 @@ public class AddWorkerTransaction extends Transaction
 		{
 			if(myWorker != null)
 			{
-				return true;
+				if(myWorker.getState("Status").equals("Active"))
+					return true;
+				else
+					return false;
 			}
 			return false;
 		}
@@ -126,8 +145,23 @@ public class AddWorkerTransaction extends Transaction
 			{
 				myWorker = new Worker((Properties)value);
 				
-				errorMessage = "ERROR: Worker with Bannerid " + ((Properties)value).getProperty("BannerId") + " already exists!";
-		
+				if(myWorker.getState("Status").equals("Active"))
+				{
+					errorMessage = "ERROR: Worker with Bannerid " + ((Properties)value).getProperty("BannerId") + " already exists!";
+				}
+				else
+				{
+					try
+					{
+						myPerson = new Person((Properties)value);
+						
+						errorMessage = "Former Worker with Bannerid " + ((Properties)value).getProperty("BannerId") +  " Found!";
+					}
+					catch(Exception ex2)
+					{
+						//how the hell is this even possible???????????????? 
+					}
+				}
 			}
 			catch(Exception ex)
 			{
