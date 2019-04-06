@@ -511,6 +511,7 @@ public class AddWorkerView extends View implements Observer
 		email.setDisable(false);
 		phoneNumber.setDisable(false);
 		password.setDisable(false);
+		credential.setDisable(false);
 	}
 	
 	//-------------------------------------------------------------
@@ -521,6 +522,7 @@ public class AddWorkerView extends View implements Observer
 		email.setDisable(true);
 		phoneNumber.setDisable(true);
 		password.setDisable(true);
+		credential.setDisable(true);
 	}
 
 	//-------------------------------------------------------------
