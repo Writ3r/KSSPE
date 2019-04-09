@@ -102,7 +102,7 @@ public class WorkerCollectionView extends View implements Observer
 					(WorkerCollection)myController.getState("WorkerList");
 
 			Vector entryList = (Vector)workerCollection.getState("Workers");
-	
+			// DEBUG System.out.println("Worker list size = " + entryList.size());
 
 			if (entryList.size() > 0)
 			{
@@ -135,6 +135,7 @@ public class WorkerCollectionView extends View implements Observer
 		}
 		catch (Exception e) {//SQLException e) {
 			// Need to handle this exception
+			// DEBUG System.out.println("Exception " + e);
 		}
 
 	}
