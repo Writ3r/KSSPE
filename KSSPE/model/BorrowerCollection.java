@@ -70,21 +70,24 @@ public class BorrowerCollection extends EntityBase
 		populateCollectionHelper(query);
 	}
 	
+	//----------------------------------------------------------
 	public void findByFirstName(String firstname)
 	{
-		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Borrower.Status = 'Active') AND (FirstName LIKE '%" + firstname + "%') AND (Borrower.BannerId = Person.BannerId))";
+		String query = "SELECT * FROM " + myTableName + ", Person WHERE ((Borrower.Status = 'Active') AND (FirstName LIKE '%" + firstname + "%') AND (Borrower.BannerId = Person.BannerId))";
 		populateCollectionHelper(query);
 	}
 	
+	//-------------------------------------------------------------
 	public void findByLastName(String lastname)
 	{
-		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Borrower.Status = 'Active') AND (LastName LIKE '%" + lastname + "%') AND (Borrower.BannerId = Person.BannerId))";
+		String query = "SELECT * FROM " + myTableName + ", Person WHERE ((Borrower.Status = 'Active') AND (LastName LIKE '%" + lastname + "%') AND (Borrower.BannerId = Person.BannerId))";
 		populateCollectionHelper(query);
 	}
 	
+	//-------------------------------------------------------------
 	public void findByFirstAndLast(Properties props)
 	{
-		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Borrower.Status = 'Active') AND (LastName LIKE '%" + props.getProperty("LastName") + "%') AND (FirstName LIKE '%" + props.getProperty("FirstName") + "%') AND (Borrower.BannerId = Person.BannerId))";
+		String query = "SELECT * FROM " + myTableName + ", Person WHERE ((Borrower.Status = 'Active') AND (LastName LIKE '%" + props.getProperty("LastName") + "%') AND (FirstName LIKE '%" + props.getProperty("FirstName") + "%') AND (Borrower.BannerId = Person.BannerId))";
 		populateCollectionHelper(query);
 	}
 
