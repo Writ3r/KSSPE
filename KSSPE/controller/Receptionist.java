@@ -114,7 +114,7 @@ public class Receptionist extends Transaction
 					
 				if (currentWorker != null)
 				{
-					if(key.equals("AddWorker") && !currentWorker.getState("Credential").equals("Admin")){
+					if(key.equals("AddWorker") && !currentWorker.getState("Credential").equals("Admin") || key.equals("ModifyWorker") && !currentWorker.getState("Credential").equals("Admin") || key.equals("RemoveWorker") && !currentWorker.getState("Credential").equals("Admin")){
 						errorMessage = "You must be 'Admin' to do this.";
 					}
 					else
