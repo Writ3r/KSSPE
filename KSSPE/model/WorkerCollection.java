@@ -66,31 +66,35 @@ public class WorkerCollection extends EntityBase
 	//-----------------------------------------------------------
 	public void findByBannerId(String bannerId)
 	{
-		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Worker.Status = 'Active') AND (Worker.BannerId = '" + bannerId + "') AND (Worker.BannerId = Person.BannerId))";
+		String query = "SELECT * FROM " + myTableName + ", Person WHERE ((Worker.Status = 'Active') AND (Worker.BannerId = '" + bannerId + "') AND (Worker.BannerId = Person.BannerId))";
 		populateCollectionHelper(query);
 	}
 
+	//-------------------------------------------------------------
 	public void findByFirstName(String firstname)
 	{
-		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Worker.Status  = 'Active') AND (FirstName LIKE '%" + firstname + "%') AND (Worker.BannerId = Person.BannerId))";
+		String query = "SELECT * FROM " + myTableName + ", Person WHERE ((Worker.Status  = 'Active') AND (FirstName LIKE '%" + firstname + "%') AND (Worker.BannerId = Person.BannerId))";
 		populateCollectionHelper(query);
 	}
 	
+	//-------------------------------------------------------------------
 	public void findByLastName(String lastname)
 	{
-		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Worker.Status  = 'Active') AND (LastName LIKE '%" + lastname + "%') AND (Worker.BannerId = Person.BannerId))";
+		String query = "SELECT * FROM " + myTableName + ", Person WHERE ((Worker.Status  = 'Active') AND (LastName LIKE '%" + lastname + "%') AND (Worker.BannerId = Person.BannerId))";
 		populateCollectionHelper(query);
 	}
 	
+	//---------------------------------------------------------------
 	public void findByFirstAndLast(Properties props)
 	{
-		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Worker.Status  = 'Active') AND (LastName LIKE '%" + props.getProperty("LastName") + "%') AND (FirstName LIKE '%" + props.getProperty("FirstName") + "%') AND (Worker.BannerId = Person.BannerId))";
+		String query = "SELECT * FROM " + myTableName + ", Person WHERE ((Worker.Status  = 'Active') AND (LastName LIKE '%" + props.getProperty("LastName") + "%') AND (FirstName LIKE '%" + props.getProperty("FirstName") + "%') AND (Worker.BannerId = Person.BannerId))";
 		populateCollectionHelper(query);
 	}
 
+	//----------------------------------------------------------------
 	public void findAll()
 	{
-		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Worker.BannerId = Person.BannerId) AND (Worker.Status = 'Active'))";
+		String query = "SELECT * FROM " + myTableName + ", Person WHERE ((Worker.BannerId = Person.BannerId) AND (Worker.Status = 'Active'))";
 		populateCollectionHelper(query);
 	}
 
