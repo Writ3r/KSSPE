@@ -31,11 +31,13 @@ public class UpdateWorkerTransaction extends Transaction
 	private Worker myWorker;
 	private WorkerCollection myWorkerList;
 
+	//--------------------------------------------------------------------------------------
 	public UpdateWorkerTransaction() throws Exception
 	{
 		super();
 	}
 
+	//---------------------------------------------------------------------------------------
 	public void processTransaction(Properties props)
 	{
 		myWorkerList = new WorkerCollection();

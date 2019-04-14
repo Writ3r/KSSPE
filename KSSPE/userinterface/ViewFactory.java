@@ -71,6 +71,10 @@ public class ViewFactory {
 		{
 			return new SearchBorrowerReserveView(t);
 		}
+		else if(viewName.equals("ReserveEquipmentView") == true)
+		{
+			return new ReserveEquipmentView(t);
+		}
 		else
 			return null;
 	}

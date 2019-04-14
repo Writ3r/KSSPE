@@ -55,14 +55,14 @@ public class Worker extends EntityBase
 				Properties retrievedWorkerData = (Properties)allDataRetrieved.elementAt(0);
 				persistentState = new Properties();
 				myPerson = new Person(props);
-				persistentState.setProperty("BannerId", retrievedWorkerData.getProperty("BannerId"));
+				persistentState.setProperty("BannerId", idToQuery); // MITRA 4-4-19: We forgot to do this!!!
 				persistentState.setProperty("Credential", retrievedWorkerData.getProperty("Credential"));
 				persistentState.setProperty("Password", retrievedWorkerData.getProperty("Password"));
 				persistentState.setProperty("Status", retrievedWorkerData.getProperty("Status"));
 				persistentState.setProperty("DateAdded", retrievedWorkerData.getProperty("DateAdded"));
 				persistentState.setProperty("DateLastUpdated", retrievedWorkerData.getProperty("DateLastUpdated"));
 				
-				updateStatusMessage = "Worker created sucessfully!";
+				updateStatusMessage = "Worker created successfully!";
 			}
 		}
 		// If no Worker found for this banner Id, throw an exception
@@ -123,23 +123,34 @@ public class Worker extends EntityBase
 	//----------------------------------------------------------------
 	 public Object getState(String key)
     {
-        String value = persistentState.getProperty(key);
         
+        if (key.equals("IsOld") == true)
+		{
+			if (oldFlag == true)
+				return "true";
+			else
+				return "false";
+		}
+		else
 		if (key.equals("UpdateStatusMessage") == true)
 		{
 			return updateStatusMessage;
 		}
-        else if (value != null)
-		{
-            return value;
+        else {
+		
+			String value = persistentState.getProperty(key);
+			if (value != null)
+			{
+				return value;
+			}
+			else
+			{
+				if (myPerson != null)
+					return myPerson.getState(key);
+				else
+					return null;
+			}
 		}
-        else
-        {
-            if (myPerson != null)
-                return myPerson.getState(key);
-            else
-                return null;
-        }
     }
 	
 	//------------------------------------------------------------------
@@ -193,6 +204,7 @@ public class Worker extends EntityBase
 		}
 	}
 
+	//---------------------------------------------------------------------------------------
 	public Vector<String> getEntryListView()
 	{
 		Vector<String> v = new Vector<String>();
@@ -204,6 +216,7 @@ public class Worker extends EntityBase
 		return v;
 	}
 	
+	//----------------------------------------------------------------------------------------
 	public static int compare(Worker a, Worker b)
 	{
 		String aVal = (String)a.getState("BannerId");
@@ -231,6 +244,7 @@ public class Worker extends EntityBase
 		}
 	}
 	
+	//----------------------------------------------------------------------------------------------------------------
 	public void stateChangeRequest(String key, Object value)
 	{
 		if(key.equals("BannerId") || key.equals("Password") || key.equals("Credential") || key.equals("Status") || key.equals("DateAdded") || key.equals("DateLastUpdated"))

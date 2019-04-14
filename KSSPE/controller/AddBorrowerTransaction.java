@@ -18,6 +18,7 @@ import exception.MultiplePrimaryKeysException;
 import userinterface.View;
 import userinterface.ViewFactory;
 import model.Borrower;
+import model.Worker;
 import model.Person;
 
 /** The class containing the AddBorrowerTransaction for the KSSPE application */
@@ -27,7 +28,6 @@ public class AddBorrowerTransaction extends Transaction
 	private String errorMessage = "";
 	private Receptionist myReceptionist;
 	private Borrower myBorrower;
-	private Person myPerson; 
 
 	public AddBorrowerTransaction() throws Exception
 	{
@@ -36,33 +36,30 @@ public class AddBorrowerTransaction extends Transaction
 
 	public void processTransaction(Properties props)
 	{
-		try
+		if (myBorrower != null)
 		{
-			myBorrower = new Borrower(props);
 			
-			if(myBorrower.getState("Status").equals("Active")) //if a borrower already exists and is active
+			myBorrower.stateChangeRequest("Status", "Active");
+			myBorrower.stateChangeRequest("FirstName", props.getProperty("FirstName"));
+			myBorrower.stateChangeRequest("LastName", props.getProperty("LastName"));
+			myBorrower.stateChangeRequest("Email", props.getProperty("Email"));
+			myBorrower.stateChangeRequest("Penalty", "0");
+			myBorrower.stateChangeRequest("BlockStatus", "Unblocked");
+			myBorrower.stateChangeRequest("PhoneNumber", props.getProperty("PhoneNumber"));
+			myBorrower.stateChangeRequest("Notes", props.getProperty("Notes"));
+			myBorrower.stateChangeRequest("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+			myBorrower.save();
+			
+			errorMessage = (String)myBorrower.getState("UpdateStatusMessage");
+			
+			if (errorMessage.startsWith("ERR") == false)
 			{
-				errorMessage = "ERROR: Borrower with id: " + myBorrower.getState("BannerId") + " already exists!";
+				errorMessage = "Borrower with id: " + myBorrower.getState("BannerId") + " saved/reinstated successfully";
 			}
-			else //update the borrower with the default information and set it to active again.
-			{
-				myBorrower.stateChangeRequest("Status", "Active");
-				myBorrower.stateChangeRequest("FirstName", props.getProperty("FirstName"));
-				myBorrower.stateChangeRequest("LastName", props.getProperty("LastName"));
-				myBorrower.stateChangeRequest("Email", props.getProperty("Email"));
-				myBorrower.stateChangeRequest("Penalty", "0");
-				myBorrower.stateChangeRequest("PhoneNumber", props.getProperty("PhoneNumber"));
-				myBorrower.stateChangeRequest("BlockStatus", "Unblocked");
-				myBorrower.stateChangeRequest("Notes", props.getProperty("Notes"));
-				myBorrower.stateChangeRequest("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-				myBorrower.save();
-				
-				errorMessage = "Borrower with id: " + myBorrower.getState("BannerId") + " reinstated Successfully";
-			}				
-		}
-		catch (InvalidPrimaryKeyException ex) 
-		{
 			
+		}
+		else
+		{
 			try
 			{
 				props.setProperty("Status", "Active");
@@ -74,13 +71,16 @@ public class AddBorrowerTransaction extends Transaction
 				myBorrower = new Borrower(props, true);
 				myBorrower.save();
 				
-				errorMessage = "Borrower with id: " + myBorrower.getState("BannerId") + " added Successfully";
+				errorMessage = (String)myBorrower.getState("UpdateStatusMessage");
+				if (errorMessage.startsWith("ERR") == false)
+				{
+					errorMessage = "Borrower with id: " + myBorrower.getState("BannerId") + " added successfully";
+				}
 			}
 			catch (InvalidPrimaryKeyException ex2) 
 			{
 				errorMessage = ex2.getMessage();
-			}
-			
+			}	
 		}
 	}
 	
@@ -95,39 +95,18 @@ public class AddBorrowerTransaction extends Transaction
 		{
 			if(myBorrower != null)
 			{
-				if(myBorrower.getState("Status").equals("Active"))
-					return true;
-				else
-					return false;
+				return true;
 			}
 			return false;
 		}
-		else if (key.equals("FirstName") == true)
-		{
-			if(myPerson != null)
-				return myPerson.getState("FirstName");
-			return null;
-		}
-		else if (key.equals("LastName") == true)
-		{
-			if(myPerson != null)
-				return myPerson.getState("LastName");
-			return null;
-		}
-		else if (key.equals("Email") == true)
-		{
-			if(myPerson != null)
-				return myPerson.getState("Email");
-			return null;
-		}
-		else if (key.equals("PhoneNumber") == true)
-		{
-			if(myPerson != null)
-				return myPerson.getState("PhoneNumber");
-			return null;
-		}
 		else
-			return null;
+		{
+			String val = (String)myBorrower.getState(key);
+			if (val != null)
+				return val;
+			else
+				return null;
+		}
 	}
 
 	public void stateChangeRequest(String key, Object value)
@@ -139,11 +118,11 @@ public class AddBorrowerTransaction extends Transaction
 			myReceptionist = (Receptionist)value;
 			doYourJob();
 		}
-		if (key.equals("WorkerData") == true)
+		if (key.equals("BorrowerData") == true)
 		{
 			processTransaction((Properties)value);
 		}
-		if(key.equals("getPersonData") == true)
+		if(key.equals("processBannerId") == true)
 		{
 			try
 			{
@@ -151,39 +130,42 @@ public class AddBorrowerTransaction extends Transaction
 				
 				if(myBorrower.getState("Status").equals("Active"))
 				{
-					errorMessage = "ERROR: Borrower with Bannerid " + ((Properties)value).getProperty("BannerId") + " already exists!";
+					errorMessage = "ERROR: Borrower with id " + ((Properties)value).getProperty("BannerId") + " already exists!";
 				}
 				else
 				{
-					try
-					{
-						myPerson = new Person((Properties)value);
-						
-						errorMessage = "Former Borrower with Bannerid " + ((Properties)value).getProperty("BannerId") +  " Found!";
-					}
-					catch(Exception ex2)
-					{
-						//how the hell is this even possible???????????????? 
-					}
+					errorMessage = "Former Borrower with id " + ((Properties)value).getProperty("BannerId") +  " found!";
 				}
 			}
 			catch(Exception ex)
 			{
 				try
 				{
-					myPerson = new Person((Properties)value);
+					Worker w = new Worker((Properties)value);
 					
-					errorMessage = "Person with Bannerid " + ((Properties)value).getProperty("BannerId") +  " Found!";
+					Properties bProp = new Properties();
+					bProp.setProperty("BannerId", (String)w.getState("BannerId"));
+					bProp.setProperty("Status", "Active");
+					bProp.setProperty("DateAdded", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+					bProp.setProperty("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+					bProp.setProperty("Penalty", "0");
+					bProp.setProperty("BlockStatus", "Unblocked");
+					bProp.setProperty("PhoneNumber", "");
+					bProp.setProperty("Notes", "");
+					myBorrower = new Borrower(bProp, true);
+					
+					errorMessage = "Person with id " + ((Properties)value).getProperty("BannerId") + " found!";
+					
 				}
-				catch(Exception ex2)
+				catch (Exception excep)
 				{
-					//do nothing. Idc if nobody was found. 
+					//do nothing here. If here, nothing exists to fill. 
 				}
+				
 			}
 		}
-		if(key.equals("removePersonData") == true)
+		if(key.equals("clearState") == true)
 		{
-			myPerson = null;
 			myBorrower = null;
 		}
 		if (key.equals("CancelTransaction") == true)

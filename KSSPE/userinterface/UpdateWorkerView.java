@@ -108,9 +108,9 @@ public class UpdateWorkerView extends AddWorkerView
 		String credentialText = (String)myController.getState("Credential");
 		if (credentialText != null)
 		{
-			System.out.println("Credential text = " + credentialText);
+			// DEBUG System.out.println("Credential text = " + credentialText);
 			credential.setValue(credentialText);
-			System.out.println("Credential text set");
+			// DEBUG System.out.println("Credential text set");
 		}
 
 		submitButton.setText("Update"); 
@@ -185,9 +185,31 @@ public class UpdateWorkerView extends AddWorkerView
 		
 	}
 
+	
 	//---------------------------------------------------------------------
 	public void clearValues(){
 
+	}
+	
+	/**
+	 * Update method
+	 */
+	//---------------------------------------------------------
+	
+	public void update(Observable o, Object value)
+	{
+		clearErrorMessage();
+		
+		String val = (String)value;
+		if (val.startsWith("ERR") == true)
+		{
+			displayErrorMessage(val);
+		}
+		else
+		{
+			displayMessage(val);
+		}
+		
 	}
 }
 

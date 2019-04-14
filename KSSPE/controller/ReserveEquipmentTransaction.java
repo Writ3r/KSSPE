@@ -27,6 +27,7 @@ public class ReserveEquipmentTransaction extends Transaction
 	private String errorMessage = "";
 	private Receptionist myReceptionist;
 	private Borrower myBorrower;
+	private String myWorkerId;
 	private BorrowerCollection myBorrowerList;
 
 	//----------------------------------------------------------------
@@ -62,6 +63,11 @@ public class ReserveEquipmentTransaction extends Transaction
 				myBorrowerList.findByLastName(name);
 			}
 		}
+		else if (props.getProperty("PhoneNumber") != null)
+		{
+			String phone = props.getProperty("PhoneNumber");
+			myBorrowerList.findByPhone(phone);
+		}
 		else
 		{
 			myBorrowerList.findAll();
@@ -90,25 +96,13 @@ public class ReserveEquipmentTransaction extends Transaction
 		{
 			return myBorrowerList;
 		}
-		else if (key.equals("BannerId") == true)
+		else if (key.equals("BorrowerBannerId") == true)
 		{
 			return myBorrower.getState("BannerId");
 		}
-		else if (key.equals("FirstName") == true)
+		else if (key.equals("WorkerBannerId") == true)
 		{
-			return myBorrower.getState("FirstName");
-		}
-		else if (key.equals("LastName") == true)
-		{
-			return myBorrower.getState("LastName");
-		}
-		else if (key.equals("Email") == true)
-		{
-			return myBorrower.getState("Email");
-		}
-		else if (key.equals("PhoneNumber") == true)
-		{
-			return myBorrower.getState("PhoneNumber");
+			return myWorkerId;
 		}
 		else if (key.equals("Penalty") == true)
 		{
@@ -134,6 +128,7 @@ public class ReserveEquipmentTransaction extends Transaction
 		if (key.equals("DoYourJob") == true)
 		{
 			myReceptionist = (Receptionist)value;
+			myWorkerId = (String)myReceptionist.getState("BannerId");
 			doYourJob();
 		}
 		if (key.equals("SearchBorrower") == true)
@@ -146,7 +141,7 @@ public class ReserveEquipmentTransaction extends Transaction
 			
 			try
 			{
-				Scene newScene = createModifyBorrowerView();
+				Scene newScene = createReserveEquipmentView();
 				swapToView(newScene);
 			}
 			catch (Exception ex)
@@ -190,15 +185,15 @@ public class ReserveEquipmentTransaction extends Transaction
 	}
 	
 	//-----------------------------------------------------------------------
-	protected Scene createModifyBorrowerView()
+	protected Scene createReserveEquipmentView()
 	{
-		Scene currentScene = myViews.get("UpdateBorrowerView");
+		Scene currentScene = myViews.get("ReserveEquipmentView");
 
 		if (currentScene == null)
 		{
-			View newView = ViewFactory.createView("UpdateBorrowerView", this);
+			View newView = ViewFactory.createView("ReserveEquipmentView", this);
 			currentScene = new Scene(newView);
-			myViews.put("UpdateBorrowerView", currentScene);
+			myViews.put("ReserveEquipmentView", currentScene);
 
 			return currentScene;
 		}

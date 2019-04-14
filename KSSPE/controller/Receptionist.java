@@ -148,17 +148,26 @@ public class Receptionist extends Transaction
 		try
 		{
 			currentWorker = new Worker(props);
-			try
+			
+			if (((String)currentWorker.getState("Status")).equals("Active"))
 			{
-				currentWorker.checkPasswordMatch(props.getProperty("Password"));
-				return true;
+				try
+				{
+					currentWorker.checkPasswordMatch(props.getProperty("Password"));
+					return true;
+				}
+				catch (PasswordMismatchException px)
+				{
+					errorMessage = px.getMessage();
+					
+					return false;
+				} 
 			}
-			catch (PasswordMismatchException px)
+			else
 			{
-				errorMessage = px.getMessage();
-				
+				errorMessage = "ERROR: No valid worker found for id: " + props.getProperty("BannerId");
 				return false;
-			} 
+			}
 			
 		}
 		catch (InvalidPrimaryKeyException ex)

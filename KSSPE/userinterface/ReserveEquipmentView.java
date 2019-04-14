@@ -22,7 +22,10 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.collections.FXCollections;
-import javafx.scene.layout.ColumnConstraints;
+import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.Scene;
 
 import java.util.Properties;
 import java.util.Observer;
@@ -41,35 +44,33 @@ import javafx.util.StringConverter;
 
 import controller.Transaction;
 
-/** The class containing the Search Borrower View for the KSSPE
+/** The class containing the Add Borrower View for the KSSPE
  *  application 
  */
 //==============================================================
-public class SearchBorrowerReserveView extends View implements Observer
+public class ReserveEquipmentView extends View implements Observer
 {
 
 	// GUI components
-	protected TextField bannerId;
-	protected TextField firstName;
-	protected TextField lastName;
-	protected TextField phone;
+	protected TextField barcode;
+	protected TextField count;
+	protected TextField dueDate;
+	
+	protected GridPane grid;
+	protected Font myFont;
 
 	protected Text actionText;
 	protected Text prompt;
-
-	protected HBox bannerBox;
+	
 	protected HBox doneCont;
 	protected Button submitButton;
 	protected Button cancelButton;
-	
-	protected GridPane grid2;
-	protected Font myFont;
 
 	protected MessageView statusLog;
 
-	// Constructor for this class -- takes a controller object
+	// constructor for this class -- takes a controller object
 	//----------------------------------------------------------
-	public SearchBorrowerReserveView(Transaction t)
+	public ReserveEquipmentView(Transaction t)
 	{
 		super(t);
 
@@ -84,21 +85,29 @@ public class SearchBorrowerReserveView extends View implements Observer
 		container.getChildren().add(createStatusLog("             "));
 
 		getChildren().add(container);
-
-		myController.addObserver(this);
 		
 		populateFields();
+		
+		checkForPenaltiesAndBlocks(); //checks if the user has penalties/blocks. Puts up an alert if so. 
+
+		myController.addObserver(this);
 	}
 
 	//-------------------------------------------------------------
 	protected String getActionText()
 	{
-		return "** SEARCH FOR A BORROWER **";
+		return "** RESERVE EQUIPMENT **";
 	}
-
+	
 	public void populateFields()
 	{
-		//not needed here
+		
+	}
+
+	protected void processBarcode(String barcode)
+	{
+		
+		
 	}
 
 	// Create the title container
@@ -122,7 +131,7 @@ public class SearchBorrowerReserveView extends View implements Observer
 		container.getChildren().add(titleText);
 
 		Text blankText = new Text("  ");
-			blankText.setFont(Font.font("Arial", FontWeight.BOLD, 10));
+			blankText.setFont(Font.font("Arial", FontWeight.BOLD, 15));
 			blankText.setWrappingWidth(350);
 			blankText.setTextAlignment(TextAlignment.CENTER);
 			blankText.setFill(Color.WHITE);
@@ -147,114 +156,73 @@ public class SearchBorrowerReserveView extends View implements Observer
 		VBox vbox = new VBox(10);
 		vbox.setAlignment(Pos.CENTER);
 		
-		Font bannerFont = Font.font("copperplate", FontWeight.THIN, 18);  
-		myFont = Font.font("copperplate", FontWeight.THIN, 18);  
+		myFont = Font.font("Copperplate", FontWeight.THIN, 17);
+		Font bannerFont = Font.font("copperplate", FontWeight.BOLD, 17);   
 
 		Text blankText = new Text("  ");
-			blankText.setFont(Font.font("Arial", FontWeight.BOLD, 1));
+			blankText.setFont(Font.font("Arial", FontWeight.BOLD, 17));
 			blankText.setWrappingWidth(350);
 			blankText.setTextAlignment(TextAlignment.CENTER);
 			blankText.setFill(Color.WHITE);
 		vbox.getChildren().add(blankText);
-
 		
-		GridPane grid = new GridPane();
+		
+		
+		grid = new GridPane();
 			grid.setHgap(15);
 			grid.setVgap(15);
-			grid.setPadding(new Insets(0, 20, 15, 20));
+			grid.setPadding(new Insets(0, 20, 20, 15));
 			grid.setAlignment(Pos.CENTER);
-			
-
-		Text bannerIdHeader = new Text("Banner ID :");
-			bannerIdHeader.setUnderline(true);
-			bannerIdHeader.setFill(Color.GOLD);
-			bannerIdHeader.setFont(bannerFont);
-			bannerIdHeader.setTextAlignment(TextAlignment.RIGHT);
-		grid.add(bannerIdHeader, 0, 1);
-			
-			
-		bannerId = new TextField();
-			bannerId.setMinWidth(150);
-			bannerId.addEventFilter(KeyEvent.KEY_RELEASED, event->{
+		
+		Text barcodeLabel = new Text("Barcode :");
+			barcodeLabel.setFill(Color.GOLD);
+			barcodeLabel.setFont(bannerFont);
+			barcodeLabel.setUnderline(true);
+			barcodeLabel.setTextAlignment(TextAlignment.RIGHT);
+		grid.add(barcodeLabel, 0, 1);
+		
+		barcode = new TextField();
+			barcode.setMinWidth(110);
+			barcode.addEventFilter(KeyEvent.KEY_RELEASED, event->{
+				clearErrorMessage();
+				if(Utilities.checkBarcode(barcode.getText()))
+				{
+					processBarcode(barcode.getText());
+				}
+			});
+		grid.add(barcode, 1, 1);
+		
+		Text countLabel = new Text("Units Taken:");
+			countLabel.setFill(Color.GOLD);
+			countLabel.setFont(myFont);
+			countLabel.setTextAlignment(TextAlignment.RIGHT);
+		grid.add(countLabel, 0, 2);
+		
+		count = new TextField();
+			count.setMinWidth(110);
+			count.setMinWidth(110);
+			count.addEventFilter(KeyEvent.KEY_RELEASED, event->{
 				clearErrorMessage();
 			});
-		grid.add(bannerId, 1, 1);
+		grid.add(count, 1, 2);
 		
+		Text dueLabel = new Text("Due Date :");
+			dueLabel.setFill(Color.GOLD);
+			dueLabel.setFont(myFont);
+			dueLabel.setTextAlignment(TextAlignment.RIGHT);
+		grid.add(dueLabel, 0, 3);
 		
-		HBox orCont = new HBox(10);
-			orCont.setAlignment(Pos.CENTER);
-			
-		Text orHeader = new Text("---------- OR SEARCH BY ----------");
-			orHeader.setFill(Color.GOLD);
-			orHeader.setFont(myFont);
-			orHeader.setTextAlignment(TextAlignment.RIGHT);
-		orCont.getChildren().add(orHeader);
-		
-		
-		grid2 = new GridPane();
-			grid2.setHgap(15);
-			grid2.setVgap(15);
-			grid2.setPadding(new Insets(5, 20, 13, 20));
-			grid2.setAlignment(Pos.CENTER);
-		
-		
-		Text firstNameHeader = new Text("First Name :"); 
-			firstNameHeader.setFill(Color.GOLD);
-			firstNameHeader.setFont(myFont);
-			firstNameHeader.setTextAlignment(TextAlignment.RIGHT);
-		grid2.add(firstNameHeader, 0, 1);
-		
-		firstName = new TextField();
-			firstName.setMinWidth(150);
-			firstName.addEventFilter(KeyEvent.KEY_RELEASED, event->{
+		dueDate = new TextField();
+			dueDate.setMinWidth(110);
+			dueDate.setMinWidth(110);
+			dueDate.addEventFilter(KeyEvent.KEY_RELEASED, event->{
 				clearErrorMessage();
 			});
-		grid2.add(firstName, 1, 1);
-
-		Text lastNameHeader = new Text("Last Name :"); 
-			lastNameHeader.setFill(Color.GOLD);
-			lastNameHeader.setFont(myFont);
-			lastNameHeader.setTextAlignment(TextAlignment.RIGHT);
-		grid2.add(lastNameHeader, 0, 2);
-		
-		lastName = new TextField();
-			lastName.setMinWidth(150);
-			lastName.addEventFilter(KeyEvent.KEY_RELEASED, event->{
-				clearErrorMessage();
-			});
-		grid2.add(lastName, 1, 2);
+		grid.add(dueDate, 1, 3);
 		
 		
-		HBox orCont2 = new HBox(10);
-			orCont2.setAlignment(Pos.CENTER);
-			
-		Text orHeader2 = new Text("---------- OR SEARCH BY ----------");
-			orHeader2.setFill(Color.GOLD);
-			orHeader2.setFont(myFont);
-			orHeader2.setTextAlignment(TextAlignment.RIGHT);
-		orCont2.getChildren().add(orHeader2);
+		//---------------------------------- middle grid done.
 		
-		GridPane grid3 = new GridPane();
-			grid3.setHgap(15);
-			grid3.setVgap(15);
-			grid3.setPadding(new Insets(0, 20, 25, 20));
-			grid3.setAlignment(Pos.CENTER);
-		
-		Text phoneLabel = new Text("Phone :");
-			phoneLabel.setFill(Color.GOLD);
-			phoneLabel.setFont(myFont);
-			phoneLabel.setTextAlignment(TextAlignment.RIGHT);
-		grid3.add(phoneLabel, 0, 1);
-
-		phone = new TextField();
-			phone.setMinWidth(150);
-			phone.addEventFilter(KeyEvent.KEY_RELEASED, event->{
-				clearErrorMessage();
-			});
-		grid3.add(phone, 1, 1);
-		
-		//---------------------------------------------------------------------------------
-
 		
 		doneCont = new HBox(10);
 		doneCont.setAlignment(Pos.CENTER);
@@ -265,11 +233,11 @@ public class SearchBorrowerReserveView extends View implements Observer
             doneCont.setStyle("-fx-background-color: SLATEGREY");
 		});
 		
-		ImageView icon = new ImageView(new Image("/images/searchcolor.png"));
+		ImageView icon = new ImageView(new Image("/images/buyingcolor.png"));
 			icon.setFitHeight(15);
 			icon.setFitWidth(15);
 			
-		submitButton = new Button("Search", icon);
+		submitButton = new Button("Reserve", icon);
 			submitButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
 			submitButton.setOnAction((ActionEvent e) -> {
 				sendToController();
@@ -301,108 +269,36 @@ public class SearchBorrowerReserveView extends View implements Observer
 		doneCont.getChildren().add(cancelButton);
 		
 		vbox.getChildren().add(grid);
-		vbox.getChildren().add(orCont);
-		vbox.getChildren().add(grid2);
-		vbox.getChildren().add(orCont2);
-		vbox.getChildren().add(grid3);
 		vbox.getChildren().add(doneCont);
 	
 		setOutlines();
-               
+		
 		return vbox;
 	}
 
+	//---------------------------------------------------------------------------------------------------
 	protected void sendToController()
 	{
-		clearErrorMessage();
 		
-		String BannerId = bannerId.getText();
-		String FirstName = firstName.getText();
-		String LastName = lastName.getText();
-		String Phone = phone.getText();
-		Properties props = new Properties();
 		
-		if(!BannerId.equals("")) //if search by banner Id
+	}
+	
+	
+	private void checkForPenaltiesAndBlocks()
+	{
+		String penalty = (String)myController.getState("Penalty");
+		String block = (String)myController.getState("BlockStatus");
+		
+		if((!penalty.equals("") && penalty != null && !penalty.equals("0")) || (!block.equals("") && block != null && !block.equals("Unblocked")))
 		{
-			if(Utilities.checkBannerId(BannerId))
-			{
-				props.setProperty("BannerId", BannerId);
-				myController.stateChangeRequest("SearchBorrower", props);			
-			}
-			else
-			{
-				displayErrorMessage("Banner Id: " + bannerId.getText() + " not valid.");
-				bannerId.requestFocus();
-			}
-			
-		}
-		else if(!FirstName.equals("") || !LastName.equals("")) //if search by first or last name
-		{
-			if(!FirstName.equals("") && !LastName.equals(""))
-			{
-				if(Utilities.checkName(FirstName))
-				{
-					if(Utilities.checkName(LastName))
-					{
-						props.setProperty("FirstName", FirstName);
-						props.setProperty("LastName", LastName);
-						myController.stateChangeRequest("SearchBorrower", props);
-					}
-					else
-					{
-						displayErrorMessage("Please enter a valid last name.");
-						lastName.requestFocus();
-					}					
-				}
-				else
-				{
-					displayErrorMessage("Please enter a valid first name.");
-					firstName.requestFocus();
-				}
-			}
-			else if(!FirstName.equals(""))
-			{
-				if(Utilities.checkName(FirstName))
-				{
-					props.setProperty("FirstName", FirstName);
-					myController.stateChangeRequest("SearchBorrower", props);
-				}
-				else
-				{
-					displayErrorMessage("Please enter a valid first name.");
-					firstName.requestFocus();
-				}
-			}
-			else
-			{
-				if(Utilities.checkName(LastName))
-				{
-					props.setProperty("LastName", LastName);
-					myController.stateChangeRequest("SearchBorrower", props);
-				}
-				else
-				{
-					displayErrorMessage("Please enter a valid last name.");
-					lastName.requestFocus();
-				}	
-			}
-		}
-		else if(!Phone.equals("")) //search by phone
-		{
-			if(Utilities.checkPhone(Phone))
-			{
-				props.setProperty("PhoneNumber", Phone);
-				myController.stateChangeRequest("SearchBorrower", props);
-			}
-			else
-			{
-				displayErrorMessage("Please enter a valid phone number.");
-				phone.requestFocus();
-			}		
-		}
-		else //search for all
-		{
-			myController.stateChangeRequest("SearchBorrower", props);
+			Alert alert = new Alert(Alert.AlertType.ERROR,"BannerId: "+(String)myController.getState("BorrowerBannerId")
+					+"\nBlocked Status: "+ block
+					+"\nPenalty: " + penalty, ButtonType.OK);
+					
+			alert.setTitle("Penalized or Blocked Borrower");
+			alert.setHeaderText("Borrower has been Blocked or Penalized.");
+			((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(new Image("images/BPT_LOGO_All-In-One_Color.png"));
+			alert.showAndWait();
 		}
 	}
 	
@@ -414,20 +310,27 @@ public class SearchBorrowerReserveView extends View implements Observer
 		return statusLog;
 	}
 
+	//-------------------------------------------------------------
 	public void clearValues()
 	{
-		bannerId.clear();
-		firstName.clear();
-		lastName.clear();
-		phone.clear();
+		barcode.clear();
+		count.clear();
+		dueDate.clear();
+		
+	}
+	
+	public void clearValuesExceptDue()
+	{
+		barcode.clear();
+		count.clear();
 	}
 
-	protected void setOutlines()
+	//------------------------------------------------------------------------------------------
+	private void setOutlines()
 	{
-		bannerId.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
-		firstName.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
-		lastName.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
-		phone.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
+		barcode.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
+		count.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
+		dueDate.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
 	}
 
 	/**
@@ -446,7 +349,7 @@ public class SearchBorrowerReserveView extends View implements Observer
 		}
 		else
 		{
-			clearValues();
+			clearValuesExceptDue();
 			displayMessage(val);
 		}
 		

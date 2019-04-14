@@ -110,46 +110,11 @@ public class AddBorrowerView extends View implements Observer
 		Properties props = new Properties();
 		props.setProperty("BannerId", BannerId);
 		
-		myController.stateChangeRequest("removePersonData", props); //cleans out the past person.
+		myController.stateChangeRequest("clearState", props); //clears state of controller
 		
-		myController.stateChangeRequest("getPersonData", props);
+		myController.stateChangeRequest("processBannerId", props);
 		
-		if((Boolean)myController.getState("TestBorrower"))
-		{
-			clearValues();
-			setDisables();
-		}
-		else //if the borrower doesn't exist, continue on testing if it can autofill or not. 
-		{
-			removeDisables();
-			
-			String firstNameState = (String)myController.getState("FirstName"); 
-			String lastNameState = (String)myController.getState("LastName");
-			String emailState = (String)myController.getState("Email");
-			String phoneState = (String)myController.getState("PhoneNumber");
-			
-			if(firstNameState != null) //checks if the person exists or not. 
-			{
-				firstName.setText(firstNameState);
-				lastName.setText(lastNameState);
-				email.setText(emailState);
-				phoneNumber.setText(phoneState);
-				
-				firstName.setDisable(true);
-				lastName.setDisable(true);
-				email.setDisable(true);
-				phoneNumber.setDisable(true);
-				
-				notes.requestFocus();
-			}
-			else
-			{
-				firstName.requestFocus();
-			}
-			
-			bannerId.setText(BannerId);
-
-		}
+		checkForFormerBorrowerOrPerson(BannerId);
 		
 	}
 
@@ -229,7 +194,6 @@ public class AddBorrowerView extends View implements Observer
 				
 				if(Utilities.checkBannerId(bannerId.getText()))
 				{
-					removeDisables();
 					processBannerId(bannerId.getText());
 				}
 				else
@@ -412,7 +376,7 @@ public class AddBorrowerView extends View implements Observer
 							props.setProperty("PhoneNumber", Utilities.formatUSPhoneNumber(PhoneNumber));
 							props.setProperty("Notes", Notes);
 							removeDisables();
-							myController.stateChangeRequest("WorkerData", props);
+							myController.stateChangeRequest("BorrowerData", props);
 							setDisables();
 										
 						}
@@ -446,6 +410,66 @@ public class AddBorrowerView extends View implements Observer
 			bannerId.requestFocus();
 		}
 		
+	}
+	
+	
+	private void checkForFormerBorrowerOrPerson(String BannerId)
+	{
+		if((Boolean)myController.getState("TestBorrower"))
+		{
+			if(((String)myController.getState("Status")).equals("Inactive"))
+			{
+				removeDisables();
+				
+				String firstNameState = (String)myController.getState("FirstName"); 
+				String lastNameState = (String)myController.getState("LastName");
+				String emailState = (String)myController.getState("Email");
+				String phoneState = (String)myController.getState("PhoneNumber");
+				String notesState = (String)myController.getState("Notes");
+				
+				bannerId.setText(BannerId);
+				firstName.setText(firstNameState);
+				lastName.setText(lastNameState);
+				email.setText(emailState);
+				phoneNumber.setText(phoneState);
+				notes.setText(notesState);
+				
+				notes.requestFocus();
+			}
+			else if(((String)myController.getState("IsOld")).equals("false")) //if there is a person
+			{
+				removeDisables();
+				
+				String firstNameState = (String)myController.getState("FirstName"); 
+				String lastNameState = (String)myController.getState("LastName");
+				String emailState = (String)myController.getState("Email");
+				String phoneState = (String)myController.getState("PhoneNumber");
+				
+				bannerId.setText(BannerId);
+				firstName.setText(firstNameState);
+				lastName.setText(lastNameState);
+				email.setText(emailState);
+				phoneNumber.setText(phoneState);
+				
+				firstName.setDisable(true);
+				lastName.setDisable(true);
+				email.setDisable(true);
+				phoneNumber.setDisable(true);
+				
+				notes.requestFocus();
+			}
+			else //worker exists and is active
+			{
+				clearValues();
+				setDisables();
+			}
+		}
+		else
+		{
+			removeDisables();
+			bannerId.setText(BannerId);
+			firstName.requestFocus();
+		}
 	}
 	
 	

@@ -100,57 +100,24 @@ public class AddWorkerView extends View implements Observer
 		return "** ADD NEW WORKER **";
 	}
 	
+	//-------------------------------------------------------------
 	public void populateFields()
 	{
 		
 	}
 
+	//--------------------------------------------------------------
 	protected void processBannerId(String BannerId)
 	{
 		
 		Properties props = new Properties();
 		props.setProperty("BannerId", BannerId);
 		
-		myController.stateChangeRequest("removePersonData", props); //cleans out the past person.
+		myController.stateChangeRequest("clearState", props); //clears state of controller
 		
-		myController.stateChangeRequest("getPersonData", props);
+		myController.stateChangeRequest("processBannerId", props);
 		
-		if((Boolean)myController.getState("TestWorker"))
-		{
-			clearValues();
-			setDisables();
-		}
-		else //if the borrower doesn't exist, continue on testing if it can autofill or not. 
-		{
-			removeDisables();
-			
-			String firstNameState = (String)myController.getState("FirstName"); 
-			String lastNameState = (String)myController.getState("LastName");
-			String emailState = (String)myController.getState("Email");
-			String phoneState = (String)myController.getState("PhoneNumber");
-			
-			if(firstNameState != null) //checks if the person exists or not. 
-			{
-				firstName.setText(firstNameState);
-				lastName.setText(lastNameState);
-				email.setText(emailState);
-				phoneNumber.setText(phoneState);
-				
-				firstName.setDisable(true);
-				lastName.setDisable(true);
-				email.setDisable(true);
-				phoneNumber.setDisable(true);
-				
-				password.requestFocus();
-			}
-			else
-			{
-				firstName.requestFocus();
-			}
-			
-			bannerId.setText(BannerId);
-
-		}
+		checkForFormerWorkerOrPerson(BannerId);
 		
 	}
 
@@ -230,7 +197,6 @@ public class AddWorkerView extends View implements Observer
 				
 				if(Utilities.checkBannerId(bannerId.getText()))
 				{
-					removeDisables();
 					processBannerId(bannerId.getText());
 				}
 				else
@@ -556,6 +522,65 @@ public class AddWorkerView extends View implements Observer
 			displayMessage(val);
 		}
 		
+	}
+	
+	private void checkForFormerWorkerOrPerson(String BannerId)
+	{
+		if((Boolean)myController.getState("TestWorker"))
+		{
+			if(((String)myController.getState("Status")).equals("Inactive"))
+			{
+				removeDisables();
+				
+				String firstNameState = (String)myController.getState("FirstName"); 
+				String lastNameState = (String)myController.getState("LastName");
+				String emailState = (String)myController.getState("Email");
+				String phoneState = (String)myController.getState("PhoneNumber");
+				String credentialState = (String)myController.getState("Credential");
+				
+				bannerId.setText(BannerId);
+				firstName.setText(firstNameState);
+				lastName.setText(lastNameState);
+				email.setText(emailState);
+				phoneNumber.setText(phoneState);
+				credential.setValue(credentialState);
+				
+				password.requestFocus();
+			}
+			else if(((String)myController.getState("IsOld")).equals("false")) //if there is a person
+			{
+				removeDisables();
+				
+				String firstNameState = (String)myController.getState("FirstName"); 
+				String lastNameState = (String)myController.getState("LastName");
+				String emailState = (String)myController.getState("Email");
+				String phoneState = (String)myController.getState("PhoneNumber");
+				
+				bannerId.setText(BannerId);
+				firstName.setText(firstNameState);
+				lastName.setText(lastNameState);
+				email.setText(emailState);
+				phoneNumber.setText(phoneState);
+				
+				firstName.setDisable(true);
+				lastName.setDisable(true);
+				email.setDisable(true);
+				phoneNumber.setDisable(true);
+				
+				password.requestFocus();
+			}
+			else //worker exists and is active
+			{
+				clearValues();
+				setDisables();
+			}
+		}
+		else
+		{
+			removeDisables();
+			bannerId.setText(BannerId);
+			firstName.requestFocus();
+		}
 	}
 
 	/**

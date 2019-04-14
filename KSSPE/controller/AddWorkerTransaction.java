@@ -18,7 +18,7 @@ import exception.MultiplePrimaryKeysException;
 import userinterface.View;
 import userinterface.ViewFactory;
 import model.Worker;
-import model.Person;
+import model.Borrower;
 
 /** The class containing the AddWorkerTransaction for the KSSPE application */
 //==============================================================
@@ -26,41 +26,40 @@ public class AddWorkerTransaction extends Transaction
 {
 	private String errorMessage = "";
 	private Receptionist myReceptionist;
-	private Worker myWorker;
-	private Person myPerson; 
+	private Worker myWorker; 
 
+	//-----------------------------------------------------------
 	public AddWorkerTransaction() throws Exception
 	{
 		super();
 	}
 
+	//-----------------------------------------------------------
 	public void processTransaction(Properties props)
 	{
-		try
+		if (myWorker != null)
 		{
-			myWorker = new Worker(props);
 			
-			if(myWorker.getState("Status").equals("Active")) //if a worker already exists and is active
+			myWorker.stateChangeRequest("Status", "Active");
+			myWorker.stateChangeRequest("FirstName", props.getProperty("FirstName"));
+			myWorker.stateChangeRequest("LastName", props.getProperty("LastName"));
+			myWorker.stateChangeRequest("Email", props.getProperty("Email"));
+			myWorker.stateChangeRequest("PhoneNumber", props.getProperty("PhoneNumber"));
+			myWorker.stateChangeRequest("Credential", props.getProperty("Credential"));
+			myWorker.stateChangeRequest("Password", props.getProperty("Password"));
+			myWorker.stateChangeRequest("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+			myWorker.save();
+			
+			errorMessage = (String)myWorker.getState("UpdateStatusMessage");
+			
+			if (errorMessage.startsWith("ERR") == false)
 			{
-				errorMessage = "ERROR: Worker with id: " + myWorker.getState("BannerId") + " already exists!";
+				errorMessage = "Worker with id: " + myWorker.getState("BannerId") + " saved/reinstated successfully";
 			}
-			else //update the borrower with the default information and set it to active again.
-			{
-				myWorker.stateChangeRequest("Status", "Active");
-				myWorker.stateChangeRequest("FirstName", props.getProperty("FirstName"));
-				myWorker.stateChangeRequest("LastName", props.getProperty("LastName"));
-				myWorker.stateChangeRequest("Email", props.getProperty("Email"));
-				myWorker.stateChangeRequest("Credential", props.getProperty("Credential"));
-				myWorker.stateChangeRequest("Password", props.getProperty("Password"));
-				myWorker.stateChangeRequest("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-				myWorker.save();
-				
-				errorMessage = "Worker with id: " + myWorker.getState("BannerId") + " reinstated Successfully";
-			}			
-		}
-		catch (InvalidPrimaryKeyException ex) 
-		{
 			
+		}
+		else
+		{
 			try
 			{
 				props.setProperty("Status", "Active");
@@ -70,7 +69,11 @@ public class AddWorkerTransaction extends Transaction
 				myWorker = new Worker(props, true);
 				myWorker.save();
 				
-				errorMessage = "Worker with id: " + myWorker.getState("BannerId") + " added successfully";
+				errorMessage = (String)myWorker.getState("UpdateStatusMessage");
+				if (errorMessage.startsWith("ERR") == false)
+				{
+					errorMessage = "Worker with id: " + myWorker.getState("BannerId") + " added successfully";
+				}
 			}
 			catch (InvalidPrimaryKeyException ex2) 
 			{
@@ -91,41 +94,21 @@ public class AddWorkerTransaction extends Transaction
 		{
 			if(myWorker != null)
 			{
-				if(myWorker.getState("Status").equals("Active"))
-					return true;
-				else
-					return false;
+				return true;
 			}
 			return false;
 		}
-		else if (key.equals("FirstName") == true)
-		{
-			if(myPerson != null)
-				return myPerson.getState("FirstName");
-			return null;
-		}
-		else if (key.equals("LastName") == true)
-		{
-			if(myPerson != null)
-				return myPerson.getState("LastName");
-			return null;
-		}
-		else if (key.equals("Email") == true)
-		{
-			if(myPerson != null)
-				return myPerson.getState("Email");
-			return null;
-		}
-		else if (key.equals("PhoneNumber") == true)
-		{
-			if(myPerson != null)
-				return myPerson.getState("PhoneNumber");
-			return null;
-		}
 		else
-			return null;
+		{
+			String val = (String)myWorker.getState(key);
+			if (val != null)
+				return val;
+			else
+				return null;
+		}
 	}
 
+	//-----------------------------------------------------------------------------
 	public void stateChangeRequest(String key, Object value)
 	{
 		errorMessage = "";
@@ -139,7 +122,7 @@ public class AddWorkerTransaction extends Transaction
 		{
 			processTransaction((Properties)value);
 		}
-		if(key.equals("getPersonData") == true)
+		if(key.equals("processBannerId") == true)
 		{
 			try
 			{
@@ -147,39 +130,40 @@ public class AddWorkerTransaction extends Transaction
 				
 				if(myWorker.getState("Status").equals("Active"))
 				{
-					errorMessage = "ERROR: Worker with Bannerid " + ((Properties)value).getProperty("BannerId") + " already exists!";
+					errorMessage = "ERROR: Worker with id " + ((Properties)value).getProperty("BannerId") + " already exists!";
 				}
 				else
 				{
-					try
-					{
-						myPerson = new Person((Properties)value);
-						
-						errorMessage = "Former Worker with Bannerid " + ((Properties)value).getProperty("BannerId") +  " Found!";
-					}
-					catch(Exception ex2)
-					{
-						//how the hell is this even possible???????????????? 
-					}
+					errorMessage = "Former Worker with id " + ((Properties)value).getProperty("BannerId") +  " found!";
 				}
 			}
 			catch(Exception ex)
 			{
 				try
 				{
-					myPerson = new Person((Properties)value);
+					Borrower b = new Borrower((Properties)value);
 					
-					errorMessage = "Person with Bannerid " + ((Properties)value).getProperty("BannerId") +  " Found!";
+					Properties wProp = new Properties();
+					wProp.setProperty("BannerId", (String)b.getState("BannerId"));
+					wProp.setProperty("Password", "Default"); //this is overwritten when the user enters it. 
+					wProp.setProperty("Credential", "Ordinary");
+					wProp.setProperty("Status", "Active");
+					wProp.setProperty("DateAdded", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+					wProp.setProperty("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+					myWorker = new Worker(wProp, true);
+					
+					errorMessage = "Person with id " + ((Properties)value).getProperty("BannerId") + " found!";
+					
 				}
-				catch(Exception ex2)
+				catch (Exception excep)
 				{
-					//do nothing. Idc if nobody was found. 
+					//do nothing here. If here, nothing exists to fill. 
 				}
+				
 			}
 		}
-		if(key.equals("removePersonData") == true)
+		if(key.equals("clearState") == true)
 		{
-			myPerson = null;
 			myWorker = null;
 		}
 		if (key.equals("CancelTransaction") == true)
