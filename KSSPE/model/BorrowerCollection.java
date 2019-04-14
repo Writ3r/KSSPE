@@ -90,6 +90,13 @@ public class BorrowerCollection extends EntityBase
 		String query = "SELECT * FROM " + myTableName + ", Person WHERE ((Borrower.Status = 'Active') AND (LastName LIKE '%" + props.getProperty("LastName") + "%') AND (FirstName LIKE '%" + props.getProperty("FirstName") + "%') AND (Borrower.BannerId = Person.BannerId))";
 		populateCollectionHelper(query);
 	}
+	
+	//-------------------------------------------------------------
+	public void findByPhone(String phone)
+	{
+		String query = "SELECT * FROM " + myTableName + ", PERSON WHERE ((Borrower.Status = 'Active') AND (PhoneNumber LIKE '%" + phone + "%') AND (Borrower.BannerId = Person.BannerId))";
+		populateCollectionHelper(query);
+	}
 
 	//-----------------------------------------------------------
 	public void findAll()
@@ -97,15 +104,6 @@ public class BorrowerCollection extends EntityBase
 		String query = "SELECT * FROM " + myTableName + ", Person WHERE ((Borrower.BannerId = Person.BannerId) AND (Borrower.Status = 'Active'))";
 		populateCollectionHelper(query);
 	}
-
-	//-----------------------------------------------------------
-	// public void findByName(String firstName, String lastName)
-	// {
-	// 	String query = "SELECT * FROM " + myTableName + " WHERE ((Status = 'Active') AND (FirstName LIKE '%" + firstName + "%')" 
-	// 	+ "AND (LastName LIKE '%" + lastName + "%'))";
-	// 	populateCollectionHelper(query);
-	// }
-
 
 	//----------------------------------------------------------------------------------
 	private void addBorrower(Borrower w)

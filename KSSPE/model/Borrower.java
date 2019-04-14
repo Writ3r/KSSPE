@@ -136,8 +136,14 @@ public class Borrower extends EntityBase
 	 public Object getState(String key)
     {
         String value = persistentState.getProperty(key);
-        
-		if (key.equals("UpdateStatusMessage") == true)
+        if (key.equals("IsOld") == true)
+		{
+			if (oldFlag == true)
+				return "true";
+			else
+				return "false";
+		}
+		else if (key.equals("UpdateStatusMessage") == true)
 		{
 			return updateStatusMessage;
 		}
