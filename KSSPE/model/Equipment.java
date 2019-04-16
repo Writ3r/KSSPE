@@ -115,7 +115,6 @@ public class Equipment extends EntityBase
 	public void stateChangeRequest(String key, Object value)
 	{
 		persistentState.setProperty(key, (String)value);
-
 	}
 	
 	//-----------------------------------------------------------------------------------

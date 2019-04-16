@@ -63,11 +63,11 @@ public class Receptionist extends Transaction
 			return errorMessage;
 		}
 		else
-		if (key.equals("bannerID") == true)
+		if (key.equals("BannerId") == true)
 		{
 			if (currentWorker != null)
 			{
-				return currentWorker.getState("bannerID");
+				return currentWorker.getState("BannerId");
 			}
 			else
 				return "Undefined";
