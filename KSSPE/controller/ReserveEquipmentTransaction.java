@@ -18,6 +18,8 @@ import exception.MultiplePrimaryKeysException;
 import userinterface.View;
 import userinterface.ViewFactory;
 import model.Borrower;
+import model.Equipment;
+import model.CheckOut;
 import model.BorrowerCollection;
 
 /** The class containing the ModifyBorrowerTransaction for the KSSPE application */
@@ -27,8 +29,9 @@ public class ReserveEquipmentTransaction extends Transaction
 	private String errorMessage = "";
 	private Receptionist myReceptionist;
 	private Borrower myBorrower;
-	private String myWorkerId;
+	private Equipment myCurrentEquipment;
 	private BorrowerCollection myBorrowerList;
+	private String myWorkerId;
 
 	//----------------------------------------------------------------
 	public ReserveEquipmentTransaction() throws Exception
@@ -116,6 +119,13 @@ public class ReserveEquipmentTransaction extends Transaction
 		{
 			return myBorrower.getState("Notes");
 		}
+		else if (key.equals("TestEquipment") == true)
+		{
+			if(myCurrentEquipment != null)
+				return true;
+			else
+				return false;
+		}
 		else
 			return null;
 	}
@@ -150,13 +160,27 @@ public class ReserveEquipmentTransaction extends Transaction
 						"Error in creating ModifyBorrowerView", Event.ERROR);
 			}
 		}
-		if (key.equals("BorrowerData") == true)
+		if (key.equals("CheckOutData") == true)
 		{
-			modifyBorrowerHelper((Properties)value);
+			reserveEquipment((Properties)value);
+		}
+		if (key.equals("TestEquipment") == true)
+		{
+			myCurrentEquipment = null; //clears out past equipment.
+			
+			try
+			{
+				myCurrentEquipment = new Equipment((Properties)value);
+				
+				errorMessage = "Equipment with Barcode: " + ((Properties)value).getProperty("Barcode") +  " found!";
+			}
+			catch(Exception ex)
+			{
+				errorMessage = "ERROR: Equipment with Barcode: " + ((Properties)value).getProperty("Barcode") +  " does not Exist!";
+			}
 		}
 		if (key.equals("CancelBorrowerList") == true)
 		{
-			
 			Scene oldScene = createView();	
 			swapToView(oldScene);
 		}
@@ -170,18 +194,29 @@ public class ReserveEquipmentTransaction extends Transaction
 	}
 	
 	//------------------------------------------------------------------------
-	private void modifyBorrowerHelper(Properties props)
+	private void reserveEquipment(Properties props)
 	{
-		myBorrower.stateChangeRequest("FirstName", props.getProperty("FirstName"));
-		myBorrower.stateChangeRequest("LastName", props.getProperty("LastName"));
-		myBorrower.stateChangeRequest("Email", props.getProperty("Email"));
-		myBorrower.stateChangeRequest("Penalty", props.getProperty("Penalty"));
-		myBorrower.stateChangeRequest("PhoneNumber", props.getProperty("PhoneNumber"));
-		myBorrower.stateChangeRequest("BlockStatus", props.getProperty("BlockStatus"));
-		myBorrower.stateChangeRequest("Notes", props.getProperty("Notes"));
-		myBorrower.stateChangeRequest("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-		myBorrower.save();
-		errorMessage = (String)myBorrower.getState("UpdateStatusMessage");
+		int stock = Integer.parseInt((String)myCurrentEquipment.getState("InStockCount"));
+		int taken = Integer.parseInt(props.getProperty("UnitsTaken"));
+		
+		if(stock - taken >= 0)
+		{
+			props.setProperty("BannerId", (String)getState("BorrowerBannerId"));
+			props.setProperty("TotalUnitsReturned", "0");
+			props.setProperty("RentDate", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+			props.setProperty("CheckOutWorkerID", myWorkerId);
+			
+			CheckOut checkOut = new CheckOut(props);
+			checkOut.save();
+			
+			myCurrentEquipment.stateChangeRequest("InStockCount", Integer.toString(stock - taken));
+			myCurrentEquipment.save();
+			
+			errorMessage = (String)checkOut.getState("UpdateStatusMessage");
+		}
+		else
+			errorMessage = "ERROR: Cannot exceed the " + stock + " units in stock";
+		
 	}
 	
 	//-----------------------------------------------------------------------

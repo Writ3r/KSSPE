@@ -19,7 +19,6 @@ import userinterface.View;
 import userinterface.ViewFactory;
 import model.Borrower;
 import model.Worker;
-import model.Person;
 
 /** The class containing the AddBorrowerTransaction for the KSSPE application */
 //==============================================================

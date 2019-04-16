@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import utilities.GlobalVariables;
 
@@ -226,6 +227,40 @@ public class Utilities
 
 			return valToReturn;
 		}
+	}
+	
+	public static boolean checkDueDate(String date)
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		/*
+		if(Pattern.matches("\\d[4]-\\d[2]-\\d[2]", date))
+		{
+		*/
+		try{	
+			if(sdf.parse(date) != null)
+			{
+				Date currDate = new Date();
+				Date dueDate = sdf.parse(date);
+				
+				if (dueDate.after(currDate))
+				{
+					return true;
+				} 
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		catch(ParseException ex)
+		{
+			return false;
+		}
+		
 	}
 
 	//----------------------------------------------------------

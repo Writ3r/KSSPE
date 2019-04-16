@@ -104,9 +104,24 @@ public class ReserveEquipmentView extends View implements Observer
 		
 	}
 
-	protected void processBarcode(String barcode)
+	protected void processBarcode(String Barcode)
 	{
+		//make sure equipment with this barcode actually exists. If so, inform the user and remove disables on the other fields.
+		Properties props = new Properties();
+		props.setProperty("Barcode", Barcode);
+		myController.stateChangeRequest("TestEquipment", props);
 		
+		if((Boolean)myController.getState("TestEquipment") == true)
+		{
+			removeDisables();
+			barcode.setText(Barcode);
+			count.requestFocus();
+		}
+		else
+		{
+			count.clear();  //clear everything except barcode and re-disable them. 
+			setDisables();
+		}
 		
 	}
 
@@ -189,6 +204,11 @@ public class ReserveEquipmentView extends View implements Observer
 				{
 					processBarcode(barcode.getText());
 				}
+				else
+				{
+					count.clear();  //clear everything except barcode and re-disable them. 
+					setDisables();
+				}
 			});
 		grid.add(barcode, 1, 1);
 		
@@ -270,6 +290,8 @@ public class ReserveEquipmentView extends View implements Observer
 		
 		vbox.getChildren().add(grid);
 		vbox.getChildren().add(doneCont);
+		
+		setDisables();
 	
 		setOutlines();
 		
@@ -279,8 +301,41 @@ public class ReserveEquipmentView extends View implements Observer
 	//---------------------------------------------------------------------------------------------------
 	protected void sendToController()
 	{
+		clearErrorMessage();
 		
+		String Barcode = barcode.getText();
+		String Count = count.getText();
+		String DueDate = dueDate.getText();
 		
+		if(Utilities.checkBarcode(Barcode))
+		{
+			if(Utilities.checkGoodCount(Count))
+			{
+				if(Utilities.checkDueDate(DueDate))
+				{
+					Properties props = new Properties();
+					props.setProperty("Barcode", Barcode);
+					props.setProperty("UnitsTaken", Count);
+					props.setProperty("DueDate", DueDate);
+					myController.stateChangeRequest("CheckOutData", props);
+				}
+				else
+				{
+					displayErrorMessage("Please enter a valid date in the form yyyy-mm-dd");
+					dueDate.requestFocus();
+				}
+			}
+			else
+			{
+				displayErrorMessage("Please enter a valid count.");
+				count.requestFocus();
+			}
+		}
+		else
+		{
+			displayErrorMessage("Please enter a valid barcode.");
+			barcode.requestFocus();
+		}
 	}
 	
 	
@@ -316,15 +371,28 @@ public class ReserveEquipmentView extends View implements Observer
 		barcode.clear();
 		count.clear();
 		dueDate.clear();
-		
 	}
 	
-	public void clearValuesExceptDue()
+	//------------------------------------------------------------------------------------------
+	private void removeDisables()
+	{
+		count.setDisable(false);
+		dueDate.setDisable(false);
+	}
+	
+	//------------------------------------------------------------------------------------------
+	protected void setDisables()
+	{
+		count.setDisable(true);
+		dueDate.setDisable(true);
+	}
+	
+	private void clearValuesExceptDue()
 	{
 		barcode.clear();
 		count.clear();
 	}
-
+	
 	//------------------------------------------------------------------------------------------
 	private void setOutlines()
 	{
@@ -350,6 +418,7 @@ public class ReserveEquipmentView extends View implements Observer
 		else
 		{
 			clearValuesExceptDue();
+			setDisables();
 			displayMessage(val);
 		}
 		
