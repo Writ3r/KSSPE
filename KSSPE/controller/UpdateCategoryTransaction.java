@@ -142,6 +142,16 @@ public class UpdateCategoryTransaction extends Transaction
 	//------------------------------------------------------------------------
 	private void modifyCategoryHelper(Properties props)
 	{
+		
+		// check if name already exists
+		CategoryCollection c = new CategoryCollection();
+		c.findAllByName(props.getProperty("Name"));
+		
+		if (c.getSize() > 0)
+		{
+			errorMessage = "ERROR: Category with name: " + props.getProperty("Name") + " already used!";
+			return;
+		}
 		myCategory.stateChangeRequest("Name", props.getProperty("Name"));
 		myCategory.save();
 		errorMessage = (String)myCategory.getState("UpdateStatusMessage");
