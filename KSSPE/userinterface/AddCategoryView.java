@@ -8,6 +8,9 @@ import utilities.Utilities;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -23,7 +26,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.collections.FXCollections;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.ButtonType;
 
 import java.util.Properties;
 import java.util.Observer;
@@ -32,9 +34,6 @@ import java.util.Observable;
 // project imports
 import java.util.Enumeration;
 import java.util.Vector;
-
-import javafx.stage.Stage;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ComboBox;
 import javafx.scene.effect.DropShadow;
@@ -42,7 +41,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.StringConverter;
-import javafx.scene.control.Alert;
 
 import controller.Transaction;
 
@@ -180,7 +178,7 @@ public class AddCategoryView extends View implements Observer
 				clearErrorMessage();
 				if(Utilities.checkBarcodePrefix(barcodePrefix.getText()))
 				{
-					barcodePrefix.getText();
+					processBarcodePrefix(barcodePrefix.getText());
 				}
 			});
 		grid.add(barcodePrefix, 1, 1);
@@ -254,62 +252,56 @@ public class AddCategoryView extends View implements Observer
 		return vbox;
 	}
 
+	//--------------------------------------------------------------------------
 	private void sendToController()
 	{
 		clearErrorMessage();
-		
-		String BarcodePrefix = barcodePrefix.getText();
-		String Name = name.getText();
-		
-		if(Utilities.checkBarcodePrefix(BarcodePrefix)) 
-		{
-			if(Utilities.checkCategoryName(Name))
-			{
-		
-				Properties props = new Properties();
-				props.setProperty("BarcodePrefix", BarcodePrefix);
-				props.setProperty("Name", Name);
-				
-				myController.stateChangeRequest("TestCategory", props);
-				
-				String oldCategoryName = (String)myController.getState("CategoryIsInactive");
-				
-				if(oldCategoryName != null)
-				{
-					displayReinstateAlert(BarcodePrefix, oldCategoryName, props);
-				}
-				else
-					myController.stateChangeRequest("CategoryData", props);					
-						
-			}
-			else
-			{
-				displayErrorMessage("Please enter a valid name.");
-				name.requestFocus();
-			}
-		}
-		else
-		{
-			displayErrorMessage("Please enter a valid Barcode Prefix (Digits).");
-			barcodePrefix.requestFocus();
-		}
-	}
-	
-	
-	private void displayReinstateAlert(String barcodePrefix, String name, Properties props)
-	{
-		clearErrorMessage();
-		Alert alert = new Alert(Alert.AlertType.ERROR,"Old category with data : \nBarcode Prefix: "+ barcodePrefix + "\nName: " + name + "\nPreviously was removed.\nWould you like to reinstate it with this new name?", ButtonType.YES, ButtonType.NO);
+		Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"NOTE: Barcode Prefixes and Category Names are UNIQUE to each Category and MUST be carefully considered before assigning to the category", 
+			ButtonType.YES, ButtonType.NO);
 		alert.setHeaderText(null);
-		alert.setTitle("Reinstate Category");
-		alert.setHeaderText("Reinstate this Category?");
+		alert.setTitle("Confirm Barcode prefix");
+		alert.setHeaderText("Are you sure want to use the barcode prefix: " +  barcodePrefix.getText() + " and name: " + name.getText() + " ?");
 		((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(new Image("images/BPT_LOGO_All-In-One_Color.png"));
 		alert.showAndWait();
 
 		if (alert.getResult() == ButtonType.YES) {
-			myController.stateChangeRequest("CategoryData", props);	
+			String BarcodePrefix = barcodePrefix.getText();
+			String Name = name.getText();
+			
+			if(Utilities.checkBarcodePrefix(BarcodePrefix)) 
+			{
+				if(Utilities.checkCategoryName(Name))
+				{
+			
+					Properties props = new Properties();
+					props.setProperty("BarcodePrefix", BarcodePrefix);
+					props.setProperty("Name", Name);
+				
+					myController.stateChangeRequest("CategoryData", props);					
+							
+				}
+				else
+				{
+					displayErrorMessage("Please enter a valid name.");
+					name.requestFocus();
+				}
+			}
+			else
+			{
+				displayErrorMessage("Please enter a valid Barcode Prefix (Digits).");
+				barcodePrefix.requestFocus();
+			}
 		}
 	}
+	
+	//--------------------------------------------------------------------
+	protected void processBarcodePrefix(String BarcodePrefix)
+	{
+		
+		
+		
+	}
+	
 	
 	//-------------------------------------------------------------
 	protected MessageView createStatusLog(String initialMessage)
@@ -319,12 +311,14 @@ public class AddCategoryView extends View implements Observer
 		return statusLog;
 	}
 
+	//-----------------------------------------------------------
 	public void clearValues()
 	{
 		barcodePrefix.clear();
 		name.clear();
 	}
 
+	//---------------------------------------------------------
 	private void setOutlines()
 	{
 		barcodePrefix.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
