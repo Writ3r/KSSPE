@@ -39,6 +39,7 @@ import java.util.Observer;
 import java.util.Observable;
 
 // project imports
+import impresario.IModel;
 import controller.Transaction;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -301,6 +302,16 @@ public class CategoryCollectionView extends View implements Observer
 
 		if (alert.getResult() == ButtonType.YES) {
 			processCategorySelected();
+			//String val = (String)myController.getState("Error");
+			//if (val.startsWith("ERR") == true)
+			//{
+			//	statusLog.displayErrorMessage(val);
+			//}
+			//else
+			//{
+			//	displayMessage(val);
+			//	getEntryTableModelValues();
+			//}		
 		}
 	}
        
