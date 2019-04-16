@@ -63,7 +63,7 @@ public class Borrower extends EntityBase
 				persistentState.setProperty("DateLastUpdated", retrievedBorrowerData.getProperty("DateLastUpdated"));
 				persistentState.setProperty("DateAdded", retrievedBorrowerData.getProperty("DateAdded"));
 				
-				updateStatusMessage = "Borrower created sucessfully!";
+				updateStatusMessage = "Borrower created successfully!";
 			}
 		}
 		// If no Borrower found for this banner Id, throw an exception
@@ -123,7 +123,7 @@ public class Borrower extends EntityBase
 		
 	}
 	
-	
+	//---------------------------------------------------------------
 	public static int compare(Borrower a, Borrower b)
 	{
 		String aVal = (String)a.getState("BannerId");
@@ -131,28 +131,31 @@ public class Borrower extends EntityBase
 
 		return aVal.compareTo(bVal);
 	}
-
+	
 	//----------------------------------------------------------------
-	 public Object getState(String key)
+	public Object getState(String key)
     {
-        String value = persistentState.getProperty(key);
-        if (key.equals("IsOld") == true)
+       
+         if (key.equals("IsOld") == true)
 		{
 			if (oldFlag == true)
-				return "true";
+				return "Yes";
 			else
-				return "false";
+				return "No";
 		}
-		else if (key.equals("UpdateStatusMessage") == true)
+		else
+		if (key.equals("UpdateStatusMessage") == true)
 		{
 			return updateStatusMessage;
 		}
-        else if (value != null)
-		{
-            return value;
-		}
         else
         {
+			String value = persistentState.getProperty(key);
+			if (value != null)
+			{
+				return value;
+			}
+			else
             if (myPerson != null)
                 return myPerson.getState(key);
             else
@@ -161,7 +164,6 @@ public class Borrower extends EntityBase
     }
 	
 	//------------------------------------------------------------------
-	
 	public void save()
 	{
 		updateStateInDatabase();
@@ -212,7 +214,7 @@ public class Borrower extends EntityBase
 		}
 	}
 	
-	
+	//-------------------------------------------------------------------
 	public Vector<String> getEntryListView()
 	{
 		Vector<String> v = new Vector<String>();
@@ -224,9 +226,7 @@ public class Borrower extends EntityBase
 		return v;
 	}
 	
-	
 	//-------------------------------------------------------------------
-	
 	public void stateChangeRequest(String key, Object value)
 	{
 		if(key.equals("BannerId") || key.equals("BlockStatus") || key.equals("Penalty") || key.equals("Notes") || key.equals("Status") || key.equals("DateAdded") || key.equals("DateLastUpdated"))
@@ -239,7 +239,7 @@ public class Borrower extends EntityBase
 		}
 	}
 	
-
+	//-------------------------------------------------------------------
 	protected void initializeSchema(String tableName)
 	{
 		if (mySchema == null)
