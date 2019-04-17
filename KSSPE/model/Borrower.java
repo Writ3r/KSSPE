@@ -139,9 +139,9 @@ public class Borrower extends EntityBase
          if (key.equals("IsOld") == true)
 		{
 			if (oldFlag == true)
-				return "Yes";
+				return "true";
 			else
-				return "No";
+				return "false";
 		}
 		else
 		if (key.equals("UpdateStatusMessage") == true)

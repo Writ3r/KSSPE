@@ -95,7 +95,7 @@ public class CategoryCollection extends EntityBase
 	//-----------------------------------------------------------
 	public void findAllByName(String name)
 	{
-		String query = "SELECT * FROM " + myTableName + " WHERE (Name LIKE '%" + name + "%')";
+		String query = "SELECT * FROM " + myTableName + " WHERE (Name = '" + name + "')";
 		populateCollectionHelper(query);
 	}
 
