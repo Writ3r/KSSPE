@@ -53,6 +53,8 @@ public class AddBorrowerView extends View implements Observer
 	protected TextField lastName;
 	protected TextField email;
 	protected TextField phoneNumber;
+	protected TextField penalty;
+	protected ComboBox<String>  blockStatus;
 	protected TextField notes;
 	
 	protected GridPane grid;
@@ -99,11 +101,14 @@ public class AddBorrowerView extends View implements Observer
 		return "** ADD NEW BORROWER **";
 	}
 	
+	//-------------------------------------------------------------
 	public void populateFields()
 	{
-		
+		penalty.setText("0.00");
+		blockStatus.setValue("Unblocked");
 	}
 
+	//-------------------------------------------------------------------------------------------------
 	protected void processBannerId(String BannerId)
 	{
 		
@@ -115,7 +120,6 @@ public class AddBorrowerView extends View implements Observer
 		myController.stateChangeRequest("processBannerId", props);
 		
 		checkForFormerBorrowerOrPerson(BannerId);
-		
 	}
 
 	// Create the title container
@@ -195,6 +199,7 @@ public class AddBorrowerView extends View implements Observer
 				if(Utilities.checkBannerId(bannerId.getText()))
 				{
 					processBannerId(bannerId.getText());
+					
 				}
 				else
 				{
@@ -238,6 +243,20 @@ public class AddBorrowerView extends View implements Observer
 			});
 		grid.add(lastName, 1, 2);
 		
+		Text penaltyLabel = new Text("Penalty :");
+			penaltyLabel.setFill(Color.GOLD);
+			penaltyLabel.setFont(myFont);
+			penaltyLabel.setTextAlignment(TextAlignment.RIGHT);
+		grid.add(penaltyLabel, 0, 3);
+
+		penalty = new TextField();
+			penalty.setMinWidth(150);
+			penalty.addEventFilter(KeyEvent.KEY_RELEASED, event->{
+				if(!penalty.getText().equals(""))
+					clearErrorMessage();
+			});
+		grid.add(penalty, 1, 3);
+		
 		Text emailLabel = new Text(" Email : ");
 			emailLabel.setFill(Color.GOLD);
 			emailLabel.setFont(myFont);
@@ -264,6 +283,21 @@ public class AddBorrowerView extends View implements Observer
 				clearErrorMessage();
 			});
 		grid.add(phoneNumber, 3, 2);
+		
+		Text blockStatusLabel = new Text(" Block Status : ");
+		blockStatusLabel.setFill(Color.GOLD);
+		blockStatusLabel.setFont(myFont);
+		blockStatusLabel.setTextAlignment(TextAlignment.RIGHT);
+		grid.add(blockStatusLabel, 2, 3);
+
+		blockStatus = new ComboBox();
+			blockStatus.getItems().addAll(
+				"Unblocked",
+				"Blocked"
+			);
+			blockStatus.setPromptText("Choose Block Status");
+			blockStatus.setMinWidth(150);
+		grid.add(blockStatus, 3, 3);
 		
 		
 		//-------------------------------------------  grid done
@@ -354,7 +388,9 @@ public class AddBorrowerView extends View implements Observer
 		String LastName = lastName.getText();
 		String Email = email.getText();
 		String PhoneNumber = phoneNumber.getText();
+		String Penalty = penalty.getText();
 		String Notes = notes.getText();
+		String BlockStatus;
 		
 		// VALIDATE the data before passing it to controller - code below does that
 		if(Utilities.checkBannerId(BannerID)) 
@@ -367,18 +403,36 @@ public class AddBorrowerView extends View implements Observer
 					{
 						if(Utilities.checkPhone(PhoneNumber))
 						{
-							
-							Properties props = new Properties();
-							props.setProperty("BannerId", BannerID);
-							props.setProperty("FirstName", FirstName);
-							props.setProperty("LastName", LastName);
-							props.setProperty("Email", Email);
-							props.setProperty("PhoneNumber", Utilities.formatUSPhoneNumber(PhoneNumber));
-							props.setProperty("Notes", Notes);
-							removeDisables();
-							myController.stateChangeRequest("BorrowerData", props);
-							setDisables();
-										
+							if (Utilities.checkPenalty(Penalty))
+							{
+								if(blockStatus.getValue() != null)  
+								{
+									BlockStatus = blockStatus.getValue().toString();
+									
+									Properties props = new Properties();
+									props.setProperty("BannerId", BannerID);
+									props.setProperty("FirstName", FirstName);
+									props.setProperty("LastName", LastName);
+									props.setProperty("Email", Email);
+									props.setProperty("PhoneNumber", Utilities.formatUSPhoneNumber(PhoneNumber));
+									props.setProperty("Penalty", Utilities.formatPenalty(Double.parseDouble(Penalty)));
+									props.setProperty("BlockStatus", BlockStatus);
+									props.setProperty("Notes", Notes);
+									removeDisables();
+									myController.stateChangeRequest("BorrowerData", props);
+									setDisables();
+								}
+								else
+								{
+									displayErrorMessage("Please select a valid block status.");
+									blockStatus.requestFocus();
+								}
+							}
+							else
+							{
+								displayErrorMessage("Please enter a valid numerical value for penalty.");
+								penalty.requestFocus();
+							}
 						}
 						else
 						{
@@ -417,7 +471,7 @@ public class AddBorrowerView extends View implements Observer
 	{
 		if((Boolean)myController.getState("TestBorrower"))
 		{
-			if(((String)myController.getState("Status")).equals("Inactive"))
+			if(((String)myController.getState("Status")).equals("Inactive") || ((String)myController.getState("IsOld")).equals("false")) //There is an existing person or old borrower to be reinstated. 
 			{
 				removeDisables();
 				
@@ -425,6 +479,8 @@ public class AddBorrowerView extends View implements Observer
 				String lastNameState = (String)myController.getState("LastName");
 				String emailState = (String)myController.getState("Email");
 				String phoneState = (String)myController.getState("PhoneNumber");
+				String penaltyState = (String)myController.getState("Penalty");
+				String blockState = (String)myController.getState("BlockStatus");
 				String notesState = (String)myController.getState("Notes");
 				
 				bannerId.setText(BannerId);
@@ -432,29 +488,9 @@ public class AddBorrowerView extends View implements Observer
 				lastName.setText(lastNameState);
 				email.setText(emailState);
 				phoneNumber.setText(phoneState);
+				penalty.setText(penaltyState);
+				blockStatus.setValue(blockState);
 				notes.setText(notesState);
-				
-				notes.requestFocus();
-			}
-			else if(((String)myController.getState("IsOld")).equals("false")) //if there is a person
-			{
-				removeDisables();
-				
-				String firstNameState = (String)myController.getState("FirstName"); 
-				String lastNameState = (String)myController.getState("LastName");
-				String emailState = (String)myController.getState("Email");
-				String phoneState = (String)myController.getState("PhoneNumber");
-				
-				bannerId.setText(BannerId);
-				firstName.setText(firstNameState);
-				lastName.setText(lastNameState);
-				email.setText(emailState);
-				phoneNumber.setText(phoneState);
-				
-				firstName.setDisable(true);
-				lastName.setDisable(true);
-				email.setDisable(true);
-				phoneNumber.setDisable(true);
 				
 				notes.requestFocus();
 			}
@@ -490,6 +526,8 @@ public class AddBorrowerView extends View implements Observer
 		email.clear();
 		phoneNumber.clear();
 		notes.clear();
+		penalty.clear();
+		blockStatus.setValue("Unblocked");
 	}
 	
 	//----------------------------------------------------------------------------------------
@@ -509,6 +547,8 @@ public class AddBorrowerView extends View implements Observer
 		lastName.setDisable(false);
 		email.setDisable(false);
 		phoneNumber.setDisable(false);
+		penalty.setDisable(false);
+		blockStatus.setDisable(false);
 		notes.setDisable(false);
 	}
 	
@@ -519,6 +559,8 @@ public class AddBorrowerView extends View implements Observer
 		lastName.setDisable(true);
 		email.setDisable(true);
 		phoneNumber.setDisable(true);
+		penalty.setDisable(true);
+		blockStatus.setDisable(true);
 		notes.setDisable(true);
 	}
 

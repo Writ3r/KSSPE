@@ -18,6 +18,7 @@ import exception.MultiplePrimaryKeysException;
 import userinterface.View;
 import userinterface.ViewFactory;
 import model.Category;
+import model.CategoryCollection;
 
 /** The class containing the AddCategoryTransaction for the KSSPE application */
 //==============================================================
@@ -27,44 +28,51 @@ public class AddCategoryTransaction extends Transaction
 	private Receptionist myReceptionist;
 	private Category myCategory;
 
+	//--------------------------------------------------------
 	public AddCategoryTransaction() throws Exception
 	{
 		super();
 	}
 
+	//--------------------------------------------------------
 	public void processTransaction(Properties props)
 	{
 		try
 		{
-			myCategory = new Category(props);	
+			new Category(props);
 			
-			if(myCategory.getState("Status").equals("Active")) //if a category already exists and is active
-			{
-				errorMessage = "ERROR: Category already exists!";
-			}
-			else //update the category with the default information and set it to active again.
-			{
-				myCategory.stateChangeRequest("Status", "Active");
-				myCategory.stateChangeRequest("Name", props.getProperty("Name"));
-				myCategory.save();
-				
-				errorMessage = "Category with prefix: " + myCategory.getState("BarcodePrefix") + " reinstated Successfully";
-			}	
+			errorMessage = "ERROR: Category already exists - choose new barcode prefix!";	
 		}
 		catch (InvalidPrimaryKeyException ex) 
 		{
 			try
 			{
+				// check if name already exists
+				CategoryCollection c = new CategoryCollection();
+				c.findAllByName(props.getProperty("Name"));
+				
+				if (c.getSize() > 0)
+				{
+					errorMessage = "ERROR: Category with name: " + props.getProperty("Name") + " already used!";
+					return;
+				}
+				
 				props.setProperty("Status", "Active");
 				
 				myCategory = new Category(props, true);
 				myCategory.save();
 				
-				errorMessage = "Category Added Successfully";
+				errorMessage = (String)myCategory.getState("UpdateStatusMessage");
+				if (errorMessage.startsWith("ERR") == false)
+					errorMessage = "Category Added Successfully";
 			}
 			catch (InvalidPrimaryKeyException ex2) 
 			{
-				errorMessage = ex2.getMessage();
+				errorMessage = "ERROR: " + ex2.getMessage();
+			}
+			catch (Exception ex3)
+			{
+				errorMessage = "ERROR: " + ex3.getMessage();
 			}
 			
 		}
@@ -77,22 +85,11 @@ public class AddCategoryTransaction extends Transaction
 		{
 			return errorMessage;
 		}
-		else if (key.equals("CategoryIsInactive") == true)
-		{
-			if(myCategory != null)
-			{
-				if(myCategory.getState("Status").equals("Inactive"))
-					return myCategory.getState("Name");
-				else
-					return null;
-			}
-			else
-				return null;
-		}
 		else
 			return null;
 	}
-
+	
+	//-----------------------------------------------------------
 	public void stateChangeRequest(String key, Object value)
 	{
 		errorMessage = "";
@@ -105,17 +102,6 @@ public class AddCategoryTransaction extends Transaction
 		if (key.equals("CategoryData") == true)
 		{
 			processTransaction((Properties)value);
-		}
-		if (key.equals("TestCategory") == true)
-		{
-			try
-			{
-				myCategory = new Category((Properties)value);	
-			}
-			catch (InvalidPrimaryKeyException ex) 
-			{
-				//do nothing, I don't care.
-			}
 		}
 		if (key.equals("CancelTransaction") == true)
 		{

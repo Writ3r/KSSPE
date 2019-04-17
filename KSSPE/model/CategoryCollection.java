@@ -70,6 +70,13 @@ public class CategoryCollection extends EntityBase
 		String query = "SELECT * FROM " + myTableName + " WHERE ((Status = 'Active') AND (BarcodePrefix LIKE '%" + barcodePrefix + "%'))";
 		populateCollectionHelper(query);
 	}
+	
+	//-----------------------------------------------------------
+	public void findAllByBarcodePrefix(String barcodePrefix)
+	{
+		String query = "SELECT * FROM " + myTableName + " WHERE (BarcodePrefix LIKE '%" + barcodePrefix + "%')";
+		populateCollectionHelper(query);
+	}
 
 	//-----------------------------------------------------------
 	public void findAll()
@@ -82,6 +89,13 @@ public class CategoryCollection extends EntityBase
 	public void findByName(String name)
 	{
 		String query = "SELECT * FROM " + myTableName + " WHERE ((Status = 'Active') AND (Name LIKE '%" + name + "%'))";
+		populateCollectionHelper(query);
+	}
+	
+	//-----------------------------------------------------------
+	public void findAllByName(String name)
+	{
+		String query = "SELECT * FROM " + myTableName + " WHERE (Name = '" + name + "')";
 		populateCollectionHelper(query);
 	}
 
@@ -176,6 +190,16 @@ public class CategoryCollection extends EntityBase
 				categories.remove(cnt);
 			}
 		}
+	}
+	
+	//----------------------------------------------------------
+	public int getSize()
+	{
+		int numElems = 0;
+		if (categories != null)
+			numElems = categories.size();
+		
+		return numElems;
 	}
 	
 	//----------------------------------------------------------

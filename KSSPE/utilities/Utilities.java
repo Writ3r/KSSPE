@@ -2,11 +2,11 @@
 package utilities;
 
 // system imports
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.regex.Pattern;
 
 import utilities.GlobalVariables;
 
@@ -190,10 +190,15 @@ public class Utilities
 	//------------------------------------------------------
 	public static boolean checkPenalty(String p)
 	{
-		if(p.length() < GlobalVariables.PENALTY_LENGTH)
+		try
+		{
+			Double d = Double.parseDouble(p);
 			return true;
-		else
+		}
+		catch (NumberFormatException ex)
+		{
 			return false;
+		}
 	}
 	
 	
@@ -232,10 +237,7 @@ public class Utilities
 	public static boolean checkDueDate(String date)
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		/*
-		if(Pattern.matches("\\d[4]-\\d[2]-\\d[2]", date))
-		{
-		*/
+		
 		try{	
 			if(sdf.parse(date) != null)
 			{
@@ -497,6 +499,12 @@ public class Utilities
    		
    		return true;
    	}
+	
+	//----------------------------------------------------------------
+	public static String formatPenalty(double penalty)
+	{
+		return (new DecimalFormat("##0.00")).format(penalty);
+	}
 	
 	// Assume the phone number comes in validated - i.e., it has only digits, (, ) and -
 	//----------------------------------------------------------------

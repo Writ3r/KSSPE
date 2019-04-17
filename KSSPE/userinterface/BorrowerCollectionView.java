@@ -301,7 +301,7 @@ public class BorrowerCollectionView extends View implements Observer
     //---------------------------------------------------------------------------
 	private void displayRemoveAlert(){
 		clearErrorMessage();
-		Alert alert = new Alert(Alert.AlertType.ERROR,"BannerId: "+tableOfBorrowers.getSelectionModel().getSelectedItem().getBannerId()
+		Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"BannerId: "+tableOfBorrowers.getSelectionModel().getSelectedItem().getBannerId()
 				+"\nFirstName: "+tableOfBorrowers.getSelectionModel().getSelectedItem().getFirstName()
 				+"\nLastName: "+tableOfBorrowers.getSelectionModel().getSelectedItem().getLastName(), ButtonType.YES, ButtonType.NO);
 		alert.setHeaderText(null);

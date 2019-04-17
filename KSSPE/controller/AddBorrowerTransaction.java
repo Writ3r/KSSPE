@@ -28,42 +28,40 @@ public class AddBorrowerTransaction extends Transaction
 	private Receptionist myReceptionist;
 	private Borrower myBorrower;
 
+
+	//------------------------------------------------------------
 	public AddBorrowerTransaction() throws Exception
 	{
 		super();
 	}
 
+	//------------------------------------------------------------
 	public void processTransaction(Properties props)
 	{
 		if (myBorrower != null)
 		{
-			
 			myBorrower.stateChangeRequest("Status", "Active");
 			myBorrower.stateChangeRequest("FirstName", props.getProperty("FirstName"));
 			myBorrower.stateChangeRequest("LastName", props.getProperty("LastName"));
 			myBorrower.stateChangeRequest("Email", props.getProperty("Email"));
-			myBorrower.stateChangeRequest("Penalty", "0");
-			myBorrower.stateChangeRequest("BlockStatus", "Unblocked");
 			myBorrower.stateChangeRequest("PhoneNumber", props.getProperty("PhoneNumber"));
+			myBorrower.stateChangeRequest("BlockStatus", props.getProperty("BlockStatus"));
+			myBorrower.stateChangeRequest("Penalty", props.getProperty("Penalty"));
 			myBorrower.stateChangeRequest("Notes", props.getProperty("Notes"));
 			myBorrower.stateChangeRequest("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 			myBorrower.save();
 			
 			errorMessage = (String)myBorrower.getState("UpdateStatusMessage");
-			
 			if (errorMessage.startsWith("ERR") == false)
 			{
 				errorMessage = "Borrower with id: " + myBorrower.getState("BannerId") + " saved/reinstated successfully";
 			}
-			
 		}
 		else
 		{
 			try
 			{
 				props.setProperty("Status", "Active");
-				props.setProperty("BlockStatus", "Unblocked");
-				props.setProperty("Penalty", "0");
 				props.setProperty("DateAdded", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 				props.setProperty("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 				
@@ -108,6 +106,7 @@ public class AddBorrowerTransaction extends Transaction
 		}
 	}
 
+	//-----------------------------------------------------------------
 	public void stateChangeRequest(String key, Object value)
 	{
 		errorMessage = "";
@@ -145,12 +144,12 @@ public class AddBorrowerTransaction extends Transaction
 					Properties bProp = new Properties();
 					bProp.setProperty("BannerId", (String)w.getState("BannerId"));
 					bProp.setProperty("Status", "Active");
-					bProp.setProperty("DateAdded", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-					bProp.setProperty("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-					bProp.setProperty("Penalty", "0");
+					bProp.setProperty("Penalty", "0.00");
 					bProp.setProperty("BlockStatus", "Unblocked");
 					bProp.setProperty("PhoneNumber", "");
 					bProp.setProperty("Notes", "");
+					bProp.setProperty("DateAdded", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+					bProp.setProperty("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 					myBorrower = new Borrower(bProp, true);
 					
 					errorMessage = "Person with id " + ((Properties)value).getProperty("BannerId") + " found!";
@@ -158,7 +157,7 @@ public class AddBorrowerTransaction extends Transaction
 				}
 				catch (Exception excep)
 				{
-					//do nothing here. If here, nothing exists to fill. 
+					errorMessage = "Enter data for Borrower with id " + ((Properties)value).getProperty("BannerId");
 				}
 				
 			}

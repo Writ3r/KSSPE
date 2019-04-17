@@ -51,7 +51,6 @@ public class AddWorkerTransaction extends Transaction
 			myWorker.save();
 			
 			errorMessage = (String)myWorker.getState("UpdateStatusMessage");
-			
 			if (errorMessage.startsWith("ERR") == false)
 			{
 				errorMessage = "Worker with id: " + myWorker.getState("BannerId") + " saved/reinstated successfully";
@@ -157,7 +156,7 @@ public class AddWorkerTransaction extends Transaction
 				}
 				catch (Exception excep)
 				{
-					//do nothing here. If here, nothing exists to fill. 
+					errorMessage = "Enter data for worker with id " + ((Properties)value).getProperty("BannerId");
 				}
 				
 			}
