@@ -48,10 +48,10 @@ import controller.Transaction;
 public class UpdateBorrowerView extends AddBorrowerView
 {
 	
-	protected ComboBox<String> blockStatus;
-	protected TextField penalty;
+	
 	
 
+	//--------------------------------------------------------------
 	public UpdateBorrowerView(Transaction t)
 	{
 		super(t);
@@ -66,42 +66,7 @@ public class UpdateBorrowerView extends AddBorrowerView
 	//--------------------------------------------------------------
 	public void populateFields()
 	{
-		Text penaltyLabel = new Text(" Penalty ($) : ");
-			penaltyLabel.setFill(Color.GOLD);
-			penaltyLabel.setFont(myFont);
-			penaltyLabel.setTextAlignment(TextAlignment.RIGHT);
-		grid.add(penaltyLabel, 0, 3);
-
-		penalty = new TextField();
-			penalty.setMinWidth(150);
-			penalty.addEventFilter(KeyEvent.KEY_RELEASED, event->{
-				clearErrorMessage();
-			});
-		grid.add(penalty, 1, 3);
-		
-		
-		Text blockStatusLabel = new Text(" Block Status : ");
-			blockStatusLabel.setFill(Color.GOLD);
-			blockStatusLabel.setFont(myFont);
-			blockStatusLabel.setTextAlignment(TextAlignment.RIGHT);
-		grid.add(blockStatusLabel, 2, 3);
-
-		blockStatus = new ComboBox();
-			blockStatus.setMinWidth(150);
-			blockStatus.addEventFilter(KeyEvent.KEY_RELEASED, event->{
-				clearErrorMessage();
-			});
-			blockStatus.getItems().addAll(
-				"Blocked",
-				"Unblocked"
-			);
-
-		grid.add(blockStatus, 3, 3);
-		
-		penalty.setStyle("-fx-border-color: transparent;  -fx-focus-color: green;");
-		blockStatus.setStyle("-fx-border-color: transparent;  -fx-focus-color: green;");
-		
-		
+			
 		String bannerIdText = (String)myController.getState("BannerId");
 		if (bannerIdText != null)
 		{
@@ -151,7 +116,7 @@ public class UpdateBorrowerView extends AddBorrowerView
 			blockStatus.setValue(blockText);
 		}
 
-		submitButton.setText("Update"); //fix submitbutton
+		submitButton.setText("Update"); //fix submit button
 		ImageView icon = new ImageView(new Image("/images/savecolor.png"));
 		icon.setFitHeight(15);
 		icon.setFitWidth(15);
@@ -159,7 +124,7 @@ public class UpdateBorrowerView extends AddBorrowerView
 		
 	}
 	
-	
+	//-----------------------------------------------------------------------
 	protected void processBannerId(String BannerId)
 	{
 		
@@ -177,8 +142,9 @@ public class UpdateBorrowerView extends AddBorrowerView
 		String Email = email.getText();
 		String PhoneNumber = phoneNumber.getText();
 		String Notes = notes.getText();
-		String BlockStatus = blockStatus.getValue().toString();
+		
 		String Penalty = penalty.getText();
+		String BlockStatus;
 		
 		// VALIDATE the data before sending it to the controller
 		if(Utilities.checkBannerId(BannerID)) 
@@ -193,19 +159,28 @@ public class UpdateBorrowerView extends AddBorrowerView
 						{
 							if(Utilities.checkPenalty(Penalty))
 							{
-								Properties props = new Properties();
-								props.setProperty("FirstName", FirstName);
-								props.setProperty("LastName", LastName);
-								props.setProperty("Email", Email);
-								props.setProperty("PhoneNumber", Utilities.formatUSPhoneNumber(PhoneNumber));
-								props.setProperty("Notes", Notes);
-								props.setProperty("Penalty", Penalty);
-								props.setProperty("BlockStatus", BlockStatus);
-								myController.stateChangeRequest("BorrowerData", props);
+								if(blockStatus.getValue() != null)  
+								{
+									BlockStatus = blockStatus.getValue().toString();
+									Properties props = new Properties();
+									props.setProperty("FirstName", FirstName);
+									props.setProperty("LastName", LastName);
+									props.setProperty("Email", Email);
+									props.setProperty("PhoneNumber", Utilities.formatUSPhoneNumber(PhoneNumber));
+									props.setProperty("Notes", Notes);
+									props.setProperty("Penalty", Penalty);
+									props.setProperty("BlockStatus", BlockStatus);
+									myController.stateChangeRequest("BorrowerData", props);
+								}
+								else
+								{
+									displayErrorMessage("Please select a valid block status.");
+									blockStatus.requestFocus();
+								}
 							}
 							else
 							{
-								displayErrorMessage("Please enter a valid penalty.");
+								displayErrorMessage("Please enter a valid numerical value for penalty.");
 								phoneNumber.requestFocus();
 							}
 						}
@@ -256,6 +231,27 @@ public class UpdateBorrowerView extends AddBorrowerView
 	//----------------------------------
 	protected void setDisables()
 	{
+		
+	}
+	
+	/**
+	 * Update method
+	 */
+	//---------------------------------------------------------
+	
+	public void update(Observable o, Object value)
+	{
+		clearErrorMessage();
+		
+		String val = (String)value;
+		if (val.startsWith("ERR") == true)
+		{
+			displayErrorMessage(val);
+		}
+		else
+		{
+			displayMessage(val);
+		}
 		
 	}
 
