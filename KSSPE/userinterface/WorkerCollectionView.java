@@ -142,7 +142,7 @@ public class WorkerCollectionView extends View implements Observer
 
 	// Create the title container
 	//-------------------------------------------------------------
-private Node createTitle()
+	private Node createTitle()
 	{
 		VBox container = new VBox(10);
 		container.setPadding(new Insets(1, 10, 12, 10));
@@ -298,10 +298,11 @@ private Node createTitle()
 			myController.stateChangeRequest("WorkerSelected", selectedBannerId);
 		}
 	}
-        
+    
+	//----------------------------------------------------------------------------
 	private void displayRemoveAlert(){
 		clearErrorMessage();
-		Alert alert = new Alert(Alert.AlertType.ERROR,"BannerId: "+tableOfWorkers.getSelectionModel().getSelectedItem().getBannerId()
+		Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"BannerId: "+tableOfWorkers.getSelectionModel().getSelectedItem().getBannerId()
 				+"\nFirstName: "+tableOfWorkers.getSelectionModel().getSelectedItem().getFirstName()
 				+"\nLastName: "+tableOfWorkers.getSelectionModel().getSelectedItem().getLastName(), ButtonType.YES, ButtonType.NO);
 		alert.setHeaderText(null);
