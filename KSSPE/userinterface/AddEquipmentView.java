@@ -405,6 +405,7 @@ public class AddEquipmentView extends View implements Observer
 		String Note = notes.getText();
 		String Category;
 		int AvailableCount;
+		int InStockCount;
 		
 		if(Utilities.checkBarcode(Barcode)) 
 		{
@@ -421,6 +422,7 @@ public class AddEquipmentView extends View implements Observer
 								if(Utilities.checkNotes(Note))  
 								{
 									AvailableCount = Integer.parseInt(PoorCount) + Integer.parseInt(FairCount) + Integer.parseInt(GoodCount);
+									InStockCount = Integer.parseInt(PoorCount) + Integer.parseInt(FairCount) + Integer.parseInt(GoodCount);
 									Category = category.getValue().toString();
 							
 									Properties props = new Properties();
@@ -432,6 +434,7 @@ public class AddEquipmentView extends View implements Observer
 									props.setProperty("GoodCount", GoodCount);
 									props.setProperty("Notes", Note);
 									props.setProperty("AvailableCount", Integer.toString(AvailableCount));
+									props.setProperty("InStockCount", Integer.toString(InStockCount));
 									removeDisables();
 									myController.stateChangeRequest("EquipmentData", props);
 									setDisables();
