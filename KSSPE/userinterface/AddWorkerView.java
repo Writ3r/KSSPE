@@ -468,6 +468,7 @@ public class AddWorkerView extends View implements Observer
 		email.clear();
 		phoneNumber.clear();
 		password.clear();
+		credential.setValue("Ordinary");
 	}
 	
 	//-------------------------------------------------------------
@@ -529,7 +530,7 @@ public class AddWorkerView extends View implements Observer
 	{
 		if((Boolean)myController.getState("TestWorker"))
 		{
-			if(((String)myController.getState("Status")).equals("Inactive"))
+			if(((String)myController.getState("Status")).equals("Inactive") || ((String)myController.getState("IsOld")).equals("false")) //Old inactive worker to be reinstated, or an existing person.
 			{
 				removeDisables();
 				
@@ -545,28 +546,6 @@ public class AddWorkerView extends View implements Observer
 				email.setText(emailState);
 				phoneNumber.setText(phoneState);
 				credential.setValue(credentialState);
-				
-				password.requestFocus();
-			}
-			else if(((String)myController.getState("IsOld")).equals("false")) //if there is a person
-			{
-				removeDisables();
-				
-				String firstNameState = (String)myController.getState("FirstName"); 
-				String lastNameState = (String)myController.getState("LastName");
-				String emailState = (String)myController.getState("Email");
-				String phoneState = (String)myController.getState("PhoneNumber");
-				
-				bannerId.setText(BannerId);
-				firstName.setText(firstNameState);
-				lastName.setText(lastNameState);
-				email.setText(emailState);
-				phoneNumber.setText(phoneState);
-				
-				firstName.setDisable(true);
-				lastName.setDisable(true);
-				email.setDisable(true);
-				phoneNumber.setDisable(true);
 				
 				password.requestFocus();
 			}

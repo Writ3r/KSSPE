@@ -471,7 +471,7 @@ public class AddBorrowerView extends View implements Observer
 	{
 		if((Boolean)myController.getState("TestBorrower"))
 		{
-			if(((String)myController.getState("Status")).equals("Inactive"))
+			if(((String)myController.getState("Status")).equals("Inactive") || ((String)myController.getState("IsOld")).equals("false")) //There is an existing person or old borrower to be reinstated. 
 			{
 				removeDisables();
 				
@@ -479,6 +479,8 @@ public class AddBorrowerView extends View implements Observer
 				String lastNameState = (String)myController.getState("LastName");
 				String emailState = (String)myController.getState("Email");
 				String phoneState = (String)myController.getState("PhoneNumber");
+				String penaltyState = (String)myController.getState("Penalty");
+				String blockState = (String)myController.getState("BlockStatus");
 				String notesState = (String)myController.getState("Notes");
 				
 				bannerId.setText(BannerId);
@@ -486,29 +488,9 @@ public class AddBorrowerView extends View implements Observer
 				lastName.setText(lastNameState);
 				email.setText(emailState);
 				phoneNumber.setText(phoneState);
+				penalty.setText(penaltyState);
+				blockStatus.setValue(blockState);
 				notes.setText(notesState);
-				
-				notes.requestFocus();
-			}
-			else if(((String)myController.getState("IsOld")).equals("false")) //if there is a person
-			{
-				removeDisables();
-				
-				String firstNameState = (String)myController.getState("FirstName"); 
-				String lastNameState = (String)myController.getState("LastName");
-				String emailState = (String)myController.getState("Email");
-				String phoneState = (String)myController.getState("PhoneNumber");
-				
-				bannerId.setText(BannerId);
-				firstName.setText(firstNameState);
-				lastName.setText(lastNameState);
-				email.setText(emailState);
-				phoneNumber.setText(phoneState);
-				
-				firstName.setDisable(true);
-				lastName.setDisable(true);
-				email.setDisable(true);
-				phoneNumber.setDisable(true);
 				
 				notes.requestFocus();
 			}
@@ -544,6 +526,8 @@ public class AddBorrowerView extends View implements Observer
 		email.clear();
 		phoneNumber.clear();
 		notes.clear();
+		penalty.clear();
+		blockStatus.setValue("Unblocked");
 	}
 	
 	//----------------------------------------------------------------------------------------
@@ -563,6 +547,8 @@ public class AddBorrowerView extends View implements Observer
 		lastName.setDisable(false);
 		email.setDisable(false);
 		phoneNumber.setDisable(false);
+		penalty.setDisable(false);
+		blockStatus.setDisable(false);
 		notes.setDisable(false);
 	}
 	
@@ -573,6 +559,8 @@ public class AddBorrowerView extends View implements Observer
 		lastName.setDisable(true);
 		email.setDisable(true);
 		phoneNumber.setDisable(true);
+		penalty.setDisable(true);
+		blockStatus.setDisable(true);
 		notes.setDisable(true);
 	}
 
