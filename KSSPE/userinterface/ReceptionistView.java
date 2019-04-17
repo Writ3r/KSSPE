@@ -100,7 +100,20 @@ public class ReceptionistView extends View implements Observer
 
 		getChildren().add(container);
 		
+		populateFields();
+		
 		myController.addObserver(this);
+	}
+	
+	//-------------------------------------------------------------
+	public void populateFields()
+	{
+		if(((String)myController.getState("Credential")).equals("Ordinary"))
+		{
+			addWorkerButton.setDisable(true);
+			updateWorkerButton.setDisable(true);
+			removeWorkerButton.setDisable(true);
+		}
 	}
 
 	// Create the labels and fields
@@ -121,6 +134,14 @@ public class ReceptionistView extends View implements Observer
 		titleText.setTextAlignment(TextAlignment.CENTER);
 		titleText.setFill(Color.GOLD);
 		container.getChildren().add(titleText);
+		
+		String TextFILL = "ID: " + ((String)myController.getState("BannerId")) + " / Cred: " + ((String)myController.getState("Credential"));
+		
+		Text workerText = new Text(TextFILL);
+		workerText.setFont(Font.font("Copperplate", FontWeight.BOLD, 23));
+		workerText.setTextAlignment(TextAlignment.CENTER);
+		workerText.setFill(Color.DARKGREEN);
+		container.getChildren().add(workerText);
 
 		//bport icon
 		ImageView bportIcon = new ImageView(new Image("/images/bportB.png",225,225 ,true,true));
