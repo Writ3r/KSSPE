@@ -544,27 +544,6 @@ public class ReceptionistView extends View implements Observer
 		HBox doneCont = new HBox(10);
 		doneCont.setAlignment(Pos.CENTER);
 		
-		icon = new ImageView(new Image("/images/exitcolor.png"));
-		icon.setFitHeight(15);
-		icon.setFitWidth(15);
-		cancelButton = new Button("Logout",icon);
-		cancelButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
-		cancelButton.setOnAction((ActionEvent e) -> {
-			myController.stateChangeRequest("Logout", null);    
-		});
-		
-		cancelButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-			cancelButton.setEffect(shadow);
-                        statusLog.displayInfoMessage("Return to Login Screen");
-		});
-		cancelButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-			cancelButton.setEffect(null);
-                        clearErrorMessage();
-		});
-		doneCont.getChildren().add(cancelButton);
-		
-		
-		
 		icon = new ImageView(new Image("/images/log.png"));
 		icon.setFitHeight(15);
 		icon.setFitWidth(15);
@@ -586,6 +565,26 @@ public class ReceptionistView extends View implements Observer
                         clearErrorMessage();
 		});
 		doneCont.getChildren().add(licenseButton);
+		
+		
+		icon = new ImageView(new Image("/images/exitcolor.png"));
+		icon.setFitHeight(15);
+		icon.setFitWidth(15);
+		cancelButton = new Button("Logout",icon);
+		cancelButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
+		cancelButton.setOnAction((ActionEvent e) -> {
+			myController.stateChangeRequest("Logout", null);    
+		});
+		
+		cancelButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+			cancelButton.setEffect(shadow);
+                        statusLog.displayInfoMessage("Return to Login Screen");
+		});
+		cancelButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+			cancelButton.setEffect(null);
+                        clearErrorMessage();
+		});
+		doneCont.getChildren().add(cancelButton);
 		
 		
 		
