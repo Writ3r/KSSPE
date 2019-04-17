@@ -135,9 +135,7 @@ public class ReceptionistView extends View implements Observer
 		titleText.setFill(Color.GOLD);
 		container.getChildren().add(titleText);
 		
-		String TextFILL = "ID: " + ((String)myController.getState("BannerId")) + " / Cred: " + ((String)myController.getState("Credential"));
-		
-		Text workerText = new Text(TextFILL);
+		Text workerText = new Text("ID: " + ((String)myController.getState("BannerId")) + " / Cred: " + ((String)myController.getState("Credential")));
 		workerText.setFont(Font.font("Copperplate", FontWeight.BOLD, 23));
 		workerText.setTextAlignment(TextAlignment.CENTER);
 		workerText.setFill(Color.DARKGREEN);
