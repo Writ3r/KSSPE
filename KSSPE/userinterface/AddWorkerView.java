@@ -198,6 +198,7 @@ public class AddWorkerView extends View implements Observer
 				if(Utilities.checkBannerId(bannerId.getText()))
 				{
 					processBannerId(bannerId.getText());
+					
 				}
 				else
 				{
