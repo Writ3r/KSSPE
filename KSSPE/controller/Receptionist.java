@@ -81,6 +81,15 @@ public class Receptionist extends Transaction
 			else
 				return "Undefined";
 		}
+		if (key.equals("Name") == true)
+		{
+			if (currentWorker != null)
+			{
+				return (String)currentWorker.getState("FirstName") + " " + (String)currentWorker.getState("LastName");
+			}
+			else
+				return "Undefined";
+		}
 		else
 			return "";
 	}

@@ -21,6 +21,7 @@ import model.Borrower;
 import model.Equipment;
 import model.CheckOut;
 import model.BorrowerCollection;
+import utilities.ReserveReceipt;
 
 /** The class containing the ModifyBorrowerTransaction for the KSSPE application */
 //==============================================================
@@ -31,6 +32,7 @@ public class ReserveEquipmentTransaction extends Transaction
 	private Borrower myBorrower;
 	private Equipment myCurrentEquipment;
 	private BorrowerCollection myBorrowerList;
+	private Vector<Properties> reservedEquipment = new Vector<Properties>();
 	private String myWorkerId;
 
 	//----------------------------------------------------------------
@@ -102,6 +104,10 @@ public class ReserveEquipmentTransaction extends Transaction
 		else if (key.equals("BorrowerBannerId") == true)
 		{
 			return myBorrower.getState("BannerId");
+		}
+		else if (key.equals("BorrowerName") == true)
+		{
+			return (String)myBorrower.getState("FirstName") + " " + (String)myBorrower.getState("LastName");
 		}
 		else if (key.equals("WorkerBannerId") == true)
 		{
@@ -184,10 +190,30 @@ public class ReserveEquipmentTransaction extends Transaction
 			Scene oldScene = createView();	
 			swapToView(oldScene);
 		}
+		if (key.equals("CancelTransactionAndMakeReceipt") == true)
+		{
+			
+			if(!reservedEquipment.isEmpty())
+			{
+			
+					Properties props = new Properties();
+					props.setProperty("WorkerName", (String)myReceptionist.getState("Name"));
+					props.setProperty("WorkerBannerId", myWorkerId);
+					props.setProperty("BorrowerName", (String)this.getState("BorrowerName"));
+					props.setProperty("BorrowerBannerId", (String)this.getState("BorrowerBannerId"));
+					
+					new ReserveReceipt(props, reservedEquipment);
+					
+					myReceptionist.stateChangeRequest("CancelTransaction", null);
+				
+				
+			}
+		}
 		if (key.equals("CancelTransaction") == true)
 		{
 			myReceptionist.stateChangeRequest("CancelTransaction", null);
 		}
+		
 		
 		setChanged();
         notifyObservers(errorMessage);
@@ -210,9 +236,18 @@ public class ReserveEquipmentTransaction extends Transaction
 			checkOut.save();
 			
 			myCurrentEquipment.stateChangeRequest("InStockCount", Integer.toString(stock - taken));
+			
 			myCurrentEquipment.save();
 			
 			errorMessage = (String)checkOut.getState("UpdateStatusMessage");
+			
+			//recipt code
+			Properties sendData = new Properties();
+			sendData.setProperty("Name", (String)myCurrentEquipment.getState("Name"));
+			sendData.setProperty("Barcode", (String)myCurrentEquipment.getState("Barcode"));
+			sendData.setProperty("Count", props.getProperty("UnitsTaken"));
+			sendData.setProperty("DueDate", props.getProperty("DueDate"));
+			reservedEquipment.add(sendData);
 		}
 		else
 			errorMessage = "ERROR: Cannot exceed the " + stock + " units in stock";
