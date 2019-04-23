@@ -64,6 +64,22 @@ public class TransactionFactory
 		if (transType.equals("ReserveEquipment") == true)
 		{
 			retValue = new ReserveEquipmentTransaction();
+		}
+		if (transType.equals("ListAllInventory") == true)
+		{
+			retValue = new ListAllInventoryTransaction();
+		} 
+		if (transType.equals("ListAvailableInventory") == true)
+		{
+			retValue = new ListAvailableInventoryTransaction();
+		} 
+		if (transType.equals("ListReservedInventory") == true)
+		{
+			retValue = new ListReservedInventoryTransaction();
+		} 
+		if (transType.equals("ListOverDueInventory") == true)
+		{
+			retValue = new ListOverDueInventoryTransaction();
 		} 
 		return retValue;
 	}
