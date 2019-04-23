@@ -195,32 +195,43 @@ public class ReceptionistView extends View implements Observer
         checkoutCont.getChildren().add(manageButton);
 		
    
+		icon = new ImageView(new Image("/images/list.png"));
+			icon.setFitHeight(20);
+			icon.setFitWidth(20);
+		MenuItem allInventory = new MenuItem("All Inventory", icon);
+
 		icon = new ImageView(new Image("/images/listcolor.png"));
 			icon.setFitHeight(20);
 			icon.setFitWidth(20);
 		MenuItem availInventory = new MenuItem("Available Inventory", icon);
 		
+		icon = new ImageView(new Image("/images/checkout.png"));
+			icon.setFitHeight(25);
+			icon.setFitWidth(25);
+		MenuItem currentlyReserved = new MenuItem("Currently Reserved", icon);
+		
 		icon = new ImageView(new Image("/images/datecolor.png"));
 			icon.setFitHeight(25);
 			icon.setFitWidth(25);
-		MenuItem itemCheckedOutTillDate = new MenuItem("Checked Out Items", icon);
-		
-		icon = new ImageView(new Image("/images/medalcolor.png"));
-			icon.setFitHeight(25);
-			icon.setFitWidth(25);
-		MenuItem topDonators = new MenuItem("Top Donor", icon);
+		MenuItem overdueItems = new MenuItem("Over Due Items", icon);
 
         icon = new ImageView(new Image("/images/reportcolor.png"));
 			icon.setFitHeight(25);
 			icon.setFitWidth(25);
-        MenuButton reportsButton = new MenuButton("   Reports   ", icon, availInventory, itemCheckedOutTillDate, topDonators);
+        MenuButton reportsButton = new MenuButton("   Reports   ", icon, allInventory, availInventory, currentlyReserved, overdueItems);
 			reportsButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
             reportsButton.setStyle("-fx-selection-bar:gold");
+            allInventory.setOnAction((ActionEvent e) -> {
+				myController.stateChangeRequest("ListAllInventory", null);
+			});
 			availInventory.setOnAction((ActionEvent e) -> {
 				myController.stateChangeRequest("ListAvailableInventory", null);
 			});
-			topDonators.setOnAction((ActionEvent e) -> {
-				myController.stateChangeRequest("TopDonatorReport", null);
+			currentlyReserved.setOnAction((ActionEvent e) -> {
+				myController.stateChangeRequest("ListReservedInventory", null);
+			});
+			overdueItems.setOnAction((ActionEvent e) -> {
+				myController.stateChangeRequest("ListOverDueInventory", null);
 			});
 			reportsButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
 				reportsButton.setEffect(shadow);
