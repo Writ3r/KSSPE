@@ -74,7 +74,32 @@ public class EquipmentCollection extends EntityBase
 	//-----------------------------------------------------------
 	public void findAll()
 	{
+		System.out.println("Finding all");
+		String query = "SELECT * FROM " + myTableName;
+		populateCollectionHelper(query);
+	}
+
+	//-----------------------------------------------------------
+	public void findAllAvailable()
+	{
+		System.out.println("Finding all available");
 		String query = "SELECT * FROM " + myTableName + " WHERE (AvailableCount > 0)";
+		populateCollectionHelper(query);
+	}
+
+	//-----------------------------------------------------------
+	public void findReserved()
+	{
+		System.out.println("Finding reserved");
+		String query = "";
+		populateCollectionHelper(query);
+	}
+
+	//-----------------------------------------------------------
+	public void findOverdue()
+	{
+		System.out.println("Finding overdue");
+		String query = "";
 		populateCollectionHelper(query);
 	}
 
@@ -138,10 +163,10 @@ public class EquipmentCollection extends EntityBase
 	//----------------------------------------------------------
 	public Object getState(String key)
 	{
-		if (key.equals("AllEquipment"))
+		if (key.equals("EquipmentList"))
 			return equipmentList;
 		else
-			if (key.equals("EquipmentList"))
+			if (key.equals("Equipment"))
 				return this;
 		return null;
 	}

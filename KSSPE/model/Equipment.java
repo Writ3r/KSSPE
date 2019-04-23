@@ -111,6 +111,26 @@ public class Equipment extends EntityBase
 		return persistentState.getProperty(key);
 	}
 
+	//-------------------------------------------------------------------
+	public Vector<String> getEntryListView()
+	{
+		Vector<String> v = new Vector<String>();
+		
+		v.addElement((String)this.getState("Barcode"));
+		v.addElement((String)this.getState("Name"));
+		v.addElement((String)this.getState("CategoryName"));
+		v.addElement((String)this.getState("Notes"));
+		v.addElement((String)this.getState("GoodCount"));
+		v.addElement((String)this.getState("FairCount"));
+		v.addElement((String)this.getState("PoorCount"));
+		v.addElement((String)this.getState("AvailableCount"));
+		v.addElement((String)this.getState("InStockCount"));
+		v.addElement((String)this.getState("DateAdded"));
+		v.addElement((String)this.getState("DateLastUsed"));
+		
+		return v;
+	}
+
 	//----------------------------------------------------------------
 	public void stateChangeRequest(String key, Object value)
 	{
