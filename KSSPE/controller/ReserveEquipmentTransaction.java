@@ -213,6 +213,8 @@ public class ReserveEquipmentTransaction extends Transaction
 					
 				myReceptionist.stateChangeRequest("CancelTransaction", null);
 			}
+			else
+				myReceptionist.stateChangeRequest("CancelTransaction", null);
 		}
 		if (key.equals("CancelTransaction") == true)
 		{
