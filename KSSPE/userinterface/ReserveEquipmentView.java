@@ -25,7 +25,10 @@ import javafx.collections.FXCollections;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DatePicker;
 import javafx.scene.Scene;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 
 import java.util.Properties;
 import java.util.Observer;
@@ -55,6 +58,7 @@ public class ReserveEquipmentView extends View implements Observer
 	protected TextField barcode;
 	protected TextField count;
 	protected TextField dueDate;
+	protected DatePicker datePicker;
 	
 	protected GridPane grid;
 	protected Font myFont;
@@ -87,10 +91,10 @@ public class ReserveEquipmentView extends View implements Observer
 		getChildren().add(container);
 		
 		populateFields();
-		
-		checkForPenaltiesAndBlocks(); //checks if the user has penalties/blocks. Puts up an alert if so. 
 
 		myController.addObserver(this);
+		
+		checkForPenaltiesAndBlocks(); //checks if the user has penalties/blocks. Puts up an alert if so. 
 	}
 
 	//-------------------------------------------------------------
@@ -101,7 +105,8 @@ public class ReserveEquipmentView extends View implements Observer
 	
 	public void populateFields()
 	{
-		
+		LocalDate today = LocalDate.now();
+		datePicker.setValue(today.plusDays(2));
 	}
 
 	protected void processBarcode(String Barcode)
@@ -232,13 +237,14 @@ public class ReserveEquipmentView extends View implements Observer
 			dueLabel.setTextAlignment(TextAlignment.RIGHT);
 		grid.add(dueLabel, 0, 3);
 		
-		dueDate = new TextField();
-			dueDate.setMinWidth(110);
-			dueDate.setMinWidth(110);
-			dueDate.addEventFilter(KeyEvent.KEY_RELEASED, event->{
+		
+		datePicker = new DatePicker();
+			datePicker.setMinWidth(110);
+			datePicker.setMinWidth(110);
+			datePicker.addEventFilter(KeyEvent.KEY_RELEASED, event->{
 				clearErrorMessage();
 			});
-		grid.add(dueDate, 1, 3);
+		grid.add(datePicker, 1, 3);
 		
 		
 		//---------------------------------- middle grid done.
@@ -305,7 +311,7 @@ public class ReserveEquipmentView extends View implements Observer
 		
 		String Barcode = barcode.getText();
 		String Count = count.getText();
-		String DueDate = dueDate.getText();
+		String DueDate = (datePicker.getValue()).toString();
 		
 		if(Utilities.checkBarcode(Barcode))
 		{
@@ -348,12 +354,19 @@ public class ReserveEquipmentView extends View implements Observer
 		{
 			Alert alert = new Alert(Alert.AlertType.ERROR,"BannerId: "+(String)myController.getState("BorrowerBannerId")
 					+"\nBlocked Status: "+ block
-					+"\nPenalty: " + penalty, ButtonType.OK);
+					+"\nPenalty: " + penalty, ButtonType.YES, ButtonType.NO);
 					
 			alert.setTitle("Penalized or Blocked Borrower");
-			alert.setHeaderText("Borrower has been Blocked or Penalized.");
+			alert.setHeaderText("Borrower has been Blocked or Penalized. Continue?");
 			((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(new Image("images/BPT_LOGO_All-In-One_Color.png"));
 			alert.showAndWait();
+			
+			if (alert.getResult() == ButtonType.YES)
+			{
+				
+			}
+			else
+				myController.stateChangeRequest("CancelTransactionAfterLoad", null);
 		}
 	}
 	
@@ -370,21 +383,20 @@ public class ReserveEquipmentView extends View implements Observer
 	{
 		barcode.clear();
 		count.clear();
-		dueDate.clear();
 	}
 	
 	//------------------------------------------------------------------------------------------
 	private void removeDisables()
 	{
 		count.setDisable(false);
-		dueDate.setDisable(false);
+		datePicker.setDisable(false);
 	}
 	
 	//------------------------------------------------------------------------------------------
 	protected void setDisables()
 	{
 		count.setDisable(true);
-		dueDate.setDisable(true);
+		datePicker.setDisable(true);
 	}
 	
 	private void clearValuesExceptDue()
@@ -398,7 +410,7 @@ public class ReserveEquipmentView extends View implements Observer
 	{
 		barcode.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
 		count.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
-		dueDate.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
+		datePicker.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
 	}
 
 	/**
