@@ -344,7 +344,7 @@ public class ReserveEquipmentView extends View implements Observer
 		String penalty = (String)myController.getState("Penalty");
 		String block = (String)myController.getState("BlockStatus");
 		
-		if((!penalty.equals("") && penalty != null && !penalty.equals("0")) || (!block.equals("") && block != null && !block.equals("Unblocked")))
+		if(!penalty.equals("") && penalty != null && (!(Double.parseDouble(penalty) == 0) || !block.equals("Unblocked")))
 		{
 			Alert alert = new Alert(Alert.AlertType.ERROR,"BannerId: "+(String)myController.getState("BorrowerBannerId")
 					+"\nBlocked Status: "+ block
