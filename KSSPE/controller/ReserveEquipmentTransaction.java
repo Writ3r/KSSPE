@@ -34,6 +34,7 @@ public class ReserveEquipmentTransaction extends Transaction
 	private BorrowerCollection myBorrowerList;
 	private Vector<Properties> reservedEquipment = new Vector<Properties>();
 	private String myWorkerId;
+	private Boolean continueScreenCreation = true;
 
 	//----------------------------------------------------------------
 	public ReserveEquipmentTransaction() throws Exception
@@ -158,7 +159,10 @@ public class ReserveEquipmentTransaction extends Transaction
 			try
 			{
 				Scene newScene = createReserveEquipmentView();
-				swapToView(newScene);
+				if(continueScreenCreation)
+					swapToView(newScene);
+				else
+					myReceptionist.stateChangeRequest("CancelTransaction", null);
 			}
 			catch (Exception ex)
 			{
@@ -178,7 +182,7 @@ public class ReserveEquipmentTransaction extends Transaction
 			{
 				myCurrentEquipment = new Equipment((Properties)value);
 				
-				errorMessage = "Equipment with Barcode: " + ((Properties)value).getProperty("Barcode") +  " found!";
+				errorMessage = "Equipment: [" + myCurrentEquipment.getState("Name") + "] found!";
 			}
 			catch(Exception ex)
 			{
@@ -187,12 +191,11 @@ public class ReserveEquipmentTransaction extends Transaction
 		}
 		if (key.equals("CancelBorrowerList") == true)
 		{
-			Scene oldScene = createView();	
+			Scene oldScene = createView();
 			swapToView(oldScene);
 		}
 		if (key.equals("CancelTransactionAndMakeReceipt") == true)
 		{
-			
 			if(!reservedEquipment.isEmpty())
 			{
 			
@@ -219,6 +222,10 @@ public class ReserveEquipmentTransaction extends Transaction
 		if (key.equals("CancelTransaction") == true)
 		{
 			myReceptionist.stateChangeRequest("CancelTransaction", null);
+		}
+		if (key.equals("CancelTransactionAfterLoad") == true)
+		{
+			continueScreenCreation = false;
 		}
 		
 		
