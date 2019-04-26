@@ -181,7 +181,7 @@ public class UpdateBorrowerView extends AddBorrowerView
 							else
 							{
 								displayErrorMessage("Please enter a valid numerical value for penalty.");
-								phoneNumber.requestFocus();
+								penalty.requestFocus();
 							}
 						}
 						else
