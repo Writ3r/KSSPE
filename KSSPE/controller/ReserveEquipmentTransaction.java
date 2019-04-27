@@ -215,31 +215,6 @@ public class ReserveEquipmentTransaction extends Transaction
 				}
 			}
 		}
-		if (key.equals("CancelTransactionAndMakeReceipt") == true)
-		{
-			if(!reservedEquipment.isEmpty())
-			{
-			
-				Properties props = new Properties();
-				props.setProperty("WorkerName", (String)myReceptionist.getState("Name"));
-				props.setProperty("WorkerBannerId", myWorkerId);
-				props.setProperty("BorrowerName", (String)this.getState("BorrowerName"));
-				props.setProperty("BorrowerBannerId", (String)this.getState("BorrowerBannerId"));
-				
-				try
-				{
-					new ReserveReceipt(props, reservedEquipment);
-				}
-				catch(Exception ex)
-				{
-					errorMessage = ex.getMessage();
-				}
-					
-				myReceptionist.stateChangeRequest("CancelTransaction", null);
-			}
-			else
-				myReceptionist.stateChangeRequest("CancelTransaction", null);
-		}
 		if (key.equals("CancelTransaction") == true)
 		{
 			myReceptionist.stateChangeRequest("CancelTransaction", null);
