@@ -284,7 +284,12 @@ public class ReserveEquipmentView extends View implements Observer
 			cancelButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
 			cancelButton.setOnAction((ActionEvent e) -> {
 				clearErrorMessage();
-				myController.stateChangeRequest("CancelTransactionAndMakeReceipt", null);
+				myController.stateChangeRequest("MakeRecipt", null);
+				
+				if(!((String)myController.getState("Error")).equals(""))
+					showErrorAlert((String)myController.getState("Error"));
+				else
+					myController.stateChangeRequest("CancelTransaction", null);
 			});
 			cancelButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
 				cancelButton.setEffect(new DropShadow());
@@ -344,6 +349,21 @@ public class ReserveEquipmentView extends View implements Observer
 		}
 	}
 	
+	private void showErrorAlert(String error)
+	{
+		
+		Alert alert = new Alert(Alert.AlertType.ERROR,"Error Message: " + error, ButtonType.OK);
+				
+		alert.setTitle("Error in Receipt Creation");
+		alert.setHeaderText("An Error occurred in Receipt Creation");
+		((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(new Image("images/BPT_LOGO_All-In-One_Color.png"));
+		alert.showAndWait();
+		
+		if (alert.getResult() == ButtonType.OK)
+		{
+			myController.stateChangeRequest("CancelTransaction", null);
+		}
+	}
 	
 	private void checkForPenaltiesAndBlocks()
 	{
