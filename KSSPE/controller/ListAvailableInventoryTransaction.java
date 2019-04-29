@@ -40,7 +40,6 @@ public class ListAvailableInventoryTransaction extends Transaction
 	//------------------------------------------------------------
 	public void processTransaction()
 	{
-		System.out.println("ListAllAvailable processTransaction: 43");
 		myEquipmentList = new EquipmentCollection();
 		myEquipmentList.findAllAvailable();
 		
