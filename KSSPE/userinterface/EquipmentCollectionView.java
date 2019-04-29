@@ -93,10 +93,10 @@ public class EquipmentCollectionView extends View implements Observer
 	//--------------------------------------------------------------------------
 	protected void getEntryTableModelValues()
 	{
-
 		ObservableList<EquipmentTableModel> tableData = FXCollections.observableArrayList();
 		try
 		{
+			//System.out.println("We have data");
 	
 			EquipmentCollection equipmentCollection = 
 					(EquipmentCollection)myController.getState("EquipmentList");
@@ -119,8 +119,10 @@ public class EquipmentCollectionView extends View implements Observer
 
 				}
 
-				//equipment is the same plural as singular, no need to see if just one
-				actionText.setText(entryList.size()+" Equipment Found!");
+				if(entryList.size() == 1)
+					actionText.setText(entryList.size()+" Item Found!");
+				else
+					actionText.setText(entryList.size()+" Items Found!");
 				actionText.setFill(Color.LIGHTGREEN);
 			}
 			else
@@ -235,13 +237,15 @@ public class EquipmentCollectionView extends View implements Observer
 		poorCountColumn.setCellValueFactory(
 				new PropertyValueFactory<EquipmentTableModel, String>("PoorCount"));
 
-		TableColumn availableCountColumn = new TableColumn("Available Count") ;
-		availableCountColumn.setMinWidth(116.6);
-		availableCountColumn.setStyle(" -fx-alignment: CENTER;");
-		availableCountColumn.setCellValueFactory(
-				new PropertyValueFactory<EquipmentTableModel, String>("AvailableCount"));
+		//NOTE: Took this out because it didn't make much sense to display to the user
+		//		If you want it back, make sure you add the column back in line 260
+		// TableColumn availableCountColumn = new TableColumn("Available Count") ;
+		// availableCountColumn.setMinWidth(116.6);
+		// availableCountColumn.setStyle(" -fx-alignment: CENTER;");
+		// availableCountColumn.setCellValueFactory(
+		// 		new PropertyValueFactory<EquipmentTableModel, String>("AvailableCount"));
 
-		TableColumn stockCountColumn = new TableColumn("Stock Count") ;
+		TableColumn stockCountColumn = new TableColumn("Currently in Stock") ;
 		stockCountColumn.setMinWidth(116.6);
 		stockCountColumn.setStyle(" -fx-alignment: CENTER;");
 		stockCountColumn.setCellValueFactory(
@@ -254,7 +258,7 @@ public class EquipmentCollectionView extends View implements Observer
 				new PropertyValueFactory<EquipmentTableModel, String>("DateLastUsed"));
 
 		tableOfEquipment.getColumns().addAll(barcodeColumn, nameColumn, categoryNameColumn, notesColumn, 
-			goodCountColumn, fairCountColumn, poorCountColumn, availableCountColumn, stockCountColumn, lastUsedColumn);
+			goodCountColumn, fairCountColumn, poorCountColumn, stockCountColumn, lastUsedColumn);
 
 		ImageView icon = new ImageView(new Image("/images/return.png"));
 		icon.setFitHeight(15);
