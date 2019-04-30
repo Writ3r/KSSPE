@@ -59,6 +59,23 @@ public class CheckOut extends EntityBase
 	{
 		persistentState.setProperty(key, (String)value);
 	}
+
+	//-------------------------------------------------------------------
+	public Vector<String> getEntryListView()
+	{
+		Vector<String> v = new Vector<String>();
+		
+		v.addElement((String)this.getState("Id"));
+		v.addElement((String)this.getState("BannerId"));
+		v.addElement((String)this.getState("Barcode"));
+		v.addElement((String)this.getState("UnitsTaken"));
+		v.addElement((String)this.getState("TotalUnitsReturned"));
+		v.addElement((String)this.getState("RentDate"));
+		v.addElement((String)this.getState("DueDate"));
+		v.addElement((String)this.getState("CheckOutWorkerId"));
+		
+		return v;
+	}
 	
 	//-----------------------------------------------------------------------------------
 	public static int compare(CheckOut a, CheckOut b)
