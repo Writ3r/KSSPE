@@ -42,7 +42,7 @@ public class ListReservedInventoryTransaction extends Transaction
 	{
 		System.out.println("ListReserved processTransaction: 43");
 		myEquipmentList = new EquipmentCollection();
-		myEquipmentList.findReserved();
+		//myEquipmentList.findReserved();
 		
 		try
 		{	
