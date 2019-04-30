@@ -42,7 +42,7 @@ public class ListOverDueInventoryTransaction extends Transaction
 	{
 		System.out.println("ListOverDue processTransaction: 43");
 		myEquipmentList = new EquipmentCollection();
-		myEquipmentList.findOverdue();
+		//myEquipmentList.findOverdue();
 		
 		try
 		{	
