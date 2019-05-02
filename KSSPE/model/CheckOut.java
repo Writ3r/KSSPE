@@ -19,7 +19,8 @@ import database.*;
 public class CheckOut extends EntityBase
 {
 	private static final String myTableName = "CheckOut";
-	
+
+	private Equipment myEquipment;
 	// GUI Components
 	private String updateStatusMessage = "";
 
@@ -43,6 +44,25 @@ public class CheckOut extends EntityBase
 				persistentState.setProperty(nextKey, nextValue);
 			}
 		}
+		
+		String barcodeSent = (String)getState("Barcode");
+		if (barcodeSent != null)
+		{
+			try
+			{
+				Properties p = new Properties();
+				p.setProperty("Barcode", barcodeSent);
+				myEquipment = new Equipment(p);
+			}
+			catch (InvalidPrimaryKeyException excep)
+			{
+				myEquipment = null;
+			}
+		}
+		else
+		{
+			myEquipment = null;
+		}
 	}
 
 	//----------------------------------------------------------
@@ -51,30 +71,31 @@ public class CheckOut extends EntityBase
 		if (key.equals("UpdateStatusMessage") == true)
 			return updateStatusMessage;
 		
-		return persistentState.getProperty(key);
+		if (key.equals("Equipment") == true)
+			return myEquipment;
+		
+		String val = persistentState.getProperty(key);
+		if (val != null)
+		{
+			return val;
+		}
+		else
+		{
+			if (myEquipment != null)
+			{
+				return myEquipment.getState(key);
+			}
+			else
+			{
+				return null;
+			}
+		}
 	}
 
 	//----------------------------------------------------------------
 	public void stateChangeRequest(String key, Object value)
 	{
 		persistentState.setProperty(key, (String)value);
-	}
-
-	//-------------------------------------------------------------------
-	public Vector<String> getEntryListView()
-	{
-		Vector<String> v = new Vector<String>();
-		
-		v.addElement((String)this.getState("Id"));
-		v.addElement((String)this.getState("BannerId"));
-		v.addElement((String)this.getState("Barcode"));
-		v.addElement((String)this.getState("UnitsTaken"));
-		v.addElement((String)this.getState("TotalUnitsReturned"));
-		v.addElement((String)this.getState("RentDate"));
-		v.addElement((String)this.getState("DueDate"));
-		v.addElement((String)this.getState("CheckOutWorkerId"));
-		
-		return v;
 	}
 	
 	//-----------------------------------------------------------------------------------
@@ -94,19 +115,49 @@ public class CheckOut extends EntityBase
 	//------------------------------------------------------------------
 	private void updateStateInDatabase()
 	{
-		try
+		if (myEquipment != null)
 		{
-			Integer atID = insertAutoIncrementalPersistentState(mySchema, persistentState);
-			persistentState.setProperty("ID", "" + atID.intValue());
-			updateStatusMessage = "Check Out record inserted successfully!";
+			try
+			{
+				Integer atID = insertAutoIncrementalPersistentState(mySchema, persistentState);
+				persistentState.setProperty("ID", "" + atID.intValue());
+				updateStatusMessage = "Check Out record inserted successfully!";
+			}
+			catch (SQLException ex)
+			{
+				updateStatusMessage = "ERROR: Check out record could not be installed in database!";
+				new Event(Event.getLeafLevelClassName(this), "updateStateInDatabase", "Equipment with Barcode : " + 
+					persistentState.getProperty("Barcode") + " could not be saved in database: " + ex.toString(), Event.ERROR);
+			}
 		}
-		catch (SQLException ex)
+		else
 		{
-			updateStatusMessage = "ERROR: Check out record could not be installed in database!";
-			new Event(Event.getLeafLevelClassName(this), "updateStateInDatabase", "Equipment with Barcode : " + 
-				persistentState.getProperty("Barcode") + " could not be saved in database: " + ex.toString(), Event.ERROR);
+			updateStatusMessage = "ERROR: Checking out invalid equipment!";
+			new Event(Event.getLeafLevelClassName(this), "updateStateInDatabase", "Checkout record is not associated with valid equipment Barcode sent was: " + 
+					persistentState.getProperty("Barcode"), Event.ERROR);	
 		}
 			
+	}
+	
+	//-------------------------------------------------------------------
+	public Vector<String> getEntryListView()
+	{
+		Vector<String> v = new Vector<String>();
+
+		v.addElement(persistentState.getProperty("ID"));
+		v.addElement(persistentState.getProperty("BannerId"));
+		v.addElement(persistentState.getProperty("Barcode"));
+		if (myEquipment != null)
+			v.addElement((String)myEquipment.getState("Barcode"));
+		else
+			v.addElement("Unknown barcode");
+		v.addElement(persistentState.getProperty("UnitsTaken"));
+		v.addElement(persistentState.getProperty("TotalUnitsReturned"));
+		v.addElement(persistentState.getProperty("DueDate"));
+		v.addElement(persistentState.getProperty("RentDate"));
+		//v.addElement(persistentState.getProperty("Status"));
+
+		return v;
 	}
 	
 	//------------------------------------------------------------------
