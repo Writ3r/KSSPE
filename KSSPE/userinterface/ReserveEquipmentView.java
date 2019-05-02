@@ -47,7 +47,7 @@ import javafx.util.StringConverter;
 
 import controller.Transaction;
 
-/** The class containing the Add Borrower View for the KSSPE
+/** The class containing the Reserve Equipment View View for the KSSPE
  *  application 
  */
 //==============================================================
@@ -93,8 +93,6 @@ public class ReserveEquipmentView extends View implements Observer
 		populateFields();
 
 		myController.addObserver(this);
-		
-		checkForPenaltiesAndBlocks(); //checks if the user has penalties/blocks. Puts up an alert if so. 
 	}
 
 	//-------------------------------------------------------------
@@ -103,12 +101,14 @@ public class ReserveEquipmentView extends View implements Observer
 		return "** RESERVE EQUIPMENT **";
 	}
 	
+	//-------------------------------------------------------------
 	public void populateFields()
 	{
 		LocalDate today = LocalDate.now();
 		datePicker.setValue(today.plusDays(2));
 	}
 
+	//-------------------------------------------------------------
 	protected void processBarcode(String Barcode)
 	{
 		//make sure equipment with this barcode actually exists. If so, inform the user and remove disables on the other fields.
@@ -185,7 +185,6 @@ public class ReserveEquipmentView extends View implements Observer
 			blankText.setTextAlignment(TextAlignment.CENTER);
 			blankText.setFill(Color.WHITE);
 		vbox.getChildren().add(blankText);
-		
 		
 		
 		grid = new GridPane();
@@ -284,12 +283,7 @@ public class ReserveEquipmentView extends View implements Observer
 			cancelButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
 			cancelButton.setOnAction((ActionEvent e) -> {
 				clearErrorMessage();
-				myController.stateChangeRequest("MakeRecipt", null);
-				
-				if(!((String)myController.getState("Error")).equals(""))
-					showErrorAlert((String)myController.getState("Error"));
-				else
-					myController.stateChangeRequest("CancelTransaction", null);
+				myController.stateChangeRequest("CancelTransactionAndMakeReceipt", null);
 			});
 			cancelButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
 				cancelButton.setEffect(new DropShadow());
@@ -346,47 +340,6 @@ public class ReserveEquipmentView extends View implements Observer
 		{
 			displayErrorMessage("Please enter a valid barcode.");
 			barcode.requestFocus();
-		}
-	}
-	
-	private void showErrorAlert(String error)
-	{
-		
-		Alert alert = new Alert(Alert.AlertType.ERROR,"Error Message: " + error, ButtonType.OK);
-				
-		alert.setTitle("Error in Receipt Creation");
-		alert.setHeaderText("An Error occurred in Receipt Creation");
-		((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(new Image("images/BPT_LOGO_All-In-One_Color.png"));
-		alert.showAndWait();
-		
-		if (alert.getResult() == ButtonType.OK)
-		{
-			myController.stateChangeRequest("CancelTransaction", null);
-		}
-	}
-	
-	private void checkForPenaltiesAndBlocks()
-	{
-		String penalty = (String)myController.getState("Penalty");
-		String block = (String)myController.getState("BlockStatus");
-		
-		if(!penalty.equals("") && penalty != null && (!(Double.parseDouble(penalty) == 0) || !block.equals("Unblocked")))
-		{
-			Alert alert = new Alert(Alert.AlertType.ERROR,"BannerId: "+(String)myController.getState("BorrowerBannerId")
-					+"\nBlocked Status: "+ block
-					+"\nPenalty: " + penalty, ButtonType.YES, ButtonType.NO);
-					
-			alert.setTitle("Penalized or Blocked Borrower");
-			alert.setHeaderText("Borrower has been Blocked or Penalized. Continue?");
-			((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(new Image("images/BPT_LOGO_All-In-One_Color.png"));
-			alert.showAndWait();
-			
-			if (alert.getResult() == ButtonType.YES)
-			{
-				
-			}
-			else
-				myController.stateChangeRequest("CancelTransactionAfterLoad", null);
 		}
 	}
 	
