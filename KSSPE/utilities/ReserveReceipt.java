@@ -11,13 +11,12 @@ import utilities.Utilities;
 
 import model.Equipment;
 
+//===========================================================================
 public class ReserveReceipt
 {
 	// Declare a home directory to save receipts in at the top of the class
 	private static final String receiptHomeDirectory = 
-			"C:" + File.separator + "Users" + File.separator + 
-			"Luke" + File.separator + "Desktop" + File.separator + 
-			"Receipts";
+			System. getProperty("user.dir") + File.separator + "receipts";
 
 	// Hold the receipt to save as a hash table
 	private Hashtable receipt = new Hashtable();
@@ -26,10 +25,10 @@ public class ReserveReceipt
 
 	// CREATE the Hashtable if it does not exist in the constructor of whichever class is building up the receipt
 
-	//Put stuff in the Hashtable to build up the receipt as appropriate
-	// For example, the JRB people want the "Cage worker" name and banner id to be printed as part of the receipt,
+	// Put stuff in the Hashtable to build up the receipt as appropriate
+	// For example, if the KSSPE people want the worker name and banner id to be printed as part of the receipt,
 	// so they must be put in the receipt
-
+	//------------------------------------------------------------------------------
 	public ReserveReceipt(Properties p, Vector rentals) throws Exception
 	{
 		receipt.put("WorkerName", p.getProperty("WorkerName"));
@@ -51,7 +50,8 @@ public class ReserveReceipt
 		cal.setTime(new Date());
 		
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
-
+		SimpleDateFormat dateFormatter2 = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+		
 		int nowYear = cal.get(Calendar.YEAR);
 		int nowMonth = cal.get(Calendar.MONTH);
 			
@@ -62,7 +62,9 @@ public class ReserveReceipt
 				"CheckoutReceipts" + File.separator + yearValue + File.separator +
 				monthName; 
 				
-		String nowTimeText = dateFormatter.format(cal.getTime());	
+		String nowTimeText = dateFormatter.format(cal.getTime());
+		String nowTimeText2 = dateFormatter2.format(cal.getTime());		
+		
 		receipt.put("ReceiptTime", nowTimeText);
 		
 		String borrowerName = (String)receipt.get("BorrowerName");
@@ -76,7 +78,7 @@ public class ReserveReceipt
 			if (flag == true)
 			{
 				receiptFileName = receiptDirectoryName + File.separator + 
-						 borrowerName + "Checkout" + nowTimeText + ".txt";
+						 borrowerName + "Checkout" + nowTimeText2 + ".txt";
 			}
 			else
 			{
@@ -86,7 +88,7 @@ public class ReserveReceipt
 		else
 		{
 			receiptFileName = receiptDirectoryName + File.separator + 
-				borrowerName + "Checkout" + nowTimeText + ".txt";
+				borrowerName + "Checkout" + nowTimeText2 + ".txt";
 		}
 
 		writeReceiptDataToFile(receiptFileName);
@@ -164,13 +166,13 @@ public class ReserveReceipt
 				cal.add(cal.MINUTE, 15);
 				String futureTimeText = dateFormatter.format(cal.getTime());
 
-				outputFile.write("We will begin to charge fines at " + futureTimeText + " on the due date." );  
+				outputFile.write("We may begin to charge penalties at " + futureTimeText + " on the due date." );  
 			  
 				outputFile.newLine();
 				outputFile.newLine();
 				
 				String tailMessage = "IMPORTANT NOTE: Double check that all the items on your receipt" +
-				" are there and in good condition. \nYou have 15 minutes to do so, otherwise you will be " +
+				" are there and in good condition. \n\nYou have 15 minutes to do so, otherwise you will be " +
 				"charged for the missing or damaged items.";
 					
 				outputFile.write(tailMessage);
