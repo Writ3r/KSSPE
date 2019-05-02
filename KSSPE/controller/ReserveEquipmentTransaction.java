@@ -3,12 +3,17 @@ package controller;
 
 // system imports
 import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.Scene;
+import javafx.scene.control.ButtonType;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.Enumeration;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 
 // project imports
 import event.Event;
@@ -23,7 +28,7 @@ import model.CheckOut;
 import model.BorrowerCollection;
 import utilities.ReserveReceipt;
 
-/** The class containing the ModifyBorrowerTransaction for the KSSPE application */
+/** The class containing the Reserve Equipment Transaction for the KSSPE application */
 //==============================================================
 public class ReserveEquipmentTransaction extends Transaction
 {
@@ -34,7 +39,6 @@ public class ReserveEquipmentTransaction extends Transaction
 	private BorrowerCollection myBorrowerList;
 	private Vector<Properties> reservedEquipment = new Vector<Properties>();
 	private String myWorkerId;
-	private Boolean continueScreenCreation = true;
 
 	//----------------------------------------------------------------
 	public ReserveEquipmentTransaction() throws Exception
@@ -42,6 +46,11 @@ public class ReserveEquipmentTransaction extends Transaction
 		super();
 	}
 
+	/**
+     * This method actually just handles finding all the Borrowers who match
+     * the entered search criteria in this transaction. Not the actual reservation
+     * of equipment	 
+	*/
 	//----------------------------------------------------------------
 	public void processTransaction(Properties props)
 	{
@@ -159,10 +168,7 @@ public class ReserveEquipmentTransaction extends Transaction
 			try
 			{
 				Scene newScene = createReserveEquipmentView();
-				if(continueScreenCreation)
-					swapToView(newScene);
-				else
-					myReceptionist.stateChangeRequest("CancelTransaction", null);
+				swapToView(newScene);
 			}
 			catch (Exception ex)
 			{
@@ -194,7 +200,7 @@ public class ReserveEquipmentTransaction extends Transaction
 			Scene oldScene = createView();
 			swapToView(oldScene);
 		}
-		if (key.equals("MakeRecipt") == true)
+		if (key.equals("CancelTransactionAndMakeReceipt") == true)
 		{
 			if(!reservedEquipment.isEmpty())
 			{
@@ -213,15 +219,15 @@ public class ReserveEquipmentTransaction extends Transaction
 				{
 					errorMessage = ex.getMessage();
 				}
+					
+				myReceptionist.stateChangeRequest("CancelTransaction", null);
 			}
+			else
+				myReceptionist.stateChangeRequest("CancelTransaction", null);
 		}
 		if (key.equals("CancelTransaction") == true)
 		{
 			myReceptionist.stateChangeRequest("CancelTransaction", null);
-		}
-		if (key.equals("CancelTransactionAfterLoad") == true)
-		{
-			continueScreenCreation = false;
 		}
 		
 		
@@ -229,38 +235,90 @@ public class ReserveEquipmentTransaction extends Transaction
         notifyObservers(errorMessage);
 	}
 	
+	//--------------------------------------------------------------
+	private boolean checkForPenaltiesAndBlocks()
+	{
+		String penalty = (String)this.getState("Penalty");
+		String block = (String)this.getState("BlockStatus");
+		
+		double penaltyVal = 0.0;
+		try
+		{
+			penaltyVal = Double.parseDouble(penalty);
+		}
+		catch (Exception ex) {}
+		
+		String blockVal = "Unblocked";
+		if (block != null)
+		{
+			blockVal = block;
+		}
+		
+		boolean borrowerBlocked = (penaltyVal > 0.0) || (blockVal.equals("Unblocked") == false);
+
+		if (borrowerBlocked)
+		{
+			Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"BannerId: "+(String)getState("BorrowerBannerId")
+					+"\nBlocked Status: "+ block
+					+"\nPenalty: " + penalty + ".\n OK to proceed with check out?", ButtonType.OK, ButtonType.CANCEL);
+					
+			alert.setTitle("Penalized or Blocked Borrower");
+			alert.setHeaderText("Borrower has been Blocked or Penalized.");
+			((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(new Image("images/BPT_LOGO_All-In-One_Color.png"));
+			Optional<ButtonType> result= alert.showAndWait();
+			if (result.isPresent() && result.get() == ButtonType.OK) {
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return true;
+		}
+	}
+	
 	//------------------------------------------------------------------------
 	private void reserveEquipment(Properties props)
 	{
-		int stock = Integer.parseInt((String)myCurrentEquipment.getState("InStockCount"));
-		int taken = Integer.parseInt(props.getProperty("UnitsTaken"));
+		boolean OKtoProceed = checkForPenaltiesAndBlocks();
 		
-		if(stock - taken >= 0)
+		if (OKtoProceed == true)
 		{
-			props.setProperty("BannerId", (String)getState("BorrowerBannerId"));
-			props.setProperty("TotalUnitsReturned", "0");
-			props.setProperty("RentDate", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-			props.setProperty("CheckOutWorkerID", myWorkerId);
+			int stock = Integer.parseInt((String)myCurrentEquipment.getState("InStockCount"));
+			int taken = Integer.parseInt(props.getProperty("UnitsTaken"));
 			
-			CheckOut checkOut = new CheckOut(props);
-			checkOut.save();
-			
-			myCurrentEquipment.stateChangeRequest("InStockCount", Integer.toString(stock - taken));
-			
-			myCurrentEquipment.save();
-			
-			errorMessage = (String)checkOut.getState("UpdateStatusMessage");
-			
-			//recipt code
-			Properties sendData = new Properties();
-			sendData.setProperty("Name", (String)myCurrentEquipment.getState("Name"));
-			sendData.setProperty("Barcode", (String)myCurrentEquipment.getState("Barcode"));
-			sendData.setProperty("Count", props.getProperty("UnitsTaken"));
-			sendData.setProperty("DueDate", props.getProperty("DueDate"));
-			reservedEquipment.add(sendData);
+			if(stock - taken >= 0)
+			{
+				props.setProperty("BannerId", (String)getState("BorrowerBannerId"));
+				props.setProperty("TotalUnitsReturned", "0");
+				props.setProperty("RentDate", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+				props.setProperty("CheckOutWorkerID", myWorkerId);
+				
+				CheckOut checkOut = new CheckOut(props);
+				checkOut.save();
+				
+				myCurrentEquipment.stateChangeRequest("InStockCount", Integer.toString(stock - taken));
+				
+				myCurrentEquipment.save();
+				
+				errorMessage = (String)checkOut.getState("UpdateStatusMessage");
+				
+				//receipt code
+				Properties sendData = new Properties();
+				sendData.setProperty("Name", (String)myCurrentEquipment.getState("Name"));
+				sendData.setProperty("Barcode", (String)myCurrentEquipment.getState("Barcode"));
+				sendData.setProperty("Count", props.getProperty("UnitsTaken"));
+				sendData.setProperty("DueDate", props.getProperty("DueDate"));
+				reservedEquipment.add(sendData);
+			}
+			else
+				errorMessage = "ERROR: Cannot exceed the " + stock + " units in stock";
 		}
 		else
-			errorMessage = "ERROR: Cannot exceed the " + stock + " units in stock";
+			errorMessage = "ERROR: Borrower with id: " + getState("BorrowerBannerId") + " blocked or has a fine!";
 		
 	}
 	
