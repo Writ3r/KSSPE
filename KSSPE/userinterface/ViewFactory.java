@@ -55,10 +55,6 @@ public class ViewFactory {
 		{
 			return new EquipmentCollectionView(t);
 		}
-		else if(viewName.equals("CheckOutCollectionView") == true)
-		{
-			return new CheckOutCollectionView(t);
-		}
 		else if(viewName.equals("UpdateWorkerView") == true)
 		{
 			return new UpdateWorkerView(t);
@@ -82,6 +78,10 @@ public class ViewFactory {
 		else if(viewName.equals("ReserveEquipmentView") == true)
 		{
 			return new ReserveEquipmentView(t);
+		}
+		else if(viewName.equals("ReturnEquipmentView") == true)
+		{
+			return new ReturnEquipmentView(t);
 		}
 		else
 			return null;

@@ -51,7 +51,7 @@ import controller.Transaction;
  *  application 
  */
 //==============================================================
-public class ReserveEquipmentView extends View implements Observer
+public class ReturnEquipmentView extends View implements Observer
 {
 
 	// GUI components
@@ -74,7 +74,7 @@ public class ReserveEquipmentView extends View implements Observer
 
 	// constructor for this class -- takes a controller object
 	//----------------------------------------------------------
-	public ReserveEquipmentView(Transaction t)
+	public ReturnEquipmentView(Transaction t)
 	{
 		super(t);
 
@@ -100,7 +100,7 @@ public class ReserveEquipmentView extends View implements Observer
 	//-------------------------------------------------------------
 	protected String getActionText()
 	{
-		return "** RESERVE EQUIPMENT **";
+		return "** RETURN EQUIPMENT **";
 	}
 	
 	public void populateFields()
@@ -217,7 +217,7 @@ public class ReserveEquipmentView extends View implements Observer
 			});
 		grid.add(barcode, 1, 1);
 		
-		Text countLabel = new Text("Units Taken:");
+		Text countLabel = new Text("Units Returned:");
 			countLabel.setFill(Color.GOLD);
 			countLabel.setFont(myFont);
 			countLabel.setTextAlignment(TextAlignment.RIGHT);
@@ -231,7 +231,7 @@ public class ReserveEquipmentView extends View implements Observer
 			});
 		grid.add(count, 1, 2);
 		
-		Text dueLabel = new Text("Due Date :");
+		Text dueLabel = new Text("Return Date :");
 			dueLabel.setFill(Color.GOLD);
 			dueLabel.setFont(myFont);
 			dueLabel.setTextAlignment(TextAlignment.RIGHT);
@@ -263,7 +263,7 @@ public class ReserveEquipmentView extends View implements Observer
 			icon.setFitHeight(15);
 			icon.setFitWidth(15);
 			
-		submitButton = new Button("Reserve", icon);
+		submitButton = new Button("Return Equipment", icon);
 			submitButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
 			submitButton.setOnAction((ActionEvent e) -> {
 				sendToController();
@@ -326,9 +326,9 @@ public class ReserveEquipmentView extends View implements Observer
 				{
 					Properties props = new Properties();
 					props.setProperty("Barcode", Barcode);
-					props.setProperty("UnitsTaken", Count);
-					props.setProperty("DueDate", DueDate);
-					myController.stateChangeRequest("CheckOutData", props);
+					props.setProperty("UnitsReturned", Count);
+					props.setProperty("ReturnDate", DueDate);
+					myController.stateChangeRequest("CheckInData", props);
 				}
 				else
 				{

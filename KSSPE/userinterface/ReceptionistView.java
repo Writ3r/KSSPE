@@ -182,7 +182,7 @@ public class ReceptionistView extends View implements Observer
 				myController.stateChangeRequest("ReserveEquipment", null);
 			});
 			returnItems.setOnAction((ActionEvent e) -> {
-				myController.stateChangeRequest("TopDonatorReport", null);
+				myController.stateChangeRequest("ReturnEquipment", null);
 			});
 			manageButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
 				manageButton.setEffect(shadow);

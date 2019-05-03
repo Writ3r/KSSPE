@@ -54,6 +54,7 @@ public class CheckOutCollectionView extends View implements Observer
 {
 	protected TableView<CheckOutTableModel> tableOfCheckOuts;
 	protected Button cancelButton;
+	protected Button submitButton;
 	protected MessageView statusLog;
 	protected Text actionText; 
         
@@ -92,13 +93,15 @@ public class CheckOutCollectionView extends View implements Observer
 	//--------------------------------------------------------------------------
 	protected void getEntryTableModelValues()
 	{
+
 		ObservableList<CheckOutTableModel> tableData = FXCollections.observableArrayList();
 		try
 		{
-			CheckOutCollection checkOutCollection = 
+	
+			CheckOutCollection checkoutCollection = 
 					(CheckOutCollection)myController.getState("CheckOutList");
 
-			Vector entryList = (Vector)checkOutCollection.getState("CheckOuts");
+			Vector entryList = (Vector)checkoutCollection.getState("CheckOuts");
 			
 			if (entryList.size() > 0)
 			{
@@ -106,25 +109,25 @@ public class CheckOutCollectionView extends View implements Observer
 
 				while (entries.hasMoreElements() == true)
 				{
-					CheckOut nextC = (CheckOut)entries.nextElement();
+					CheckOut nextCO = (CheckOut)entries.nextElement();
 
-					Vector<String> view = nextC.getEntryListView();
+					Vector<String> view = nextCO.getEntryListView();
 
 					// add this list entry to the list
 					CheckOutTableModel nextTableRowData = new CheckOutTableModel(view);
 					tableData.add(nextTableRowData);
 
 				}
-
 				if(entryList.size() == 1)
-					actionText.setText(entryList.size()+" Record Found!");
-				else
-					actionText.setText(entryList.size()+" Records Found!");
+					actionText.setText(entryList.size()+" Reservation Found!");
+				else 
+					actionText.setText(entryList.size()+" Reservations Found!");
+
 				actionText.setFill(Color.LIGHTGREEN);
 			}
 			else
 			{
-				actionText.setText("No Records Found!");
+				actionText.setText("No Reservations Found!");
 				actionText.setFill(Color.FIREBRICK);
 			}
 
@@ -177,7 +180,7 @@ public class CheckOutCollectionView extends View implements Observer
 	
 	protected String getActionText()
 	{
-		return "** LIST OF RECORDS **";
+		return "** CHOOSE ONE RESERVATION TO RETURN **";
 	}
 
 	// Create the main form content
@@ -191,45 +194,68 @@ public class CheckOutCollectionView extends View implements Observer
 		tableOfCheckOuts.setStyle("-fx-focus-color: transparent; -fx-faint-focus-color: transparent; -fx-selection-bar: gold;");
 		tableOfCheckOuts.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-		TableColumn barcodeColumn = new TableColumn("Barcode") ;
-		barcodeColumn.setMinWidth(116.6);
-		barcodeColumn.setStyle(" -fx-alignment: CENTER;");
-		barcodeColumn.setCellValueFactory(
+		
+		TableColumn barcodePrefixColumn = new TableColumn("Barcode") ;
+		barcodePrefixColumn.setMinWidth(116.6);
+		barcodePrefixColumn.setStyle(" -fx-alignment: CENTER;");
+		barcodePrefixColumn.setCellValueFactory(
 				new PropertyValueFactory<CheckOutTableModel, String>("Barcode"));
 
-		TableColumn bannerIdColumn = new TableColumn("BannerId") ;
-		bannerIdColumn.setMinWidth(116.6);
-		bannerIdColumn.setStyle(" -fx-alignment: CENTER;");
-		bannerIdColumn.setCellValueFactory(
-				new PropertyValueFactory<CheckOutTableModel, String>("BannerId"));
 
-		TableColumn unitsTakenColumn = new TableColumn("Units Taken") ;
-		unitsTakenColumn.setMinWidth(116.6);
-		unitsTakenColumn.setStyle(" -fx-alignment: CENTER;");
-		unitsTakenColumn.setCellValueFactory(
+		TableColumn bannerColumn = new TableColumn("Banner ID") ;
+		bannerColumn.setMinWidth(116.6);
+		bannerColumn.setStyle(" -fx-alignment: CENTER;");
+		bannerColumn.setCellValueFactory(
+				new PropertyValueFactory<CheckOutTableModel, String>("BannerId"));
+		
+		TableColumn takenColumn = new TableColumn("Units Taken") ;
+		takenColumn.setMinWidth(116.6);
+		takenColumn.setStyle(" -fx-alignment: CENTER;");
+		takenColumn.setCellValueFactory(
 				new PropertyValueFactory<CheckOutTableModel, String>("UnitsTaken"));
 
-		TableColumn unitsReturnedColumn = new TableColumn("Units Returned") ;
-		unitsReturnedColumn.setMinWidth(116.6);
-		unitsReturnedColumn.setStyle(" -fx-alignment: CENTER;");
-		unitsReturnedColumn.setCellValueFactory(
+		TableColumn returnedColumn = new TableColumn("Total Units Returned") ;
+		returnedColumn.setMinWidth(116.6);
+		returnedColumn.setStyle(" -fx-alignment: CENTER;");
+		returnedColumn.setCellValueFactory(
 				new PropertyValueFactory<CheckOutTableModel, String>("TotalUnitsReturned"));
 
-		TableColumn rentDateColumn = new TableColumn("Rented on") ;
-		rentDateColumn.setMinWidth(116.6);
-		rentDateColumn.setStyle(" -fx-alignment: CENTER;");
-		rentDateColumn.setCellValueFactory(
-				new PropertyValueFactory<CheckOutTableModel, String>("RentDate"));
-
-		TableColumn dueDateColumn = new TableColumn("Due on") ;
-		dueDateColumn.setMinWidth(116.6);
-		dueDateColumn.setStyle(" -fx-alignment: CENTER;");
-		dueDateColumn.setCellValueFactory(
+		TableColumn dueColumn = new TableColumn("Due Date") ;
+		dueColumn.setMinWidth(116.6);
+		dueColumn.setStyle(" -fx-alignment: CENTER;");
+		dueColumn.setCellValueFactory(
 				new PropertyValueFactory<CheckOutTableModel, String>("DueDate"));
 
-		tableOfCheckOuts.getColumns().addAll(barcodeColumn, bannerIdColumn, unitsTakenColumn, unitsReturnedColumn, rentDateColumn, dueDateColumn);
+		TableColumn rentColumn = new TableColumn("Check Out Date") ;
+		rentColumn.setMinWidth(116.6);
+		rentColumn.setStyle(" -fx-alignment: CENTER;");
+		rentColumn.setCellValueFactory(
+				new PropertyValueFactory<CheckOutTableModel, String>("RentDate"));
 
-		ImageView icon = new ImageView(new Image("/images/return.png"));
+		tableOfCheckOuts.getColumns().addAll(bannerColumn, barcodePrefixColumn, takenColumn, returnedColumn, dueColumn, rentColumn);
+
+		tableOfCheckOuts.setOnMousePressed((MouseEvent event) -> {
+			if (event.isPrimaryButtonDown() && event.getClickCount() >=2 ){
+				processCheckOutSelected();
+			}
+		});
+		ImageView icon = new ImageView(new Image("/images/check.png"));
+		icon.setFitHeight(15);
+		icon.setFitWidth(15);
+		submitButton = new Button("Select",icon);
+		submitButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
+		submitButton.requestFocus();
+		submitButton.setOnAction((ActionEvent e) -> {
+			clearErrorMessage();
+			processCheckOutSelected();
+		});
+		submitButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+			submitButton.setEffect(new DropShadow());
+		});
+		submitButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+			submitButton.setEffect(null);
+		});
+		icon = new ImageView(new Image("/images/return.png"));
 		icon.setFitHeight(15);
 		icon.setFitWidth(15);
 		cancelButton = new Button("Return", icon);
@@ -253,11 +279,15 @@ public class CheckOutCollectionView extends View implements Observer
                 btnContainer.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
                     btnContainer.setStyle("-fx-background-color: SLATEGREY");
 		});
-
+		btnContainer.getChildren().add(submitButton);
 		btnContainer.getChildren().add(cancelButton);
 
 		tableOfCheckOuts.setPrefHeight(275);
-        tableOfCheckOuts.setMaxWidth(3000);
+        tableOfCheckOuts.setMaxWidth(350);
+		
+		ScrollPane scrollPane = new ScrollPane();
+		scrollPane.setPrefSize(250, 150);
+		scrollPane.setContent(tableOfCheckOuts); // should we use this? (Probably not - FX tables come with their own scroll pane)
 		
 		vbox.getChildren().add(tableOfCheckOuts);
 		vbox.getChildren().add(btnContainer);
@@ -266,6 +296,36 @@ public class CheckOutCollectionView extends View implements Observer
 
 		return vbox;
 	}
+
+	//--------------------------------------------------------------------------
+	protected void processCheckOutSelected()
+	{
+		CheckOutTableModel selectedItem = tableOfCheckOuts.getSelectionModel().getSelectedItem();
+
+		if(selectedItem != null)
+		{
+			String reservationId = selectedItem.getId();
+
+			myController.stateChangeRequest("CheckOutSelected", reservationId);
+		}
+	}
+	
+    //---------------------------------------------------------------------------
+	// private void displayRemoveAlert(){
+	// 	clearErrorMessage();
+	// 	Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"BannerId: "+tableOfBorrowers.getSelectionModel().getSelectedItem().getBannerId()
+	// 			+"\nFirstName: "+tableOfBorrowers.getSelectionModel().getSelectedItem().getFirstName()
+	// 			+"\nLastName: "+tableOfBorrowers.getSelectionModel().getSelectedItem().getLastName(), ButtonType.YES, ButtonType.NO);
+	// 	alert.setHeaderText(null);
+	// 	alert.setTitle("Remove Borrower");
+	// 	alert.setHeaderText("Are you sure want to remove this Borrower?");
+	// 	((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(new Image("images/BPT_LOGO_All-In-One_Color.png"));
+	// 	alert.showAndWait();
+
+	// 	if (alert.getResult() == ButtonType.YES) {
+	// 		processBorrowerSelected();
+	// 	}
+	// }
        
 	//--------------------------------------------------------------------------
 	protected MessageView createStatusLog(String initialMessage)
