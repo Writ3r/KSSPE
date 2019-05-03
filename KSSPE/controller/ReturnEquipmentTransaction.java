@@ -289,7 +289,7 @@ public class ReturnEquipmentTransaction extends Transaction
 		int taken = myCheckOut.getState("UnitsTaken");
 		int unitsReturned = Integer.parseInt(props.getProperty("UnitsReturned"));
 		int rentDate = myCheckOut.getState("RentDate");
-		int totalUR = myCheckOut.getState("TotalUnitsReturned")
+		int totalUR = myCheckOut.getState("TotalUnitsReturned");
 		String myWorkerId = (String)myReceptionist.getState("BannerId");;
 		
 		if(totalUR < taken)
