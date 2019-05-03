@@ -18,6 +18,9 @@ import exception.MultiplePrimaryKeysException;
 import userinterface.View;
 import userinterface.ViewFactory;
 import model.Borrower;
+import model.CheckOut;
+import model.CheckOutCollection;
+import model.Equipment;
 import model.BorrowerCollection;
 
 /** The class containing the ReturnEquipmentTransaction for the KSSPE application */
