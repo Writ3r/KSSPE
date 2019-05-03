@@ -17,17 +17,17 @@ import exception.MultiplePrimaryKeysException;
 
 import userinterface.View;
 import userinterface.ViewFactory;
-import model.CheckOut;
-import model.CheckOutCollection;
+import model.Equipment;
+import model.EquipmentCollection;
 
-/** The class containing the ListOverDueInventoryTransaction for the KSSPE application */
+/** The class containing the ListAllInventoryTransaction for the KSSPE application */
 //==============================================================
 public class ListOverDueInventoryTransaction extends Transaction
 {
 	private String errorMessage = "";
 	private Receptionist myReceptionist;
-	private CheckOut myCheckOut;
-	private CheckOutCollection myCheckOutList;
+	private Equipment myEquipment;
+	private EquipmentCollection myEquipmentList;
 
 
 	//------------------------------------------------------------
@@ -40,8 +40,9 @@ public class ListOverDueInventoryTransaction extends Transaction
 	//------------------------------------------------------------
 	public void processTransaction()
 	{
-		myCheckOutList = new CheckOutCollection();
-		myCheckOutList.findOverDue();
+		System.out.println("ListOverDue processTransaction: 43");
+		myEquipmentList = new EquipmentCollection();
+		myEquipmentList.findOverdue();
 		
 		try
 		{	
@@ -66,9 +67,9 @@ public class ListOverDueInventoryTransaction extends Transaction
 		{
 			return true;
 		}
-		else if (key.equals("CheckOutList") == true)
+		else if (key.equals("EquipmentList") == true)
 		{
-			return myCheckOutList;
+			return myEquipmentList;
 		}
 		else
 			return null;
@@ -86,9 +87,9 @@ public class ListOverDueInventoryTransaction extends Transaction
 		}
 		else if(key.equals("clearState") == true)
 		{
-			myCheckOut = null;
+			myEquipment = null;
 		}
-		else if (key.equals("CancelCheckOutList") == true)
+		else if (key.equals("CancelEquipmentList") == true)
 		{
 			myReceptionist.stateChangeRequest("CancelTransaction", null);
 		}
@@ -102,7 +103,7 @@ public class ListOverDueInventoryTransaction extends Transaction
 	{
 		Scene currentScene;
 
-		View newView = ViewFactory.createView("CheckOutCollectionView", this);
+		View newView = ViewFactory.createView("EquipmentCollectionView", this);
 		currentScene = new Scene(newView);
 
 		return currentScene;

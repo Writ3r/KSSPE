@@ -18,26 +18,26 @@ import exception.MultiplePrimaryKeysException;
 import userinterface.View;
 import userinterface.ViewFactory;
 import model.Borrower;
-import model.Equipment;
-import model.CheckOut;
 import model.BorrowerCollection;
-import utilities.ReserveReceipt;
 
-/** The class containing the ModifyBorrowerTransaction for the KSSPE application */
+/** The class containing the ReturnEquipmentTransaction for the KSSPE application */
 //==============================================================
-public class ReserveEquipmentTransaction extends Transaction
+public class ReturnEquipmentTransaction extends Transaction
 {
 	private String errorMessage = "";
 	private Receptionist myReceptionist;
 	private Borrower myBorrower;
-	private Equipment myCurrentEquipment;
 	private BorrowerCollection myBorrowerList;
-	private Vector<Properties> reservedEquipment = new Vector<Properties>();
+	private CheckOut myCheckOut;
+	private CheckOutCollection myCheckOutList;
+	private Equipment myCurrentEquipment;
+	private Vector<Properties> returnedEquipment = new Vector<Properties>();
 	private String myWorkerId;
 	private Boolean continueScreenCreation = true;
 
+
 	//----------------------------------------------------------------
-	public ReserveEquipmentTransaction() throws Exception
+	public ReturnEquipmentTransaction() throws Exception
 	{
 		super();
 	}
@@ -69,11 +69,6 @@ public class ReserveEquipmentTransaction extends Transaction
 				myBorrowerList.findByLastName(name);
 			}
 		}
-		else if (props.getProperty("PhoneNumber") != null)
-		{
-			String phone = props.getProperty("PhoneNumber");
-			myBorrowerList.findByPhone(phone);
-		}
 		else
 		{
 			myBorrowerList.findAll();
@@ -102,17 +97,25 @@ public class ReserveEquipmentTransaction extends Transaction
 		{
 			return myBorrowerList;
 		}
-		else if (key.equals("BorrowerBannerId") == true)
+		else if (key.equals("BannerId") == true)
 		{
 			return myBorrower.getState("BannerId");
 		}
-		else if (key.equals("BorrowerName") == true)
+		else if (key.equals("FirstName") == true)
 		{
-			return (String)myBorrower.getState("FirstName") + " " + (String)myBorrower.getState("LastName");
+			return myBorrower.getState("FirstName");
 		}
-		else if (key.equals("WorkerBannerId") == true)
+		else if (key.equals("LastName") == true)
 		{
-			return myWorkerId;
+			return myBorrower.getState("LastName");
+		}
+		else if (key.equals("Email") == true)
+		{
+			return myBorrower.getState("Email");
+		}
+		else if (key.equals("PhoneNumber") == true)
+		{
+			return myBorrower.getState("PhoneNumber");
 		}
 		else if (key.equals("Penalty") == true)
 		{
@@ -126,13 +129,6 @@ public class ReserveEquipmentTransaction extends Transaction
 		{
 			return myBorrower.getState("Notes");
 		}
-		else if (key.equals("TestEquipment") == true)
-		{
-			if(myCurrentEquipment != null)
-				return true;
-			else
-				return false;
-		}
 		else
 			return null;
 	}
@@ -145,7 +141,6 @@ public class ReserveEquipmentTransaction extends Transaction
 		if (key.equals("DoYourJob") == true)
 		{
 			myReceptionist = (Receptionist)value;
-			myWorkerId = (String)myReceptionist.getState("BannerId");
 			doYourJob();
 		}
 		if (key.equals("SearchBorrower") == true)
@@ -155,25 +150,47 @@ public class ReserveEquipmentTransaction extends Transaction
 		if (key.equals("BorrowerSelected") == true)
 		{
 			myBorrower = myBorrowerList.retrieve((String)value);
-			
+			myCheckOutList = new CheckOutCollection();
+			myCheckOutList.findPendingByBannerId((String)getState("BannerId"));
+
 			try
 			{
-				Scene newScene = createReserveEquipmentView();
+				Scene newScene = createCheckOutCollectionView();
 				if(continueScreenCreation)
 					swapToView(newScene);
 				else
-					myReceptionist.stateChangeRequest("CancelTransaction", null);
+					myReceptionist.stateChangeRequest("CancelBorrowerList", null);
 			}
 			catch (Exception ex)
 			{
 				new Event(Event.getLeafLevelClassName(this), "processTransaction",
-						"Error in creating ModifyBorrowerView", Event.ERROR);
+						"Error in creating CheckOutCollectionView", Event.ERROR);
 			}
 		}
-		if (key.equals("CheckOutData") == true)
+
+		if (key.equals("CheckOutSelected") == true)
 		{
-			reserveEquipment((Properties)value);
+			myCheckOut = myCheckOutList.retrieve((String)value);
+			
+			try
+			{
+				Scene newScene = createReturnEquipmentView();
+				if(continueScreenCreation)
+					swapToView(newScene);
+				else
+					myReceptionist.stateChangeRequest("CancelCheckOutList", null);
+			}
+			catch (Exception ex)
+			{
+				new Event(Event.getLeafLevelClassName(this), "processTransaction",
+						"Error in creating ReturnEquipmentView", Event.ERROR);
+			}
 		}
+		if (key.equals("ReturnData") == true)
+		{
+			returnEquipment((Properties)value);
+		}
+
 		if (key.equals("TestEquipment") == true)
 		{
 			myCurrentEquipment = null; //clears out past equipment.
@@ -189,31 +206,18 @@ public class ReserveEquipmentTransaction extends Transaction
 				errorMessage = "ERROR: Equipment with Barcode: " + ((Properties)value).getProperty("Barcode") +  " does not Exist!";
 			}
 		}
+
 		if (key.equals("CancelBorrowerList") == true)
 		{
-			Scene oldScene = createView();
+			
+			Scene oldScene = createView();	
 			swapToView(oldScene);
 		}
-		if (key.equals("MakeRecipt") == true)
+		if (key.equals("CancelCheckOutList") == true)
 		{
-			if(!reservedEquipment.isEmpty())
-			{
 			
-				Properties props = new Properties();
-				props.setProperty("WorkerName", (String)myReceptionist.getState("Name"));
-				props.setProperty("WorkerBannerId", myWorkerId);
-				props.setProperty("BorrowerName", (String)this.getState("BorrowerName"));
-				props.setProperty("BorrowerBannerId", (String)this.getState("BorrowerBannerId"));
-				
-				try
-				{
-					new ReserveReceipt(props, reservedEquipment);
-				}
-				catch(Exception ex)
-				{
-					errorMessage = ex.getMessage();
-				}
-			}
+			Scene oldScene = createView();	
+			swapToView(oldScene);
 		}
 		if (key.equals("CancelTransaction") == true)
 		{
@@ -224,56 +228,20 @@ public class ReserveEquipmentTransaction extends Transaction
 			continueScreenCreation = false;
 		}
 		
-		
 		setChanged();
         notifyObservers(errorMessage);
 	}
 	
-	//------------------------------------------------------------------------
-	private void reserveEquipment(Properties props)
-	{
-		int stock = Integer.parseInt((String)myCurrentEquipment.getState("InStockCount"));
-		int taken = Integer.parseInt(props.getProperty("UnitsTaken"));
-		
-		if(stock - taken >= 0)
-		{
-			props.setProperty("BannerId", (String)getState("BorrowerBannerId"));
-			props.setProperty("TotalUnitsReturned", "0");
-			props.setProperty("RentDate", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-			props.setProperty("CheckOutWorkerID", myWorkerId);
-			
-			CheckOut checkOut = new CheckOut(props);
-			checkOut.save();
-			
-			myCurrentEquipment.stateChangeRequest("InStockCount", Integer.toString(stock - taken));
-			
-			myCurrentEquipment.save();
-			
-			errorMessage = (String)checkOut.getState("UpdateStatusMessage");
-			
-			//recipt code
-			Properties sendData = new Properties();
-			sendData.setProperty("Name", (String)myCurrentEquipment.getState("Name"));
-			sendData.setProperty("Barcode", (String)myCurrentEquipment.getState("Barcode"));
-			sendData.setProperty("Count", props.getProperty("UnitsTaken"));
-			sendData.setProperty("DueDate", props.getProperty("DueDate"));
-			reservedEquipment.add(sendData);
-		}
-		else
-			errorMessage = "ERROR: Cannot exceed the " + stock + " units in stock";
-		
-	}
-	
 	//-----------------------------------------------------------------------
-	protected Scene createReserveEquipmentView()
+	protected Scene createCheckOutCollectionView()
 	{
-		Scene currentScene = myViews.get("ReserveEquipmentView");
+		Scene currentScene = myViews.get("CheckOutCollectionView");
 
 		if (currentScene == null)
 		{
-			View newView = ViewFactory.createView("ReserveEquipmentView", this);
+			View newView = ViewFactory.createView("CheckOutCollectionView", this);
 			currentScene = new Scene(newView);
-			myViews.put("ReserveEquipmentView", currentScene);
+			myViews.put("CheckOutCollectionView", currentScene);
 
 			return currentScene;
 		}
@@ -295,16 +263,80 @@ public class ReserveEquipmentTransaction extends Transaction
 		return currentScene;
 	}
 
-	//------------------------------------------------------
-	protected Scene createView()
+	protected Scene createReturnEquipmentView()
 	{
-		Scene currentScene = myViews.get("SearchBorrowerReserveView");
+		Scene currentScene = myViews.get("ReturnEquipmentView");
 
 		if (currentScene == null)
 		{
-			View newView = ViewFactory.createView("SearchBorrowerReserveView", this);
+			View newView = ViewFactory.createView("ReturnEquipmentView", this);
 			currentScene = new Scene(newView);
-			myViews.put("SearchBorrowerReserveView", currentScene);
+			myViews.put("ReturnEquipmentView", currentScene);
+
+			return currentScene;
+		}
+		else
+		{
+			return currentScene;
+		}
+
+	}
+
+	//------------------------------------------------------------------------------------------------------
+	private void returnEquipment(Properties props)
+	{
+		int stock = Integer.parseInt((String)myCurrentEquipment.getState("InStockCount"));
+		int taken = myCheckOut.getState("UnitsTaken");
+		int unitsReturned = Integer.parseInt(props.getProperty("UnitsReturned"));
+		int rentDate = myCheckOut.getState("RentDate");
+		int totalUR = myCheckOut.getState("TotalUnitsReturned")
+		String myWorkerId = (String)myReceptionist.getState("BannerId");;
+		
+		if(totalUR < taken)
+		{
+			props.setProperty("BannerId", (String)getState("BorrowerBannerId"));
+			props.setProperty("Barcode", (String)myEquipment.getState("Barcode"));
+			props.setProperty("ReturnDate", (String)new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+			props.setProperty("UnitsReturned", unitsReturned);
+			props.setProperty("CheckoutID", myCheckOut.getState("ID"));
+			props.setProperty("CheckInWorkerID", myWorkerId);
+			
+			CheckIn checkIn = new CheckIn(props);
+			checkIn.save();
+			
+			myCheckOut.stateChangeRequest("TotalUnitsReturned", Integer.toString(unitsReturned + totalUR));
+
+			myCheckOut.save();
+
+			myCurrentEquipment.stateChangeRequest("InStockCount", Integer.toString(stock + unitsReturned));
+			
+			myCurrentEquipment.save();
+			
+			errorMessage = (String)checkOut.getState("UpdateStatusMessage");
+			
+			//recipt code
+			Properties sendData = new Properties();
+			sendData.setProperty("Name", (String)myCurrentEquipment.getState("Name"));
+			sendData.setProperty("Barcode", (String)myCurrentEquipment.getState("Barcode"));
+			sendData.setProperty("Count", props.getProperty("UnitsTaken"));
+			sendData.setProperty("DueDate", props.getProperty("DueDate"));
+			returnedEquipment.add(sendData);
+		}
+		else
+			errorMessage = "ERROR: Cannot exceed the " + stock + " units in stock";
+		
+	}
+
+	//------------------------------------------------------
+	protected Scene createView()
+	{
+		Scene currentScene = myViews.get("SearchBorrowerView");
+
+		if (currentScene == null)
+		{
+			View newView = ViewFactory.createView("SearchBorrowerView", this);
+			currentScene = new Scene(newView);
+			myViews.put("SearchBorrowerView", currentScene);
 
 			return currentScene;
 		}

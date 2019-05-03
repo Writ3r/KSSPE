@@ -129,7 +129,8 @@ public class Receptionist extends Transaction
 			(key.equals("RemoveCategory") == true) || (key.equals("RemoveBorrower") == true) || 
 			(key.equals("AddEquipment") == true) || (key.equals("ReserveEquipment") == true) ||
 			(key.equals("ListAllInventory") == true) || (key.equals("ListAvailableInventory") == true) ||
-			(key.equals("ListReservedInventory") == true) || (key.equals("ListOverDueInventory") == true))
+			(key.equals("ListReservedInventory") == true) || (key.equals("ListOverDueInventory") == true) || 
+			(key.equals("ReturnEquipment") == true ))
 			{
 				String transType = key;
 					

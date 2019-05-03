@@ -81,6 +81,11 @@ public class TransactionFactory
 		{
 			retValue = new ListOverDueInventoryTransaction();
 		} 
+		if (transType.equals("ReturnEquipment") == true)
+		{
+			retValue = new ReturnEquipmentTransaction();
+		} 
+
 		return retValue;
 	}
 }
