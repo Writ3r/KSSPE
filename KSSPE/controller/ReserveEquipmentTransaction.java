@@ -188,20 +188,21 @@ public class ReserveEquipmentTransaction extends Transaction
 			{
 				myCurrentEquipment = new Equipment((Properties)value);
 				
-				errorMessage = "Equipment: [" + myCurrentEquipment.getState("Name") + "] found!";
+				errorMessage = "Equipment with Barcode: " + ((Properties)value).getProperty("Barcode") +  " found!";
 			}
 			catch(Exception ex)
 			{
-				errorMessage = "ERROR: Equipment with Barcode: " + ((Properties)value).getProperty("Barcode") +  " does not Exist!";
+				errorMessage = "ERROR: No Equipment matching Barcode: " + ((Properties)value).getProperty("Barcode") +  " found!";
 			}
 		}
 		if (key.equals("CancelBorrowerList") == true)
 		{
-			Scene oldScene = createView();
+			Scene oldScene = createView();	
 			swapToView(oldScene);
 		}
 		if (key.equals("CancelTransactionAndMakeReceipt") == true)
 		{
+			
 			if(!reservedEquipment.isEmpty())
 			{
 			
@@ -234,7 +235,7 @@ public class ReserveEquipmentTransaction extends Transaction
 		setChanged();
         notifyObservers(errorMessage);
 	}
-	
+
 	//--------------------------------------------------------------
 	private boolean checkForPenaltiesAndBlocks()
 	{

@@ -41,7 +41,7 @@ public class ListAvailableInventoryTransaction extends Transaction
 	public void processTransaction()
 	{
 		myEquipmentList = new EquipmentCollection();
-		myEquipmentList.findAllAvailable();
+		myEquipmentList.findAll();
 		
 		try
 		{	
@@ -102,7 +102,7 @@ public class ListAvailableInventoryTransaction extends Transaction
 	{
 		Scene currentScene;
 
-		View newView = ViewFactory.createView("EquipmentCollectionView", this);
+		View newView = ViewFactory.createView("EquipmentCollectionReportView", this);
 		currentScene = new Scene(newView);
 
 		return currentScene;

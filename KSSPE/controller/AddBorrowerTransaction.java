@@ -27,7 +27,7 @@ public class AddBorrowerTransaction extends Transaction
 	private String errorMessage = "";
 	private Receptionist myReceptionist;
 	private Borrower myBorrower;
-
+	
 
 	//------------------------------------------------------------
 	public AddBorrowerTransaction() throws Exception
@@ -77,7 +77,8 @@ public class AddBorrowerTransaction extends Transaction
 			catch (InvalidPrimaryKeyException ex2) 
 			{
 				errorMessage = ex2.getMessage();
-			}	
+			}
+			
 		}
 	}
 	
@@ -95,6 +96,30 @@ public class AddBorrowerTransaction extends Transaction
 				return true;
 			}
 			return false;
+		}
+		else if (key.equals("FirstName") == true)
+		{
+			if(myBorrower != null)
+				return myBorrower.getState("FirstName");
+			return null;
+		}
+		else if (key.equals("LastName") == true)
+		{
+			if(myBorrower != null)
+				return myBorrower.getState("LastName");
+			return null;
+		}
+		else if (key.equals("Email") == true)
+		{
+			if(myBorrower != null)
+				return myBorrower.getState("Email");
+			return null;
+		}
+		else if (key.equals("PhoneNumber") == true)
+		{
+			if(myBorrower != null)
+				return myBorrower.getState("PhoneNumber");
+			return null;
 		}
 		else
 		{
@@ -128,11 +153,12 @@ public class AddBorrowerTransaction extends Transaction
 				
 				if(myBorrower.getState("Status").equals("Active"))
 				{
-					errorMessage = "ERROR: Borrower with id " + ((Properties)value).getProperty("BannerId") + " already exists!";
+					errorMessage = "Borrower with id " + ((Properties)value).getProperty("BannerId") + " already exists!";
 				}
 				else
 				{
 					errorMessage = "Former Borrower with id " + ((Properties)value).getProperty("BannerId") +  " found!";
+					
 				}
 			}
 			catch(Exception ex)
@@ -143,16 +169,13 @@ public class AddBorrowerTransaction extends Transaction
 					
 					Properties bProp = new Properties();
 					bProp.setProperty("BannerId", (String)w.getState("BannerId"));
-					bProp.setProperty("Status", "Active");
-					bProp.setProperty("Penalty", "0.00");
 					bProp.setProperty("BlockStatus", "Unblocked");
-					bProp.setProperty("PhoneNumber", "");
+					bProp.setProperty("Penalty", "0.00");
 					bProp.setProperty("Notes", "");
+					bProp.setProperty("Status", "Active");
 					bProp.setProperty("DateAdded", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 					bProp.setProperty("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 					myBorrower = new Borrower(bProp, true);
-					
-					errorMessage = "Person with id " + ((Properties)value).getProperty("BannerId") + " found!";
 					
 				}
 				catch (Exception excep)

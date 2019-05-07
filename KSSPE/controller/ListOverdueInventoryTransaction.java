@@ -20,9 +20,9 @@ import userinterface.ViewFactory;
 import model.CheckOut;
 import model.CheckOutCollection;
 
-/** The class containing the ListReservedInventoryTransaction for the KSSPE application */
+/** The class containing the ListOverDueInventoryTransaction for the KSSPE application */
 //==============================================================
-public class ListReservedInventoryTransaction extends Transaction
+public class ListOverdueInventoryTransaction extends Transaction
 {
 	private String errorMessage = "";
 	private Receptionist myReceptionist;
@@ -31,7 +31,7 @@ public class ListReservedInventoryTransaction extends Transaction
 
 
 	//------------------------------------------------------------
-	public ListReservedInventoryTransaction() throws Exception
+	public ListOverdueInventoryTransaction() throws Exception
 	{
 		super();
 		processTransaction();
@@ -41,7 +41,7 @@ public class ListReservedInventoryTransaction extends Transaction
 	public void processTransaction()
 	{
 		myCheckOutList = new CheckOutCollection();
-		myCheckOutList.findAllPending();
+		myCheckOutList.findAllOverdue();
 		
 		try
 		{	
@@ -51,7 +51,7 @@ public class ListReservedInventoryTransaction extends Transaction
 		catch (Exception ex)
 		{
 			new Event(Event.getLeafLevelClassName(this), "processTransaction",
-					"Error in creating CheckOutCollectionView", Event.ERROR);
+					"Error in creating EquipmentCollectionView", Event.ERROR);
 		}
 	}
 	
@@ -102,7 +102,7 @@ public class ListReservedInventoryTransaction extends Transaction
 	{
 		Scene currentScene;
 
-		View newView = ViewFactory.createView("CheckOutCollectionView", this);
+		View newView = ViewFactory.createView("CheckOutCollectionReportView", this);
 		currentScene = new Scene(newView);
 
 		return currentScene;
