@@ -83,7 +83,7 @@ public class Worker extends EntityBase
 		oldFlag = false;
 		persistentState = new Properties();
 		
-		if (props.getProperty("BannerId") == null) throw new InvalidPrimaryKeyException("ERROR: Idiot - provide a banner Id at least");
+		if (props.getProperty("BannerId") == null) throw new InvalidPrimaryKeyException("ERROR: Provide a banner Id at least");
 		
 		Properties personProperties = new Properties();
 		personProperties.setProperty("BannerId", props.getProperty("BannerId"));
