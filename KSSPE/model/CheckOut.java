@@ -146,7 +146,7 @@ public class CheckOut extends EntityBase
 
 		v.addElement(persistentState.getProperty("ID"));
 		v.addElement(persistentState.getProperty("BannerId"));
-		v.addElement(persistentState.getProperty("Barcode"));
+		//v.addElement(persistentState.getProperty("Barcode"));
 		if (myEquipment != null)
 			v.addElement((String)myEquipment.getState("Barcode"));
 		else
@@ -155,7 +155,7 @@ public class CheckOut extends EntityBase
 		v.addElement(persistentState.getProperty("TotalUnitsReturned"));
 		v.addElement(persistentState.getProperty("DueDate"));
 		v.addElement(persistentState.getProperty("RentDate"));
-		//v.addElement(persistentState.getProperty("Status"));
+		v.addElement(persistentState.getProperty("CheckOutWorkerID"));
 
 		return v;
 	}
