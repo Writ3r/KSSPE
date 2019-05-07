@@ -48,12 +48,20 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
 import model.CheckOut;
 import model.CheckOutCollection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 //==============================================================================
 public class CheckOutCollectionView extends View implements Observer
 {
 	protected TableView<CheckOutTableModel> tableOfCheckOuts;
 	protected Button cancelButton;
+	protected Button saveButton;
 	protected MessageView statusLog;
 	protected Text actionText; 
         
@@ -197,7 +205,7 @@ public class CheckOutCollectionView extends View implements Observer
 		barcodeColumn.setCellValueFactory(
 				new PropertyValueFactory<CheckOutTableModel, String>("Barcode"));
 
-		TableColumn bannerIdColumn = new TableColumn("BannerId") ;
+		TableColumn bannerIdColumn = new TableColumn("BannerId");
 		bannerIdColumn.setMinWidth(116.6);
 		bannerIdColumn.setStyle(" -fx-alignment: CENTER;");
 		bannerIdColumn.setCellValueFactory(
@@ -209,19 +217,19 @@ public class CheckOutCollectionView extends View implements Observer
 		unitsTakenColumn.setCellValueFactory(
 				new PropertyValueFactory<CheckOutTableModel, String>("UnitsTaken"));
 
-		TableColumn unitsReturnedColumn = new TableColumn("Units Returned") ;
+		TableColumn unitsReturnedColumn = new TableColumn("Units Returned");
 		unitsReturnedColumn.setMinWidth(116.6);
 		unitsReturnedColumn.setStyle(" -fx-alignment: CENTER;");
 		unitsReturnedColumn.setCellValueFactory(
 				new PropertyValueFactory<CheckOutTableModel, String>("TotalUnitsReturned"));
 
-		TableColumn rentDateColumn = new TableColumn("Rented on") ;
+		TableColumn rentDateColumn = new TableColumn("Rented on");
 		rentDateColumn.setMinWidth(116.6);
 		rentDateColumn.setStyle(" -fx-alignment: CENTER;");
 		rentDateColumn.setCellValueFactory(
 				new PropertyValueFactory<CheckOutTableModel, String>("RentDate"));
 
-		TableColumn dueDateColumn = new TableColumn("Due on") ;
+		TableColumn dueDateColumn = new TableColumn("Due on");
 		dueDateColumn.setMinWidth(116.6);
 		dueDateColumn.setStyle(" -fx-alignment: CENTER;");
 		dueDateColumn.setCellValueFactory(
@@ -254,6 +262,36 @@ public class CheckOutCollectionView extends View implements Observer
                     btnContainer.setStyle("-fx-background-color: SLATEGREY");
 		});
 
+        icon = new ImageView(new Image("/images/savecolor.png"));
+		icon.setFitHeight(15);
+		icon.setFitWidth(15);
+		saveButton = new Button("Save to File", icon);
+		saveButton.setGraphic(icon);
+                saveButton.setPadding(new Insets(5,5,5,5));
+		saveButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
+		saveButton.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent e) {
+				clearErrorMessage();
+                                saveToExcelFile();
+			}
+		});
+		saveButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+			saveButton.setEffect(new DropShadow());
+		});
+		saveButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+			saveButton.setEffect(null);
+		});
+
+        btnContainer.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+            btnContainer.setStyle("-fx-background-color: GOLD");
+		});
+        btnContainer.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+            btnContainer.setStyle("-fx-background-color: SLATEGREY");
+		});
+		btnContainer.setAlignment(Pos.CENTER);
+                btnContainer.getChildren().add(saveButton);
 		btnContainer.getChildren().add(cancelButton);
 
 		tableOfCheckOuts.setPrefHeight(275);
@@ -305,6 +343,79 @@ public class CheckOutCollectionView extends View implements Observer
 		statusLog.displayErrorMessage(message);
 	}
 
+	protected void writeToFile(String fName)
+    {
+    	Vector allColumnNames = new Vector();
+
+        try
+        {
+    	    FileWriter outFile = new FileWriter(fName);
+            PrintWriter out = new PrintWriter(outFile);
+            CheckOutCollection checkOutCollection = (CheckOutCollection)myController.getState("CheckOutList");
+            Vector entryList = (Vector)checkOutCollection.getState("CheckOuts");
+
+            if ((entryList == null) || (entryList.size() == 0))
+                return;
+
+            allColumnNames.addElement("ID");
+            allColumnNames.addElement("BannerId");
+            allColumnNames.addElement("Barcode");
+            allColumnNames.addElement("UnitsTaken");
+            allColumnNames.addElement("TotalUnitsReturned");
+            allColumnNames.addElement("RentDate");
+            allColumnNames.addElement("DueDate");
+            allColumnNames.addElement("CheckOutWorkerID");
+
+            String line = "ID, BannerId, Barcode, UnitsTaken, TotalUnitsReturned, RentDate, DueDate, CheckOutWorkerID";
+
+            out.println(line);
+
+            for (int k = 0; k < entryList.size(); k++)
+            {
+                String valuesLine = "";
+                CheckOut nextC = (CheckOut)entryList.elementAt(k);
+                Vector<String> nextRow = nextC.getEntryListView();
+
+                for (int j = 0; j < allColumnNames.size()-1; j++)
+                {
+                    String nextValue = nextRow.elementAt(j);
+                        if(nextValue != null)
+                            valuesLine += nextValue + ", ";
+                }
+
+                out.println(valuesLine);
+            }
+
+            // Also print the shift count and filter type
+            out.println("\nTotal number of Reservation Records: " + entryList.size());
+
+            // Finally, print the time-stamp
+            DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+            DateFormat timeFormat = new SimpleDateFormat("hh:mm aaa");
+            Date date = new Date();
+            String timeStamp = dateFormat.format(date) + " " +
+                    timeFormat.format(date);
+
+            out.println("Reservations Report created on " + timeStamp);
+
+            out.close();
+
+            // Acknowledge successful completion to user with JOptionPane
+            //JOptionPane.showMessageDialog(null, "Report data saved successfully to selected file");
+            }
+
+            catch (FileNotFoundException e)
+            {
+            //     JOptionPane.showMessageDialog(null, "Could not access file to save: "
+            //             + fName, "Save Error", JOptionPane.ERROR_MESSAGE );
+            }
+            catch (IOException e)
+            {
+            //     JOptionPane.showMessageDialog(null, "Error in saving to file: "
+            //             + e.toString(), "Save Error", JOptionPane.ERROR_MESSAGE );
+
+            }
+    }
 
 	/**
 	 * Clear error message
