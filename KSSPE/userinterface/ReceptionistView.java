@@ -69,7 +69,7 @@ public class ReceptionistView extends View implements Observer
 	private Button removeCategoryButton;
 	
 	private Button addEquipmentButton;
-	private Button modifyEquipmentButton;
+	private Button updateEquipmentButton;
 	private Button removeEquipmentButton;
 	
 	private Button licenseButton;
@@ -113,6 +113,9 @@ public class ReceptionistView extends View implements Observer
 			addWorkerButton.setDisable(true);
 			updateWorkerButton.setDisable(true);
 			removeWorkerButton.setDisable(true);
+			addCategoryButton.setDisable(true);
+			updateCategoryButton.setDisable(true);
+			removeCategoryButton.setDisable(true);
 		}
 	}
 
@@ -135,7 +138,8 @@ public class ReceptionistView extends View implements Observer
 		titleText.setFill(Color.GOLD);
 		container.getChildren().add(titleText);
 		
-		Text workerText = new Text("ID: " + ((String)myController.getState("BannerId")) + " / Cred: " + ((String)myController.getState("Credential")));
+		Text workerText = new Text("Worker: " + ((String)myController.getState("FirstName") + " " +
+			(String)myController.getState("LastName")) + " / Cred: " + ((String)myController.getState("Credential")));
 		workerText.setFont(Font.font("Copperplate", FontWeight.BOLD, 23));
 		workerText.setTextAlignment(TextAlignment.CENTER);
 		workerText.setFill(Color.DARKGREEN);
@@ -182,15 +186,16 @@ public class ReceptionistView extends View implements Observer
 				myController.stateChangeRequest("ReserveEquipment", null);
 			});
 			returnItems.setOnAction((ActionEvent e) -> {
-				myController.stateChangeRequest("TopDonatorReport", null);
+				// DEBUG System.out.println("Returning equipment");
+				myController.stateChangeRequest("ReturnEquipment", null);
 			});
 			manageButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
 				manageButton.setEffect(shadow);
                 statusLog.displayInfoMessage("Reserve or Return Equipment");
 			});
 			manageButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-			manageButton.setEffect(null);
-                        clearErrorMessage();
+				manageButton.setEffect(null);
+                clearErrorMessage();
 			});
         checkoutCont.getChildren().add(manageButton);
 		
@@ -199,7 +204,7 @@ public class ReceptionistView extends View implements Observer
 			icon.setFitHeight(20);
 			icon.setFitWidth(20);
 		MenuItem allInventory = new MenuItem("All Inventory", icon);
-
+		
 		icon = new ImageView(new Image("/images/listcolor.png"));
 			icon.setFitHeight(20);
 			icon.setFitWidth(20);
@@ -213,7 +218,8 @@ public class ReceptionistView extends View implements Observer
 		icon = new ImageView(new Image("/images/datecolor.png"));
 			icon.setFitHeight(25);
 			icon.setFitWidth(25);
-		MenuItem overdueItems = new MenuItem("Over Due Items", icon);
+		MenuItem overdueItems = new MenuItem("Overdue Items", icon);
+	
 
         icon = new ImageView(new Image("/images/reportcolor.png"));
 			icon.setFitHeight(25);
@@ -221,7 +227,8 @@ public class ReceptionistView extends View implements Observer
         MenuButton reportsButton = new MenuButton("   Reports   ", icon, allInventory, availInventory, currentlyReserved, overdueItems);
 			reportsButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
             reportsButton.setStyle("-fx-selection-bar:gold");
-            allInventory.setOnAction((ActionEvent e) -> {
+			allInventory.setOnAction((ActionEvent e) -> {
+				// DEBUG System.out.println("All Inventory Requested");
 				myController.stateChangeRequest("ListAllInventory", null);
 			});
 			availInventory.setOnAction((ActionEvent e) -> {
@@ -231,15 +238,15 @@ public class ReceptionistView extends View implements Observer
 				myController.stateChangeRequest("ListReservedInventory", null);
 			});
 			overdueItems.setOnAction((ActionEvent e) -> {
-				myController.stateChangeRequest("ListOverDueInventory", null);
+				myController.stateChangeRequest("ListOverdueInventory", null);
 			});
 			reportsButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
 				reportsButton.setEffect(shadow);
                 statusLog.displayInfoMessage("Displays List of Reports to Choose From");
 			});
 			reportsButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-			reportsButton.setEffect(null);
-                        clearErrorMessage();
+				reportsButton.setEffect(null);
+                clearErrorMessage();
 			});
         checkoutCont.getChildren().add(reportsButton);
 		
@@ -510,21 +517,21 @@ public class ReceptionistView extends View implements Observer
 			icon.setFitHeight(15);
 			icon.setFitWidth(15);
 			
-		modifyEquipmentButton = new Button("Update", icon);
-			modifyEquipmentButton.setMinWidth(85);
-			modifyEquipmentButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
-			modifyEquipmentButton.setOnAction((ActionEvent e) -> {
-				myController.stateChangeRequest("FulfillRequest", null);
+		updateEquipmentButton = new Button("Update", icon);
+			updateEquipmentButton.setMinWidth(85);
+			updateEquipmentButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
+			updateEquipmentButton.setOnAction((ActionEvent e) -> {
+				myController.stateChangeRequest("UpdateEquipment", null);
 			});
-			modifyEquipmentButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-			modifyEquipmentButton.setEffect(shadow);
+			updateEquipmentButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+			updateEquipmentButton.setEffect(shadow);
                 statusLog.displayInfoMessage("Update Equipment in the records");
 			});
-			modifyEquipmentButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-				modifyEquipmentButton.setEffect(null);
+			updateEquipmentButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+				updateEquipmentButton.setEffect(null);
                 clearErrorMessage();
 			});
-		equipCont.getChildren().add(modifyEquipmentButton);
+		equipCont.getChildren().add(updateEquipmentButton);
 		
 		icon = new ImageView(new Image("/images/trashcolor.png"));
 			icon.setFitHeight(15);
@@ -533,7 +540,7 @@ public class ReceptionistView extends View implements Observer
 		removeEquipmentButton = new Button("Remove",icon);
 			removeEquipmentButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
 			removeEquipmentButton.setOnAction((ActionEvent e) -> {
-				myController.stateChangeRequest("RemoveRequest", null);
+				myController.stateChangeRequest("RemoveEquipment", null);
 			});
 			removeEquipmentButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
 				removeEquipmentButton.setEffect(shadow);
@@ -594,9 +601,7 @@ public class ReceptionistView extends View implements Observer
                         clearErrorMessage();
 		});
 		doneCont.getChildren().add(cancelButton);
-		
-		
-		
+			
         doneCont.setAlignment(Pos.CENTER);
 
 		container.getChildren().add(doneCont);
@@ -614,7 +619,7 @@ public class ReceptionistView extends View implements Observer
 	}
         
 
-	
+	//------------------------------------------------------------
 	public void update(Observable o, Object value)
 	{
 		clearErrorMessage();
@@ -622,11 +627,13 @@ public class ReceptionistView extends View implements Observer
 		displayErrorMessage((String)value);
 	}
 
+	//-------------------------------------------------------------
 	public void displayErrorMessage(String message)
 	{
 		statusLog.displayErrorMessage(message);
 	}
 
+	//-------------------------------------------------------------
 	public void clearErrorMessage()
 	{
 		statusLog.clearErrorMessage();

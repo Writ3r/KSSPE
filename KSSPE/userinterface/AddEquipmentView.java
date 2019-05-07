@@ -86,7 +86,11 @@ public class AddEquipmentView extends View implements Observer
 
 		getChildren().add(container);
 
+		populateFields();
+		
 		myController.addObserver(this);
+		
+		
 	}
 
 	//-------------------------------------------------------------
@@ -95,6 +99,14 @@ public class AddEquipmentView extends View implements Observer
 		return "** ADD NEW EQUIPMENT **";
 	}
 
+	//-------------------------------------------------------------
+	protected void populateFields()
+	{
+		good.setText("1");
+		fair.setText("0");
+		poor.setText("0");
+	}
+	
 	// public void populateFields()
 	// {
 
@@ -226,9 +238,11 @@ public class AddEquipmentView extends View implements Observer
 				clearErrorMessage();
 				setDisables();
 				
-				if(Utilities.checkBarcode(barcode.getText()))
+				String enteredBarcode = barcode.getText();
+				if(Utilities.checkBarcode(enteredBarcode))
 				{
 					removeDisables();
+					myController.stateChangeRequest("Barcode", enteredBarcode);
 					//populateFields();
 				}
 				else
@@ -421,8 +435,7 @@ public class AddEquipmentView extends View implements Observer
 							{
 								if(Utilities.checkNotes(Note))  
 								{
-									AvailableCount = Integer.parseInt(PoorCount) + Integer.parseInt(FairCount) + Integer.parseInt(GoodCount);
-									InStockCount = Integer.parseInt(PoorCount) + Integer.parseInt(FairCount) + Integer.parseInt(GoodCount);
+									
 									Category = category.getValue().toString();
 							
 									Properties props = new Properties();
@@ -433,8 +446,7 @@ public class AddEquipmentView extends View implements Observer
 									props.setProperty("CategoryName", Category);
 									props.setProperty("GoodCount", GoodCount);
 									props.setProperty("Notes", Note);
-									props.setProperty("AvailableCount", Integer.toString(AvailableCount));
-									props.setProperty("InStockCount", Integer.toString(InStockCount));
+									
 									removeDisables();
 									myController.stateChangeRequest("EquipmentData", props);
 									setDisables();
@@ -528,8 +540,11 @@ public class AddEquipmentView extends View implements Observer
 		barcode.clear();
 		equipmentName.clear();
 		poor.clear();
+		poor.setText("0");
 		fair.clear();
+		fair.setText("0");
 		good.clear();
+		good.setText("1");
 		notes.clear();
 		category.getSelectionModel().select(null);
 	}
@@ -539,8 +554,11 @@ public class AddEquipmentView extends View implements Observer
 	{
 		equipmentName.clear();
 		poor.clear();
+		poor.setText("0");
 		fair.clear();
+		fair.setText("0");
 		good.clear();
+		good.setText("1");
 		notes.clear();
 		category.getSelectionModel().select(null);
 	}
@@ -589,6 +607,15 @@ public class AddEquipmentView extends View implements Observer
 		clearErrorMessage();
 
 		String val = (String)value;
+		if (val.startsWith("Category") == true)
+		{
+			String selectedCategoryName = (String)myController.getState("CategoryName");
+			if (selectedCategoryName.equals("None") == false)
+			{
+				category.setValue(selectedCategoryName);
+			}
+		}
+		else
 		if (val.startsWith("ERR") == true)
 		{
 			displayErrorMessage(val);

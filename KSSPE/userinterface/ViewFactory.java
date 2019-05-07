@@ -51,14 +51,6 @@ public class ViewFactory {
 		{
 			return new CategoryCollectionView(t);
 		}
-		else if(viewName.equals("EquipmentCollectionView") == true)
-		{
-			return new EquipmentCollectionView(t);
-		}
-		else if(viewName.equals("CheckOutCollectionView") == true)
-		{
-			return new CheckOutCollectionView(t);
-		}
 		else if(viewName.equals("UpdateWorkerView") == true)
 		{
 			return new UpdateWorkerView(t);
@@ -75,6 +67,26 @@ public class ViewFactory {
 		{
 			return new AddEquipmentView(t);
 		}
+		else if(viewName.equals("EquipmentCollectionView") == true)
+		{
+			return new EquipmentCollectionView(t);
+		}
+		else if(viewName.equals("EquipmentCollectionReportView") == true)
+		{
+			return new EquipmentCollectionReportView(t);
+		}
+		else if(viewName.equals("SearchEquipmentView") == true)
+		{
+			return new SearchEquipmentView(t);
+		}
+		else if(viewName.equals("UpdateEquipmentView") == true)
+		{
+			return new UpdateEquipmentView(t);
+		}
+		else if(viewName.equals("RemoveEquipmentView") == true)
+		{
+			return new RemoveEquipmentView(t);
+		}
 		else if(viewName.equals("SearchBorrowerReserveView") == true)
 		{
 			return new SearchBorrowerReserveView(t);
@@ -82,6 +94,14 @@ public class ViewFactory {
 		else if(viewName.equals("ReserveEquipmentView") == true)
 		{
 			return new ReserveEquipmentView(t);
+		}
+		else if(viewName.equals("CheckOutCollectionView") == true)
+		{
+			return new CheckOutCollectionView(t);
+		}
+		else if(viewName.equals("ReturnEquipmentView") == true)
+		{
+			return new ReturnEquipmentView(t);
 		}
 		else
 			return null;

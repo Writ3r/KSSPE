@@ -47,16 +47,18 @@ import javafx.util.StringConverter;
 
 import controller.Transaction;
 
-/** The class containing the Reserve Equipment View for the KSSPE
+/** The class containing the Add Borrower View for the KSSPE
  *  application 
  */
 //==============================================================
-public class ReserveEquipmentView extends View implements Observer
+public class ReturnEquipmentView extends View implements Observer
 {
 
 	// GUI components
 	protected TextField barcode;
+	protected TextField equipName;
 	protected TextField count;
+	
 	protected DatePicker datePicker;
 	
 	protected GridPane grid;
@@ -73,7 +75,7 @@ public class ReserveEquipmentView extends View implements Observer
 
 	// constructor for this class -- takes a controller object
 	//----------------------------------------------------------
-	public ReserveEquipmentView(Transaction t)
+	public ReturnEquipmentView(Transaction t)
 	{
 		super(t);
 
@@ -90,45 +92,39 @@ public class ReserveEquipmentView extends View implements Observer
 		getChildren().add(container);
 		
 		populateFields();
-		
-		// This is BUSINESS LOGIC. Should belong in controller
-		//checkForPenaltiesAndBlocks(); //checks if the user has penalties/blocks. Puts up an alert if so. 
 
 		myController.addObserver(this);
+		
+		
 	}
 
 	//-------------------------------------------------------------
 	protected String getActionText()
 	{
-		return "** RESERVE EQUIPMENT **";
+		return "** RETURN EQUIPMENT **";
 	}
 	
-	//-------------------------------------------------------------
+	//-----------------------------------------------------------------
 	public void populateFields()
 	{
+		barcode.setText((String)myController.getState("Barcode"));
+		equipName.setText((String)myController.getState("EquipmentName"));
+		count.setText((String)myController.getState("DefaultUnitsReturned"));
 		LocalDate today = LocalDate.now();
-		datePicker.setValue(today.plusDays(2));
+		datePicker.setValue(today);
+
+		barcode.setDisable(true);
+		equipName.setDisable(true);
+		datePicker.setDisable(true);
 	}
 
-	//-------------------------------------------------------------
+	//-----------------------------------------------------------------
 	protected void processBarcode(String Barcode)
 	{
 		//make sure equipment with this barcode actually exists. If so, inform the user and remove disables on the other fields.
 		Properties props = new Properties();
 		props.setProperty("Barcode", Barcode);
-		myController.stateChangeRequest("TestEquipment", props);
 		
-		if((Boolean)myController.getState("TestEquipment") == true)
-		{
-			removeDisables();
-			barcode.setText(Barcode);
-			count.requestFocus();
-		}
-		else
-		{
-			count.clear();  //clear everything except barcode and re-disable them. 
-			setDisables();
-		}
 		
 	}
 
@@ -187,7 +183,9 @@ public class ReserveEquipmentView extends View implements Observer
 			blankText.setTextAlignment(TextAlignment.CENTER);
 			blankText.setFill(Color.WHITE);
 		vbox.getChildren().add(blankText);
-			
+		
+		
+		
 		grid = new GridPane();
 			grid.setHgap(15);
 			grid.setVgap(15);
@@ -205,23 +203,29 @@ public class ReserveEquipmentView extends View implements Observer
 			barcode.setMinWidth(110);
 			barcode.addEventFilter(KeyEvent.KEY_RELEASED, event->{
 				clearErrorMessage();
-				if(Utilities.checkBarcode(barcode.getText()))
-				{
-					processBarcode(barcode.getText());
-				}
-				else
-				{
-					count.clear();  //clear everything except barcode and re-disable them. 
-					setDisables();
-				}
+
 			});
 		grid.add(barcode, 1, 1);
 		
-		Text countLabel = new Text("Units Taken:");
+		Text equipNameLabel = new Text("Equipment Name:");
+			equipNameLabel.setFill(Color.GOLD);
+			equipNameLabel.setFont(myFont);
+			equipNameLabel.setTextAlignment(TextAlignment.RIGHT);
+		grid.add(equipNameLabel, 0, 2);
+		
+		equipName = new TextField();
+			equipName.setMinWidth(110);
+			equipName.setMinWidth(110);
+			equipName.addEventFilter(KeyEvent.KEY_RELEASED, event->{
+				clearErrorMessage();
+			});
+		grid.add(equipName, 1, 2);
+		
+		Text countLabel = new Text("Units Returned:");
 			countLabel.setFill(Color.GOLD);
 			countLabel.setFont(myFont);
 			countLabel.setTextAlignment(TextAlignment.RIGHT);
-		grid.add(countLabel, 0, 2);
+		grid.add(countLabel, 0, 3);
 		
 		count = new TextField();
 			count.setMinWidth(110);
@@ -229,13 +233,14 @@ public class ReserveEquipmentView extends View implements Observer
 			count.addEventFilter(KeyEvent.KEY_RELEASED, event->{
 				clearErrorMessage();
 			});
-		grid.add(count, 1, 2);
+		grid.add(count, 1, 3);
 		
-		Text dueLabel = new Text("Due Date :");
+		Text dueLabel = new Text("Return Date :");
 			dueLabel.setFill(Color.GOLD);
 			dueLabel.setFont(myFont);
 			dueLabel.setTextAlignment(TextAlignment.RIGHT);
-		grid.add(dueLabel, 0, 3);
+		grid.add(dueLabel, 0, 4);
+		
 		
 		datePicker = new DatePicker();
 			datePicker.setMinWidth(110);
@@ -243,7 +248,7 @@ public class ReserveEquipmentView extends View implements Observer
 			datePicker.addEventFilter(KeyEvent.KEY_RELEASED, event->{
 				clearErrorMessage();
 			});
-		grid.add(datePicker, 1, 3);
+		grid.add(datePicker, 1, 4);
 		
 		
 		//---------------------------------- middle grid done.
@@ -262,7 +267,7 @@ public class ReserveEquipmentView extends View implements Observer
 			icon.setFitHeight(15);
 			icon.setFitWidth(15);
 			
-		submitButton = new Button("Reserve", icon);
+		submitButton = new Button("Return Equipment", icon);
 			submitButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
 			submitButton.setOnAction((ActionEvent e) -> {
 				sendToController();
@@ -283,7 +288,8 @@ public class ReserveEquipmentView extends View implements Observer
 			cancelButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
 			cancelButton.setOnAction((ActionEvent e) -> {
 				clearErrorMessage();
-				myController.stateChangeRequest("CancelTransactionAndMakeReceipt", null);
+			
+				myController.stateChangeRequest("CancelTransaction", null);
 			});
 			cancelButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
 				cancelButton.setEffect(new DropShadow());
@@ -296,7 +302,6 @@ public class ReserveEquipmentView extends View implements Observer
 		vbox.getChildren().add(grid);
 		vbox.getChildren().add(doneCont);
 		
-		setDisables();
 	
 		setOutlines();
 		
@@ -310,19 +315,19 @@ public class ReserveEquipmentView extends View implements Observer
 		
 		String Barcode = barcode.getText();
 		String Count = count.getText();
-		String DueDate = (datePicker.getValue()).toString();
+		String ReturnDate = (datePicker.getValue()).toString();
 		
 		if(Utilities.checkBarcode(Barcode))
 		{
 			if(Utilities.checkGoodCount(Count))
 			{
-				if(Utilities.checkDueDate(DueDate))
+				if(Utilities.checkReturnDate(ReturnDate))
 				{
 					Properties props = new Properties();
 					props.setProperty("Barcode", Barcode);
-					props.setProperty("UnitsTaken", Count);
-					props.setProperty("DueDate", DueDate);
-					myController.stateChangeRequest("CheckOutData", props);
+					props.setProperty("UnitsReturned", Count);
+					props.setProperty("ReturnDate", ReturnDate);
+					myController.stateChangeRequest("CheckInData", props);
 				}
 				else
 				{
@@ -343,8 +348,6 @@ public class ReserveEquipmentView extends View implements Observer
 		}
 	}
 	
-	
-	
 	//-------------------------------------------------------------
 	protected MessageView createStatusLog(String initialMessage)
 	{
@@ -358,7 +361,6 @@ public class ReserveEquipmentView extends View implements Observer
 	{
 		barcode.clear();
 		count.clear();
-		
 	}
 	
 	//------------------------------------------------------------------------------------------
@@ -375,12 +377,6 @@ public class ReserveEquipmentView extends View implements Observer
 		datePicker.setDisable(true);
 	}
 	
-	//-----------------------------------------------------------------------------------------
-	private void clearValuesExceptDue()
-	{
-		barcode.clear();
-		count.clear();
-	}
 	
 	//------------------------------------------------------------------------------------------
 	private void setOutlines()
@@ -406,8 +402,7 @@ public class ReserveEquipmentView extends View implements Observer
 		}
 		else
 		{
-			clearValuesExceptDue();
-			setDisables();
+			
 			displayMessage(val);
 		}
 		

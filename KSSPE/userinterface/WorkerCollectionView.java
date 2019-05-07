@@ -142,7 +142,7 @@ public class WorkerCollectionView extends View implements Observer
 
 	// Create the title container
 	//-------------------------------------------------------------
-	private Node createTitle()
+private Node createTitle()
 	{
 		VBox container = new VBox(10);
 		container.setPadding(new Insets(1, 10, 12, 10));
@@ -298,7 +298,7 @@ public class WorkerCollectionView extends View implements Observer
 			myController.stateChangeRequest("WorkerSelected", selectedBannerId);
 		}
 	}
-    
+       
 	//----------------------------------------------------------------------------
 	private void displayRemoveAlert(){
 		clearErrorMessage();

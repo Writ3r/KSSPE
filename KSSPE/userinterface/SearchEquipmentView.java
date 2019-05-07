@@ -22,13 +22,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.collections.FXCollections;
-import javafx.stage.Stage;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DatePicker;
-import javafx.scene.Scene;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
+import javafx.scene.layout.ColumnConstraints;
 
 import java.util.Properties;
 import java.util.Observer;
@@ -47,24 +41,21 @@ import javafx.util.StringConverter;
 
 import controller.Transaction;
 
-/** The class containing the Reserve Equipment View for the KSSPE
+/** The class containing the Search Equipment View for the KSSPE
  *  application 
  */
 //==============================================================
-public class ReserveEquipmentView extends View implements Observer
+public class SearchEquipmentView extends View implements Observer
 {
 
 	// GUI components
 	protected TextField barcode;
-	protected TextField count;
-	protected DatePicker datePicker;
-	
-	protected GridPane grid;
-	protected Font myFont;
+	protected TextField name;
 
 	protected Text actionText;
 	protected Text prompt;
-	
+
+	protected HBox bannerBox;
 	protected HBox doneCont;
 	protected Button submitButton;
 	protected Button cancelButton;
@@ -73,7 +64,7 @@ public class ReserveEquipmentView extends View implements Observer
 
 	// constructor for this class -- takes a controller object
 	//----------------------------------------------------------
-	public ReserveEquipmentView(Transaction t)
+	public SearchEquipmentView(Transaction t)
 	{
 		super(t);
 
@@ -88,11 +79,6 @@ public class ReserveEquipmentView extends View implements Observer
 		container.getChildren().add(createStatusLog("             "));
 
 		getChildren().add(container);
-		
-		populateFields();
-		
-		// This is BUSINESS LOGIC. Should belong in controller
-		//checkForPenaltiesAndBlocks(); //checks if the user has penalties/blocks. Puts up an alert if so. 
 
 		myController.addObserver(this);
 	}
@@ -100,41 +86,18 @@ public class ReserveEquipmentView extends View implements Observer
 	//-------------------------------------------------------------
 	protected String getActionText()
 	{
-		return "** RESERVE EQUIPMENT **";
-	}
-	
-	//-------------------------------------------------------------
-	public void populateFields()
-	{
-		LocalDate today = LocalDate.now();
-		datePicker.setValue(today.plusDays(2));
+		return "** SEARCH FOR EQUIPMENT **";
 	}
 
 	//-------------------------------------------------------------
-	protected void processBarcode(String Barcode)
+	public void populateFields()
 	{
-		//make sure equipment with this barcode actually exists. If so, inform the user and remove disables on the other fields.
-		Properties props = new Properties();
-		props.setProperty("Barcode", Barcode);
-		myController.stateChangeRequest("TestEquipment", props);
-		
-		if((Boolean)myController.getState("TestEquipment") == true)
-		{
-			removeDisables();
-			barcode.setText(Barcode);
-			count.requestFocus();
-		}
-		else
-		{
-			count.clear();  //clear everything except barcode and re-disable them. 
-			setDisables();
-		}
-		
+		//
 	}
 
 	// Create the title container
 	//-------------------------------------------------------------
-	private Node createTitle()
+	protected Node createTitle()
 	{
 		VBox container = new VBox(10);
 		container.setPadding(new Insets(1, 10, 1, 10));
@@ -173,13 +136,12 @@ public class ReserveEquipmentView extends View implements Observer
 
 	// Create the main form content
 	//-------------------------------------------------------------
-	private VBox createFormContent()
+	protected VBox createFormContent()
 	{
 		VBox vbox = new VBox(10);
 		vbox.setAlignment(Pos.CENTER);
 		
-		myFont = Font.font("Copperplate", FontWeight.THIN, 17);
-		Font bannerFont = Font.font("copperplate", FontWeight.BOLD, 17);   
+		Font myFont = Font.font("copperplate", FontWeight.THIN, 18);   
 
 		Text blankText = new Text("  ");
 			blankText.setFont(Font.font("Arial", FontWeight.BOLD, 17));
@@ -187,67 +149,66 @@ public class ReserveEquipmentView extends View implements Observer
 			blankText.setTextAlignment(TextAlignment.CENTER);
 			blankText.setFill(Color.WHITE);
 		vbox.getChildren().add(blankText);
-			
-		grid = new GridPane();
+
+		
+		GridPane grid = new GridPane();
 			grid.setHgap(15);
 			grid.setVgap(15);
-			grid.setPadding(new Insets(0, 20, 20, 15));
+			grid.setPadding(new Insets(0, 20, 25, 20));
 			grid.setAlignment(Pos.CENTER);
-		
-		Text barcodeLabel = new Text("Barcode :");
-			barcodeLabel.setFill(Color.GOLD);
-			barcodeLabel.setFont(bannerFont);
-			barcodeLabel.setUnderline(true);
-			barcodeLabel.setTextAlignment(TextAlignment.RIGHT);
-		grid.add(barcodeLabel, 0, 1);
-		
+			
+
+		Text barcodeHeader = new Text("Barcode :"); //autofill with newest autoinc number
+			barcodeHeader.setFill(Color.GOLD);
+			barcodeHeader.setFont(myFont);
+			barcodeHeader.setTextAlignment(TextAlignment.RIGHT);
+		grid.add(barcodeHeader, 0, 1);
+			
+			
 		barcode = new TextField();
-			barcode.setMinWidth(110);
+			barcode.setMinWidth(150);
+			barcode.setOnKeyTyped(event ->{
+				if(barcode.getText().length() > GlobalVariables.BARCODE_LENGTH - 1)
+					event.consume();
+			});
 			barcode.addEventFilter(KeyEvent.KEY_RELEASED, event->{
 				clearErrorMessage();
-				if(Utilities.checkBarcode(barcode.getText()))
-				{
-					processBarcode(barcode.getText());
-				}
-				else
-				{
-					count.clear();  //clear everything except barcode and re-disable them. 
-					setDisables();
-				}
 			});
 		grid.add(barcode, 1, 1);
 		
-		Text countLabel = new Text("Units Taken:");
-			countLabel.setFill(Color.GOLD);
-			countLabel.setFont(myFont);
-			countLabel.setTextAlignment(TextAlignment.RIGHT);
-		grid.add(countLabel, 0, 2);
 		
-		count = new TextField();
-			count.setMinWidth(110);
-			count.setMinWidth(110);
-			count.addEventFilter(KeyEvent.KEY_RELEASED, event->{
+		HBox orCont = new HBox(10);
+			orCont.setAlignment(Pos.CENTER);
+			
+		Text orHeader = new Text("---------- OR SEARCH BY ----------"); //autofill with newest autoinc number
+			orHeader.setFill(Color.GOLD);
+			orHeader.setFont(myFont);
+			orHeader.setTextAlignment(TextAlignment.RIGHT);
+		orCont.getChildren().add(orHeader);
+		
+		
+		GridPane grid2 = new GridPane();
+			grid2.setHgap(15);
+			grid2.setVgap(15);
+			grid2.setPadding(new Insets(10, 20, 30, 20));
+			grid2.setAlignment(Pos.CENTER);
+		
+		
+		Text nameHeader = new Text("Equipment Name :"); //autofill with newest autoinc number
+			nameHeader.setFill(Color.GOLD);
+			nameHeader.setFont(myFont);
+			nameHeader.setTextAlignment(TextAlignment.RIGHT);
+		grid2.add(nameHeader, 0, 1);
+		
+		name = new TextField();
+			name.setMinWidth(150);
+			name.addEventFilter(KeyEvent.KEY_RELEASED, event->{
 				clearErrorMessage();
 			});
-		grid.add(count, 1, 2);
+		grid2.add(name, 1, 1);
 		
-		Text dueLabel = new Text("Due Date :");
-			dueLabel.setFill(Color.GOLD);
-			dueLabel.setFont(myFont);
-			dueLabel.setTextAlignment(TextAlignment.RIGHT);
-		grid.add(dueLabel, 0, 3);
-		
-		datePicker = new DatePicker();
-			datePicker.setMinWidth(110);
-			datePicker.setMinWidth(110);
-			datePicker.addEventFilter(KeyEvent.KEY_RELEASED, event->{
-				clearErrorMessage();
-			});
-		grid.add(datePicker, 1, 3);
-		
-		
-		//---------------------------------- middle grid done.
-		
+		//---------------------------------------------------------------------------------
+
 		
 		doneCont = new HBox(10);
 		doneCont.setAlignment(Pos.CENTER);
@@ -258,11 +219,11 @@ public class ReserveEquipmentView extends View implements Observer
             doneCont.setStyle("-fx-background-color: SLATEGREY");
 		});
 		
-		ImageView icon = new ImageView(new Image("/images/buyingcolor.png"));
+		ImageView icon = new ImageView(new Image("/images/searchcolor.png"));
 			icon.setFitHeight(15);
 			icon.setFitWidth(15);
 			
-		submitButton = new Button("Reserve", icon);
+		submitButton = new Button("Search", icon);
 			submitButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
 			submitButton.setOnAction((ActionEvent e) -> {
 				sendToController();
@@ -283,7 +244,7 @@ public class ReserveEquipmentView extends View implements Observer
 			cancelButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
 			cancelButton.setOnAction((ActionEvent e) -> {
 				clearErrorMessage();
-				myController.stateChangeRequest("CancelTransactionAndMakeReceipt", null);
+				myController.stateChangeRequest("CancelTransaction", null);
 			});
 			cancelButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
 				cancelButton.setEffect(new DropShadow());
@@ -294,56 +255,56 @@ public class ReserveEquipmentView extends View implements Observer
 		doneCont.getChildren().add(cancelButton);
 		
 		vbox.getChildren().add(grid);
+		vbox.getChildren().add(orCont);
+		vbox.getChildren().add(grid2);
 		vbox.getChildren().add(doneCont);
-		
-		setDisables();
 	
 		setOutlines();
-		
+               
 		return vbox;
 	}
 
-	//---------------------------------------------------------------------------------------------------
+	//------------------------------------------------------------------
 	protected void sendToController()
 	{
 		clearErrorMessage();
 		
 		String Barcode = barcode.getText();
-		String Count = count.getText();
-		String DueDate = (datePicker.getValue()).toString();
+		String Name = name.getText();
+		Properties props = new Properties();
 		
-		if(Utilities.checkBarcode(Barcode))
+		if(!Barcode.equals(""))
 		{
-			if(Utilities.checkGoodCount(Count))
+			if(Utilities.checkIsNumber(Barcode))
 			{
-				if(Utilities.checkDueDate(DueDate))
-				{
-					Properties props = new Properties();
-					props.setProperty("Barcode", Barcode);
-					props.setProperty("UnitsTaken", Count);
-					props.setProperty("DueDate", DueDate);
-					myController.stateChangeRequest("CheckOutData", props);
-				}
-				else
-				{
-					displayErrorMessage("Please enter a valid date in the form yyyy-mm-dd");
-					datePicker.requestFocus();
-				}
+				props.setProperty("Barcode", Barcode);
+				myController.stateChangeRequest("SearchEquipment", props);			
 			}
 			else
 			{
-				displayErrorMessage("Please enter a valid count.");
-				count.requestFocus();
+				displayErrorMessage("Please enter a valid Barcode (Digits).");
+				barcode.requestFocus();
+			}
+			
+		}
+		else if(!Name.equals(""))
+		{
+			if(Utilities.checkEquipmentName(Name))
+			{
+				props.setProperty("Name", Name);
+				myController.stateChangeRequest("SearchEquipment", props);						
+			}
+			else
+			{
+				displayErrorMessage("Please enter a valid name.");
+				name.requestFocus();
 			}
 		}
 		else
 		{
-			displayErrorMessage("Please enter a valid barcode.");
-			barcode.requestFocus();
+			myController.stateChangeRequest("SearchEquipment", props);
 		}
 	}
-	
-	
 	
 	//-------------------------------------------------------------
 	protected MessageView createStatusLog(String initialMessage)
@@ -357,37 +318,14 @@ public class ReserveEquipmentView extends View implements Observer
 	public void clearValues()
 	{
 		barcode.clear();
-		count.clear();
-		
+		name.clear();
 	}
-	
-	//------------------------------------------------------------------------------------------
-	private void removeDisables()
-	{
-		count.setDisable(false);
-		datePicker.setDisable(false);
-	}
-	
-	//------------------------------------------------------------------------------------------
-	protected void setDisables()
-	{
-		count.setDisable(true);
-		datePicker.setDisable(true);
-	}
-	
-	//-----------------------------------------------------------------------------------------
-	private void clearValuesExceptDue()
-	{
-		barcode.clear();
-		count.clear();
-	}
-	
-	//------------------------------------------------------------------------------------------
+
+	//-------------------------------------------------------------
 	private void setOutlines()
 	{
 		barcode.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
-		count.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
-		datePicker.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
+		name.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
 	}
 
 	/**
@@ -406,8 +344,8 @@ public class ReserveEquipmentView extends View implements Observer
 		}
 		else
 		{
-			clearValuesExceptDue();
-			setDisables();
+			clearValues();
+			barcode.requestFocus();
 			displayMessage(val);
 		}
 		

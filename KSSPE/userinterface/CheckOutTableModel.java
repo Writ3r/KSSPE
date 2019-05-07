@@ -12,9 +12,10 @@ public class CheckOutTableModel
 	private final SimpleStringProperty Barcode;
 	private final SimpleStringProperty UnitsTaken;
 	private final SimpleStringProperty TotalUnitsReturned;
-	private final SimpleStringProperty RentDate;
 	private final SimpleStringProperty DueDate;
+	private final SimpleStringProperty RentDate;
 	private final SimpleStringProperty CheckOutWorkerId;
+	private final SimpleStringProperty EquipmentName;
 
 	//----------------------------------------------------------------------------
 	public CheckOutTableModel(Vector<String> atData)
@@ -24,19 +25,10 @@ public class CheckOutTableModel
 		Barcode =  new SimpleStringProperty(atData.elementAt(2));
 		UnitsTaken =  new SimpleStringProperty(atData.elementAt(3));
 		TotalUnitsReturned =  new SimpleStringProperty(atData.elementAt(4));
-		RentDate = new SimpleStringProperty(atData.elementAt(5));
-		DueDate = new SimpleStringProperty(atData.elementAt(6));
+		DueDate =  new SimpleStringProperty(atData.elementAt(5));
+		RentDate =  new SimpleStringProperty(atData.elementAt(6));
 		CheckOutWorkerId = new SimpleStringProperty(atData.elementAt(7));
-	}
-
-	//----------------------------------------------------------------------------
-	public String getBarcode() {
-		return Barcode.get();
-	}
-
-	//----------------------------------------------------------------------------
-	public void setBarcode(String pref) {
-		Barcode.set(pref);
+		EquipmentName = new SimpleStringProperty(atData.elementAt(8));
 	}
 
 	//----------------------------------------------------------------------------
@@ -50,13 +42,13 @@ public class CheckOutTableModel
 	}
 
 	//----------------------------------------------------------------------------
-	public String getBannerId() {
-		return BannerId.get();
+	public String getBarcode() {
+		return Barcode.get();
 	}
 
 	//----------------------------------------------------------------------------
-	public void setBannerId(String pref) {
-		BannerId.set(pref);
+	public void setBarcode(String desc) {
+		Barcode.set(desc);
 	}
 
 	//----------------------------------------------------------------------------
@@ -65,8 +57,18 @@ public class CheckOutTableModel
 	}
 
 	//----------------------------------------------------------------------------
-	public void setUnitsTaken(String pref) {
-		UnitsTaken.set(pref);
+	public void setUnitsTaken(String desc) {
+		UnitsTaken.set(desc);
+	}
+	
+	//----------------------------------------------------------------------------
+	public String getBannerId() {
+		return BannerId.get();
+	}
+
+	//----------------------------------------------------------------------------
+	public void setBannerId(String desc) {
+		BannerId.set(desc);
 	}
 
 	//----------------------------------------------------------------------------
@@ -75,8 +77,18 @@ public class CheckOutTableModel
 	}
 
 	//----------------------------------------------------------------------------
-	public void setTotalUnitsReturned(String pref) {
-		TotalUnitsReturned.set(pref);
+	public void setTotalUnitsReturned(String desc) {
+		TotalUnitsReturned.set(desc);
+	}
+	//----------------------------------------------------------------------------
+	
+	public String getDueDate() {
+		return DueDate.get();
+	}
+
+	//----------------------------------------------------------------------------
+	public void setDueDate(String desc) {
+		DueDate.set(desc);
 	}
 
 	//----------------------------------------------------------------------------
@@ -85,28 +97,27 @@ public class CheckOutTableModel
 	}
 
 	//----------------------------------------------------------------------------
-	public void setRentDate(String pref) {
-		RentDate.set(pref);
+	public void setRentDate(String desc) {
+		RentDate.set(desc);
 	}
-
-	//----------------------------------------------------------------------------
-	public String getDueDate() {
-		return DueDate.get();
-	}
-
-	//----------------------------------------------------------------------------
-	public void setDueDate(String pref) {
-		DueDate.set(pref);
-	}
-
+	
 	//----------------------------------------------------------------------------
 	public String getCheckOutWorkerId() {
 		return CheckOutWorkerId.get();
 	}
 
 	//----------------------------------------------------------------------------
-	public void setCheckOutWorkerId(String pref) {
-		CheckOutWorkerId.set(pref);
+	public void setCheckOutWorkerId(String desc) {
+		CheckOutWorkerId.set(desc);
+	}
+	
+	//----------------------------------------------------------------------------
+	public String getEquipmentName() {
+		return EquipmentName.get();
 	}
 
+	//----------------------------------------------------------------------------
+	public void setEquipmentName(String desc) {
+		EquipmentName.set(desc);
+	}
 }

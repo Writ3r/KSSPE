@@ -14,7 +14,7 @@ public class EquipmentTableModel
 	private final SimpleStringProperty GoodCount;
 	private final SimpleStringProperty FairCount;
 	private final SimpleStringProperty PoorCount;
-	private final SimpleStringProperty AvaiableCount;
+	private final SimpleStringProperty AvailableCount;
 	private final SimpleStringProperty InStockCount;
 	private final SimpleStringProperty DateAdded;
 	private final SimpleStringProperty DateLastUsed;
@@ -27,12 +27,12 @@ public class EquipmentTableModel
 		CategoryName =  new SimpleStringProperty(atData.elementAt(2));
 		Notes =  new SimpleStringProperty(atData.elementAt(3));
 		GoodCount =  new SimpleStringProperty(atData.elementAt(4));
-		FairCount = new SimpleStringProperty(atData.elementAt(5));
-		PoorCount = new SimpleStringProperty(atData.elementAt(6));
-		AvaiableCount = new SimpleStringProperty(atData.elementAt(7));
-		InStockCount = new SimpleStringProperty(atData.elementAt(8));
-		DateAdded = new SimpleStringProperty(atData.elementAt(9));
-		DateLastUsed = new SimpleStringProperty(atData.elementAt(10));
+		FairCount =  new SimpleStringProperty(atData.elementAt(5));
+		PoorCount =  new SimpleStringProperty(atData.elementAt(6));
+		AvailableCount =  new SimpleStringProperty(atData.elementAt(7));
+		InStockCount =  new SimpleStringProperty(atData.elementAt(8));
+		DateAdded =  new SimpleStringProperty(atData.elementAt(9));
+		DateLastUsed =  new SimpleStringProperty(atData.elementAt(10));
 	}
 
 	//----------------------------------------------------------------------------
@@ -51,8 +51,8 @@ public class EquipmentTableModel
 	}
 
 	//----------------------------------------------------------------------------
-	public void setName(String pref) {
-		Name.set(pref);
+	public void setName(String desc) {
+		Name.set(desc);
 	}
 
 	//----------------------------------------------------------------------------
@@ -61,8 +61,8 @@ public class EquipmentTableModel
 	}
 
 	//----------------------------------------------------------------------------
-	public void setCategoryName(String pref) {
-		CategoryName.set(pref);
+	public void setCategoryName(String desc) {
+		CategoryName.set(desc);
 	}
 
 	//----------------------------------------------------------------------------
@@ -71,8 +71,8 @@ public class EquipmentTableModel
 	}
 
 	//----------------------------------------------------------------------------
-	public void setNotes(String pref) {
-		Notes.set(pref);
+	public void setNotes(String desc) {
+		Notes.set(desc);
 	}
 
 	//----------------------------------------------------------------------------
@@ -81,8 +81,8 @@ public class EquipmentTableModel
 	}
 
 	//----------------------------------------------------------------------------
-	public void setGoodCount(String pref) {
-		GoodCount.set(pref);
+	public void setGoodCount(String desc) {
+		GoodCount.set(desc);
 	}
 
 	//----------------------------------------------------------------------------
@@ -91,8 +91,8 @@ public class EquipmentTableModel
 	}
 
 	//----------------------------------------------------------------------------
-	public void setFairCount(String pref) {
-		FairCount.set(pref);
+	public void setFairCount(String desc) {
+		FairCount.set(desc);
 	}
 
 	//----------------------------------------------------------------------------
@@ -101,18 +101,18 @@ public class EquipmentTableModel
 	}
 
 	//----------------------------------------------------------------------------
-	public void setPoorCount(String pref) {
-		PoorCount.set(pref);
+	public void setPoorCount(String desc) {
+		PoorCount.set(desc);
 	}
 
 	//----------------------------------------------------------------------------
-	public String getAvaiableCount() {
-		return AvaiableCount.get();
+	public String getAvailableCount() {
+		return AvailableCount.get();
 	}
 
 	//----------------------------------------------------------------------------
-	public void setAvaiableCount(String pref) {
-		AvaiableCount.set(pref);
+	public void setAvailableCount(String desc) {
+		AvailableCount.set(desc);
 	}
 
 	//----------------------------------------------------------------------------
@@ -121,8 +121,8 @@ public class EquipmentTableModel
 	}
 
 	//----------------------------------------------------------------------------
-	public void setInStockCount(String pref) {
-		InStockCount.set(pref);
+	public void setInStockCount(String desc) {
+		InStockCount.set(desc);
 	}
 
 	//----------------------------------------------------------------------------
@@ -131,17 +131,17 @@ public class EquipmentTableModel
 	}
 
 	//----------------------------------------------------------------------------
-	public void setDateAdded(String pref) {
-		DateAdded.set(pref);
+	public void setDateAdded(String desc) {
+		DateAdded.set(desc);
 	}
-
+	
 	//----------------------------------------------------------------------------
 	public String getDateLastUsed() {
 		return DateLastUsed.get();
 	}
 
 	//----------------------------------------------------------------------------
-	public void setDateLastUsed(String pref) {
-		DateLastUsed.set(pref);
+	public void setDateLastUsed(String desc) {
+		DateLastUsed.set(desc);
 	}
 }

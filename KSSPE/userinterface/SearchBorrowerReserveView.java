@@ -41,7 +41,7 @@ import javafx.util.StringConverter;
 
 import controller.Transaction;
 
-/** The class containing the Search Borrower View for the KSSPE
+/** The class containing the Search Borrower View (for Reserving equipment) for the KSSPE
  *  application 
  */
 //==============================================================
@@ -312,6 +312,7 @@ public class SearchBorrowerReserveView extends View implements Observer
 		return vbox;
 	}
 
+	//----------------------------------------------------------------
 	protected void sendToController()
 	{
 		clearErrorMessage();
@@ -414,6 +415,7 @@ public class SearchBorrowerReserveView extends View implements Observer
 		return statusLog;
 	}
 
+	//------------------------------------------------------------
 	public void clearValues()
 	{
 		bannerId.clear();
@@ -422,6 +424,7 @@ public class SearchBorrowerReserveView extends View implements Observer
 		phone.clear();
 	}
 
+	//------------------------------------------------------------
 	protected void setOutlines()
 	{
 		bannerId.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
