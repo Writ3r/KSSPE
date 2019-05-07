@@ -48,13 +48,20 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
 import model.Equipment;
 import model.EquipmentCollection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 //==============================================================================
 public class EquipmentCollectionView extends View implements Observer
 {
 	protected TableView<EquipmentTableModel> tableOfEquipment;
 	protected Button cancelButton;
-	protected Button submitButton;
+	protected Button saveButton;
 	protected MessageView statusLog;
 	protected Text actionText; 
         
@@ -96,8 +103,6 @@ public class EquipmentCollectionView extends View implements Observer
 		ObservableList<EquipmentTableModel> tableData = FXCollections.observableArrayList();
 		try
 		{
-			//System.out.println("We have data");
-	
 			EquipmentCollection equipmentCollection = 
 					(EquipmentCollection)myController.getState("EquipmentList");
 
@@ -285,6 +290,37 @@ public class EquipmentCollectionView extends View implements Observer
                     btnContainer.setStyle("-fx-background-color: SLATEGREY");
 		});
 
+        icon = new ImageView(new Image("/images/savecolor.png"));
+		icon.setFitHeight(15);
+		icon.setFitWidth(15);
+		saveButton = new Button("Save to File", icon);
+		saveButton.setGraphic(icon);
+                saveButton.setPadding(new Insets(5,5,5,5));
+		saveButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
+		saveButton.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent e) {
+				clearErrorMessage();
+                                saveToExcelFile();
+			}
+		});
+		saveButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+			saveButton.setEffect(new DropShadow());
+		});
+		saveButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+			saveButton.setEffect(null);
+		});
+
+        btnContainer.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+            btnContainer.setStyle("-fx-background-color: GOLD");
+		});
+        btnContainer.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+            btnContainer.setStyle("-fx-background-color: SLATEGREY");
+		});
+
+		btnContainer.setAlignment(Pos.CENTER);
+        btnContainer.getChildren().add(saveButton);
 		btnContainer.getChildren().add(cancelButton);
 
 		tableOfEquipment.setPrefHeight(275);
@@ -335,6 +371,86 @@ public class EquipmentCollectionView extends View implements Observer
 	{
 		statusLog.displayErrorMessage(message);
 	}
+
+	protected void writeToFile(String fName)
+    {
+    	Vector allColumnNames = new Vector();
+
+        try
+        {
+    	    FileWriter outFile = new FileWriter(fName);
+            PrintWriter out = new PrintWriter(outFile);
+            EquipmentCollection equipmentCollection = 
+					(EquipmentCollection)myController.getState("EquipmentList");
+
+			Vector entryList = (Vector)equipmentCollection.getState("Equipment");
+
+            if ((entryList == null) || (entryList.size() == 0))
+                return;
+
+            allColumnNames.addElement("Barcode");
+            allColumnNames.addElement("Name");
+            allColumnNames.addElement("CategoryName");
+            allColumnNames.addElement("Notes");
+            allColumnNames.addElement("GoodCount");
+            allColumnNames.addElement("FairCount");
+            allColumnNames.addElement("PoorCount");
+            allColumnNames.addElement("AvailableCount");
+            allColumnNames.addElement("InStockCount");
+            allColumnNames.addElement("DateAdded");
+            allColumnNames.addElement("DateLastUsed");
+
+            String line = "Barcode, Name, CategoryName, Notes, GoodCount, FairCount, PoorCount, " 
+            					+ "AvailableCount, InStockCount, DateAdded, DateLastUsed";
+
+            out.println(line);
+
+            for (int k = 0; k < entryList.size(); k++)
+            {
+                String valuesLine = "";
+                Equipment nextE = (Equipment)entryList.elementAt(k);
+                Vector<String> nextRow = nextE.getEntryListView();
+
+                for (int j = 0; j < allColumnNames.size()-1; j++)
+                {
+                    String nextValue = nextRow.elementAt(j);
+                        if(nextValue != null)
+                            valuesLine += nextValue + ", ";
+                }
+
+                out.println(valuesLine);
+            }
+
+            // Also print the shift count and filter type
+            out.println("\nTotal number of Equipment Items: " + entryList.size());
+
+            // Finally, print the time-stamp
+            DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+            DateFormat timeFormat = new SimpleDateFormat("hh:mm aaa");
+            Date date = new Date();
+            String timeStamp = dateFormat.format(date) + " " +
+                    timeFormat.format(date);
+
+            out.println("Equipment Report created on " + timeStamp);
+
+            out.close();
+
+            // Acknowledge successful completion to user with JOptionPane
+            //JOptionPane.showMessageDialog(null, "Report data saved successfully to selected file");
+            }
+
+            catch (FileNotFoundException e)
+            {
+            //     JOptionPane.showMessageDialog(null, "Could not access file to save: "
+            //             + fName, "Save Error", JOptionPane.ERROR_MESSAGE );
+            }
+            catch (IOException e)
+            {
+            //     JOptionPane.showMessageDialog(null, "Error in saving to file: "
+            //             + e.toString(), "Save Error", JOptionPane.ERROR_MESSAGE );
+
+            }
+    }
 
 
 	/**
