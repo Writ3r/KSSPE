@@ -6,8 +6,6 @@ import utilities.GlobalVariables;
 import java.util.Properties;
 import java.util.Vector;
 import javafx.scene.Scene;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 // project imports
 import exception.InvalidPrimaryKeyException;
@@ -18,7 +16,7 @@ import userinterface.View;
 import userinterface.ViewFactory;
 
 
-/** The class containing the CheckOutCollection for the KSSPE
+/** The class containing the CheckOut Collection for the KSSPE
  *  application 
  */
 //==============================================================
@@ -27,10 +25,11 @@ public class CheckOutCollection extends EntityBase
 	private static final String myTableName = "CheckOut";
 
 	private Vector<CheckOut> checkoutList;
+	// GUI Components
 
 	// constructor for this class
 	//----------------------------------------------------------
-	public CheckOutCollection() 
+	public CheckOutCollection( ) 
 	{
 		super(myTableName);
 	}
@@ -47,18 +46,18 @@ public class CheckOutCollection extends EntityBase
 
 			for (int cnt = 0; cnt < allDataRetrieved.size(); cnt++)
 			{
-				Properties nextCheckOutData = allDataRetrieved.elementAt(cnt);
+				Properties nextCOData = allDataRetrieved.elementAt(cnt);
 				
 				try
 				{
-					CheckOut c = new CheckOut(nextCheckOutData);
+					CheckOut e = new CheckOut(nextCOData);
 					
-					addCheckOut(c);
+					addCheckOut(e);
 				}
 				catch(Exception e)
 				{
 					new Event(Event.getLeafLevelClassName(this), "populateCollectionHelper",
-					"Error in creating a checkout from checkout collection", Event.ERROR);
+					"Error in creating CheckOut for CheckOut collection", Event.ERROR);
 				}
 			}
 
@@ -66,29 +65,44 @@ public class CheckOutCollection extends EntityBase
 	}
 
 	//-----------------------------------------------------------
-	public void findReserved()
+	public void findPendingByBannerId(String bannerId)
 	{
-		String query = "SELECT * FROM " + myTableName + " WHERE (TotalUnitsReturned < UnitsTaken)";
+		String query = "SELECT * FROM " + myTableName + " WHERE ((BannerId = '" + bannerId + "') AND (UnitsTaken > TotalUnitsReturned))";
 		populateCollectionHelper(query);
 	}
 
 	//-----------------------------------------------------------
-	public void findOverDue()
+	public void findAllPending()
 	{
-		String query = "SELECT * FROM " + myTableName + " WHERE ((TotalUnitsReturned < UnitsTaken) AND (DueDate < '" + 
-			new SimpleDateFormat("yyyy-MM-dd").format(new Date()) +"'))";
+		String query = "SELECT * FROM " + myTableName + " WHERE (UnitsTaken > TotalUnitsReturned)";
 		populateCollectionHelper(query);
 	}
 
-	//----------------------------------------------------------------------------------
-	private void addCheckOut(CheckOut c)
+	//-----------------------------------------------------------
+	public void findOverdueByBannerId(String bannerId)
 	{
-		int index = findIndexToAdd(c);
-		checkoutList.insertElementAt(c, index); // Sorts by barcode
+		String query = "....";
+		populateCollectionHelper(query);
+	}
+	
+	//-----------------------------------------------------------
+	public void findAllOverdue( )
+	{
+		String query = "...."; // Liam query
+		populateCollectionHelper(query);
+	}
+
+	
+
+	//----------------------------------------------------------------------------------
+	private void addCheckOut(CheckOut e)
+	{
+		int index = findIndexToAdd(e);
+		checkoutList.insertElementAt(e,index); // To build up a collection sorted on some key
 	}
 
 	//----------------------------------------------------------------------------------
-	private int findIndexToAdd(CheckOut c)
+	private int findIndexToAdd(CheckOut e)
 	{
 		
 		int low=0;
@@ -101,7 +115,7 @@ public class CheckOutCollection extends EntityBase
 
 			CheckOut midSession = checkoutList.elementAt(middle);
 
-			int result = CheckOut.compare(c, midSession);
+			int result = CheckOut.compare(e,midSession);
 
 			if (result == 0)
 			{
@@ -140,7 +154,48 @@ public class CheckOutCollection extends EntityBase
 		
 	}
 
+	//----------------------------------------------------------
+	public CheckOut retrieve(String checkOutID)
+	{
+		CheckOut retValue = null;
+		for (int cnt = 0; cnt < checkoutList.size(); cnt++)
+		{
+			CheckOut nextCO = checkoutList.elementAt(cnt);
+			String nextID = (String)nextCO.getState("ID");
+			if (nextID.equals(checkOutID) == true)
+			{
+				retValue = nextCO;
+				return retValue; // we should say 'break;' here
+			}
+		}
 
+		return retValue;
+	}
+
+	//----------------------------------------------------------
+	public void remove(String ID)
+	{
+		for (int cnt = 0; cnt < checkoutList.size(); cnt++)
+		{
+			CheckOut nextCO = checkoutList.elementAt(cnt);
+			String nextID = (String)nextCO.getState("ID");
+			if (nextID.equals(ID) == true)
+			{
+				checkoutList.remove(cnt);
+			}
+		}
+	}
+	
+	//--------------------------------------------------------------
+	public int getSize()
+	{
+		int numElems = 0;
+		if (checkoutList != null)
+			numElems = checkoutList.size();
+		
+		return numElems;
+	}
+	
 	//----------------------------------------------------------
 	public void updateState(String key, Object value)
 	{

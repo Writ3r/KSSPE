@@ -119,9 +119,20 @@ public class CheckOut extends EntityBase
 		{
 			try
 			{
-				Integer atID = insertAutoIncrementalPersistentState(mySchema, persistentState);
-				persistentState.setProperty("ID", "" + atID.intValue());
-				updateStatusMessage = "Check Out record inserted successfully!";
+				if (getState("ID") != null)
+				{
+					Properties whereClause = new Properties();
+					whereClause.setProperty("ID", persistentState.getProperty("ID"));
+					updatePersistentState(mySchema, persistentState, whereClause);
+					updateStatusMessage = "CheckOut with Id: " + persistentState.getProperty("ID") + " updated successfully!";
+				}
+				else
+				{
+					Integer atID = insertAutoIncrementalPersistentState(mySchema, persistentState);
+					persistentState.setProperty("ID", "" + atID.intValue());
+					updateStatusMessage = "CheckOut record inserted successfully!";
+
+				}
 			}
 			catch (SQLException ex)
 			{
@@ -146,16 +157,16 @@ public class CheckOut extends EntityBase
 
 		v.addElement(persistentState.getProperty("ID"));
 		v.addElement(persistentState.getProperty("BannerId"));
-		//v.addElement(persistentState.getProperty("Barcode"));
-		if (myEquipment != null)
-			v.addElement((String)myEquipment.getState("Barcode"));
-		else
-			v.addElement("Unknown barcode");
+		v.addElement(persistentState.getProperty("Barcode"));
 		v.addElement(persistentState.getProperty("UnitsTaken"));
 		v.addElement(persistentState.getProperty("TotalUnitsReturned"));
 		v.addElement(persistentState.getProperty("DueDate"));
 		v.addElement(persistentState.getProperty("RentDate"));
-		v.addElement(persistentState.getProperty("CheckOutWorkerID"));
+		v.addElement(persistentState.getProperty("CheckOutWorkerId"));
+		if (myEquipment != null)
+			v.addElement((String)myEquipment.getState("Name"));
+		else
+			v.addElement("Unknown Equipment");
 
 		return v;
 	}
