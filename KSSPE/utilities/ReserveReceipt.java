@@ -162,13 +162,6 @@ public class ReserveReceipt
 				outputFile.newLine();
 				outputFile.newLine();
 				
-				cal.setTime(new Date());
-				cal.add(cal.MINUTE, 15);
-				String futureTimeText = dateFormatter.format(cal.getTime());
-
-				outputFile.write("We may begin to charge penalties at " + futureTimeText + " on the due date." );  
-			  
-				outputFile.newLine();
 				outputFile.newLine();
 				
 				String tailMessage = "IMPORTANT NOTE: Double check that all the items on your receipt" +
