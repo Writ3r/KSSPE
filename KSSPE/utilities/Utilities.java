@@ -84,49 +84,6 @@ public class Utilities
 			return false;
 	}
 	
-	//--------------------------------------------------------------------------
-	public static boolean checkPoorCount(String poorCount)
-	{
-		if(poorCount.length() != 0)
-		{
-			try {
-				int num = Integer.parseInt(poorCount);
-
-				if(num < GlobalVariables.EQUIPMENT_COUNT_LENGTH)
-					return true;
-				else
-					return false;
-			}
-			catch(NumberFormatException e)
-			{
-				return false;
-			}
-		}
-		else
-			return false;
-	}
-	
-	//------------------------------------------------------------------------
-	public static boolean checkFairCount(String fairCount)
-	{
-		if(fairCount.length() != 0)
-		{
-			try {
-				int num = Integer.parseInt(fairCount);
-
-				if(num < GlobalVariables.EQUIPMENT_COUNT_LENGTH)
-					return true;
-				else
-					return false;
-			}
-			catch(NumberFormatException e)
-			{
-				return false;
-			}
-		}
-		else
-			return false;
-	}
 	
 	//------------------------------------------------------------
 	public static boolean checkGoodCount(String goodCount)
@@ -136,7 +93,7 @@ public class Utilities
 			try {
 				int num = Integer.parseInt(goodCount);
 
-				if(num < GlobalVariables.EQUIPMENT_COUNT_LENGTH)
+				if(num >= 0 && num < GlobalVariables.EQUIPMENT_COUNT_LENGTH)
 					return true;
 				else
 					return false;
@@ -148,6 +105,18 @@ public class Utilities
 		}
 		else
 			return false;
+	}
+	
+	//-----------------------------------------------------------
+	public static boolean checkFairCount(String fairCount)
+	{
+		return checkGoodCount(fairCount);
+	}
+	
+	//-----------------------------------------------------------
+	public static boolean checkPoorCount(String poorCount)
+	{
+		return checkGoodCount(poorCount);
 	}
 	
 	//-----------------------------------------------------------
@@ -200,7 +169,38 @@ public class Utilities
 			return false;
 		}
 	}
-	
+
+	//----------------------------------------------------------
+	public static boolean checkDueDate(String date)
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		
+		try{	
+			if(sdf.parse(date) != null)
+			{
+				Date currDate = new Date();
+				Date dueDate = sdf.parse(date);
+				
+				if (dueDate.after(currDate))
+				{
+					return true;
+				} 
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		catch(ParseException ex)
+		{
+			return false;
+		}
+		
+	}
 	
 	//----------------------------------------------------------
 	public static String convertToDefaultDateFormat(Date theDate)
@@ -232,37 +232,6 @@ public class Utilities
 
 			return valToReturn;
 		}
-	}
-	
-	public static boolean checkDueDate(String date)
-	{
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		
-		try{	
-			if(sdf.parse(date) != null)
-			{
-				Date currDate = new Date();
-				Date dueDate = sdf.parse(date);
-				
-				if (dueDate.after(currDate))
-				{
-					return true;
-				} 
-				else
-				{
-					return false;
-				}
-			}
-			else
-			{
-				return false;
-			}
-		}
-		catch(ParseException ex)
-		{
-			return false;
-		}
-		
 	}
 
 	//----------------------------------------------------------
