@@ -42,26 +42,19 @@ import java.util.Observable;
 import impresario.IModel;
 import controller.Transaction;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
+//import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
 import model.Equipment;
 import model.EquipmentCollection;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 //==============================================================================
 public class EquipmentCollectionView extends View implements Observer
 {
 	protected TableView<EquipmentTableModel> tableOfEquipment;
 	protected Button cancelButton;
-	protected Button saveButton;
+	protected Button submitButton;
 	protected MessageView statusLog;
 	protected Text actionText; 
         
@@ -100,34 +93,38 @@ public class EquipmentCollectionView extends View implements Observer
 	//--------------------------------------------------------------------------
 	protected void getEntryTableModelValues()
 	{
+
 		ObservableList<EquipmentTableModel> tableData = FXCollections.observableArrayList();
 		try
 		{
+	
 			EquipmentCollection equipmentCollection = 
 					(EquipmentCollection)myController.getState("EquipmentList");
 
-			Vector entryList = (Vector)equipmentCollection.getState("Equipment");
+			//System.out.println("The Size of equipmentCollection is: " + equipmentCollection.getSize());
+
+			Vector entryList = (Vector)equipmentCollection.getState("AllEquipment");
 			
+			//System.out.println("The Size of entryList is: " + entryList.size());
+
 			if (entryList.size() > 0)
 			{
 				Enumeration entries = entryList.elements();
 
 				while (entries.hasMoreElements() == true)
 				{
-					Equipment nextE = (Equipment)entries.nextElement();
-
-					Vector<String> view = nextE.getEntryListView();
+					Equipment nextC = (Equipment)entries.nextElement();
+					Vector<String> view = nextC.getEntryListView();
 
 					// add this list entry to the list
 					EquipmentTableModel nextTableRowData = new EquipmentTableModel(view);
+					//System.out.println("In the while loop: ");
 					tableData.add(nextTableRowData);
 
 				}
+				if(entryList.size() >= 1)
+					actionText.setText(entryList.size()+" Equipment Found!");
 
-				if(entryList.size() == 1)
-					actionText.setText(entryList.size()+" Item Found!");
-				else
-					actionText.setText(entryList.size()+" Items Found!");
 				actionText.setFill(Color.LIGHTGREEN);
 			}
 			else
@@ -185,7 +182,7 @@ public class EquipmentCollectionView extends View implements Observer
 	
 	protected String getActionText()
 	{
-		return "** LIST OF EQUIPMENT **";
+		return "** CHOOSE A PIECE OF EQUIPMENT **";
 	}
 
 	// Create the main form content
@@ -200,72 +197,49 @@ public class EquipmentCollectionView extends View implements Observer
 		tableOfEquipment.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
 		TableColumn barcodeColumn = new TableColumn("Barcode") ;
-		barcodeColumn.setMinWidth(116.6);
+		barcodeColumn.setMinWidth(175);
 		barcodeColumn.setStyle(" -fx-alignment: CENTER;");
 		barcodeColumn.setCellValueFactory(
-				new PropertyValueFactory<EquipmentTableModel, String>("Barcode"));
+				new PropertyValueFactory<EquipmentTableModel, String>("barcode"));
 
 
 		TableColumn nameColumn = new TableColumn("Name") ;
-		nameColumn.setMinWidth(116.6);
+		nameColumn.setMinWidth(175);
 		nameColumn.setStyle(" -fx-alignment: CENTER;");
 		nameColumn.setCellValueFactory(
-				new PropertyValueFactory<EquipmentTableModel, String>("Name"));
-		
-		TableColumn categoryNameColumn = new TableColumn("Category") ;
-		categoryNameColumn.setMinWidth(116.6);
-		categoryNameColumn.setStyle(" -fx-alignment: CENTER;");
-		categoryNameColumn.setCellValueFactory(
-				new PropertyValueFactory<EquipmentTableModel, String>("CategoryName"));
+				new PropertyValueFactory<EquipmentTableModel, String>("name"));
 
-		TableColumn notesColumn = new TableColumn("Notes") ;
-		notesColumn.setMinWidth(116.6);
-		notesColumn.setStyle(" -fx-alignment: CENTER;");
-		notesColumn.setCellValueFactory(
-				new PropertyValueFactory<EquipmentTableModel, String>("Notes"));
+		tableOfEquipment.getColumns().addAll(barcodeColumn, nameColumn);
 
-		TableColumn goodCountColumn = new TableColumn("Good Count") ;
-		goodCountColumn.setMinWidth(116.6);
-		goodCountColumn.setStyle(" -fx-alignment: CENTER;");
-		goodCountColumn.setCellValueFactory(
-				new PropertyValueFactory<EquipmentTableModel, String>("GoodCount"));
-
-		TableColumn fairCountColumn = new TableColumn("Fair Count") ;
-		fairCountColumn.setMinWidth(116.6);
-		fairCountColumn.setStyle(" -fx-alignment: CENTER;");
-		fairCountColumn.setCellValueFactory(
-				new PropertyValueFactory<EquipmentTableModel, String>("FairCount"));
-
-		TableColumn poorCountColumn = new TableColumn("Poor Count") ;
-		poorCountColumn.setMinWidth(116.6);
-		poorCountColumn.setStyle(" -fx-alignment: CENTER;");
-		poorCountColumn.setCellValueFactory(
-				new PropertyValueFactory<EquipmentTableModel, String>("PoorCount"));
-
-		//NOTE: Took this out because it didn't make much sense to display to the user
-		//		If you want it back, make sure you add the column back in line 260
-		// TableColumn availableCountColumn = new TableColumn("Available Count") ;
-		// availableCountColumn.setMinWidth(116.6);
-		// availableCountColumn.setStyle(" -fx-alignment: CENTER;");
-		// availableCountColumn.setCellValueFactory(
-		// 		new PropertyValueFactory<EquipmentTableModel, String>("AvailableCount"));
-
-		TableColumn stockCountColumn = new TableColumn("Currently in Stock") ;
-		stockCountColumn.setMinWidth(116.6);
-		stockCountColumn.setStyle(" -fx-alignment: CENTER;");
-		stockCountColumn.setCellValueFactory(
-				new PropertyValueFactory<EquipmentTableModel, String>("InStockCount"));
-
-		TableColumn lastUsedColumn = new TableColumn("Date Last Used") ;
-		lastUsedColumn.setMinWidth(116.6);
-		lastUsedColumn.setStyle(" -fx-alignment: CENTER;");
-		lastUsedColumn.setCellValueFactory(
-				new PropertyValueFactory<EquipmentTableModel, String>("DateLastUsed"));
-
-		tableOfEquipment.getColumns().addAll(barcodeColumn, nameColumn, categoryNameColumn, notesColumn, 
-			goodCountColumn, fairCountColumn, poorCountColumn, stockCountColumn, lastUsedColumn);
-
-		ImageView icon = new ImageView(new Image("/images/return.png"));
+		tableOfEquipment.setOnMousePressed((MouseEvent event) -> {
+			if (event.isPrimaryButtonDown() && event.getClickCount() >=2 ){
+				//if(myController.getState("Alert") != null)
+                                  // displayRemoveAlert();
+                                //else
+                                    processEquipmentSelected();
+			}
+		});
+		ImageView icon = new ImageView(new Image("/images/check.png"));
+		icon.setFitHeight(15);
+		icon.setFitWidth(15);
+		submitButton = new Button("Select",icon);
+		submitButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
+		submitButton.requestFocus();
+		submitButton.setOnAction((ActionEvent e) -> {
+			clearErrorMessage();
+			
+			//if(myController.getState("Alert") != null)
+                             //displayRemoveAlert();
+                         //else
+                             processEquipmentSelected();
+		});
+		submitButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+			submitButton.setEffect(new DropShadow());
+		});
+		submitButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+			submitButton.setEffect(null);
+		});
+		icon = new ImageView(new Image("/images/return.png"));
 		icon.setFitHeight(15);
 		icon.setFitWidth(15);
 		cancelButton = new Button("Return", icon);
@@ -289,42 +263,11 @@ public class EquipmentCollectionView extends View implements Observer
                 btnContainer.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
                     btnContainer.setStyle("-fx-background-color: SLATEGREY");
 		});
-
-        icon = new ImageView(new Image("/images/savecolor.png"));
-		icon.setFitHeight(15);
-		icon.setFitWidth(15);
-		saveButton = new Button("Save to File", icon);
-		saveButton.setGraphic(icon);
-                saveButton.setPadding(new Insets(5,5,5,5));
-		saveButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
-		saveButton.setOnAction(new EventHandler<ActionEvent>() {
-
-			@Override
-			public void handle(ActionEvent e) {
-				clearErrorMessage();
-                                saveToExcelFile();
-			}
-		});
-		saveButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-			saveButton.setEffect(new DropShadow());
-		});
-		saveButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-			saveButton.setEffect(null);
-		});
-
-        btnContainer.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-            btnContainer.setStyle("-fx-background-color: GOLD");
-		});
-        btnContainer.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-            btnContainer.setStyle("-fx-background-color: SLATEGREY");
-		});
-
-		btnContainer.setAlignment(Pos.CENTER);
-        btnContainer.getChildren().add(saveButton);
+		btnContainer.getChildren().add(submitButton);
 		btnContainer.getChildren().add(cancelButton);
 
 		tableOfEquipment.setPrefHeight(275);
-        tableOfEquipment.setMaxWidth(3000);
+        tableOfEquipment.setMaxWidth(350);
 		
 		vbox.getChildren().add(tableOfEquipment);
 		vbox.getChildren().add(btnContainer);
@@ -333,6 +276,44 @@ public class EquipmentCollectionView extends View implements Observer
 
 		return vbox;
 	}
+
+	//--------------------------------------------------------------------------
+	protected void processEquipmentSelected()
+	{
+		EquipmentTableModel selectedItem = tableOfEquipment.getSelectionModel().getSelectedItem();
+
+		if(selectedItem != null)
+		{
+			String selectedBarcode = selectedItem.getBarcode();
+			myController.stateChangeRequest("EquipmentSelected", selectedBarcode);
+		}
+	}
+	
+    //---------------------------------------------------------------------------
+	// private void displayRemoveAlert(){
+	// 	clearErrorMessage();
+	// 	Alert alert = new Alert(Alert.AlertType.ERROR,"Barcode Prefix: "+tableOfCategories.getSelectionModel().getSelectedItem().getBarcodePrefix()
+	// 			+"\nName: "+tableOfCategories.getSelectionModel().getSelectedItem().getName(), ButtonType.YES, ButtonType.NO);
+	// 	alert.setHeaderText(null);
+	// 	alert.setTitle("Remove Category");
+	// 	alert.setHeaderText("Are you sure want to remove this Category?");
+	// 	((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(new Image("images/BPT_LOGO_All-In-One_Color.png"));
+	// 	alert.showAndWait();
+
+	// 	if (alert.getResult() == ButtonType.YES) {
+	// 		processCategorySelected();
+	// 		//String val = (String)myController.getState("Error");
+	// 		//if (val.startsWith("ERR") == true)
+	// 		//{
+	// 		//	statusLog.displayErrorMessage(val);
+	// 		//}
+	// 		//else
+	// 		//{
+	// 		//	displayMessage(val);
+	// 		//	getEntryTableModelValues();
+	// 		//}		
+	// 	}
+	// }
        
 	//--------------------------------------------------------------------------
 	protected MessageView createStatusLog(String initialMessage)
@@ -371,86 +352,6 @@ public class EquipmentCollectionView extends View implements Observer
 	{
 		statusLog.displayErrorMessage(message);
 	}
-
-	protected void writeToFile(String fName)
-    {
-    	Vector allColumnNames = new Vector();
-
-        try
-        {
-    	    FileWriter outFile = new FileWriter(fName);
-            PrintWriter out = new PrintWriter(outFile);
-            EquipmentCollection equipmentCollection = 
-					(EquipmentCollection)myController.getState("EquipmentList");
-
-			Vector entryList = (Vector)equipmentCollection.getState("Equipment");
-
-            if ((entryList == null) || (entryList.size() == 0))
-                return;
-
-            allColumnNames.addElement("Barcode");
-            allColumnNames.addElement("Name");
-            allColumnNames.addElement("CategoryName");
-            allColumnNames.addElement("Notes");
-            allColumnNames.addElement("GoodCount");
-            allColumnNames.addElement("FairCount");
-            allColumnNames.addElement("PoorCount");
-            allColumnNames.addElement("AvailableCount");
-            allColumnNames.addElement("InStockCount");
-            allColumnNames.addElement("DateAdded");
-            allColumnNames.addElement("DateLastUsed");
-
-            String line = "Barcode, Name, CategoryName, Notes, GoodCount, FairCount, PoorCount, " 
-            					+ "AvailableCount, InStockCount, DateAdded, DateLastUsed";
-
-            out.println(line);
-
-            for (int k = 0; k < entryList.size(); k++)
-            {
-                String valuesLine = "";
-                Equipment nextE = (Equipment)entryList.elementAt(k);
-                Vector<String> nextRow = nextE.getEntryListView();
-
-                for (int j = 0; j < allColumnNames.size()-1; j++)
-                {
-                    String nextValue = nextRow.elementAt(j);
-                        if(nextValue != null)
-                            valuesLine += nextValue + ", ";
-                }
-
-                out.println(valuesLine);
-            }
-
-            // Also print the shift count and filter type
-            out.println("\nTotal number of Equipment Items: " + entryList.size());
-
-            // Finally, print the time-stamp
-            DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
-            DateFormat timeFormat = new SimpleDateFormat("hh:mm aaa");
-            Date date = new Date();
-            String timeStamp = dateFormat.format(date) + " " +
-                    timeFormat.format(date);
-
-            out.println("Equipment Report created on " + timeStamp);
-
-            out.close();
-
-            // Acknowledge successful completion to user with JOptionPane
-            //JOptionPane.showMessageDialog(null, "Report data saved successfully to selected file");
-            }
-
-            catch (FileNotFoundException e)
-            {
-            //     JOptionPane.showMessageDialog(null, "Could not access file to save: "
-            //             + fName, "Save Error", JOptionPane.ERROR_MESSAGE );
-            }
-            catch (IOException e)
-            {
-            //     JOptionPane.showMessageDialog(null, "Error in saving to file: "
-            //             + e.toString(), "Save Error", JOptionPane.ERROR_MESSAGE );
-
-            }
-    }
 
 
 	/**
