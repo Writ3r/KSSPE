@@ -41,7 +41,7 @@ public class ListReservedInventoryTransaction extends Transaction
 	public void processTransaction()
 	{
 		myCheckOutList = new CheckOutCollection();
-		myCheckOutList.findReserved();
+		myCheckOutList.findAllPending();
 		
 		try
 		{	
@@ -102,7 +102,7 @@ public class ListReservedInventoryTransaction extends Transaction
 	{
 		Scene currentScene;
 
-		View newView = ViewFactory.createView("CheckOutCollectionView", this);
+		View newView = ViewFactory.createView("CheckOutCollectionReportView", this);
 		currentScene = new Scene(newView);
 
 		return currentScene;

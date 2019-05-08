@@ -20,14 +20,14 @@ import userinterface.ViewFactory;
 import model.Equipment;
 import model.EquipmentCollection;
 
-/** The class containing the ModifyCategoryTransaction for the KSSPE application */
+/** The class containing the UpdateEquipmentTransaction for the KSSPE application */
 //==============================================================
 public class UpdateEquipmentTransaction extends Transaction
 {
-	private String errorMessage = "";
-	private Receptionist myReceptionist;
-	private Equipment myEquipment;
-	private EquipmentCollection myEquipmentList;
+	protected String errorMessage = "";
+	protected Receptionist myReceptionist;
+	protected Equipment myEquipment;
+	protected EquipmentCollection myEquipmentList;
 
 	//----------------------------------------------------------------
 	public UpdateEquipmentTransaction() throws Exception
@@ -40,10 +40,15 @@ public class UpdateEquipmentTransaction extends Transaction
 	{
 		myEquipmentList = new EquipmentCollection();
 		
+		//System.out.println(props.getProperty("Barcode"));
+		//System.out.println(props.getProperty("Name"));
 		if (props.getProperty("Barcode") != null)
 		{
+			// DEBUG System.out.println("HIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
 			String barcode = props.getProperty("Barcode");
+			// DEBUG System.out.println("Barcode Inside If: " + barcode);
 			myEquipmentList.findByBarcodePrefix(barcode);
+			//DEBUG System.out.println("Size Of List: " + myEquipmentList.getSize());
 		}
 		else if(props.getProperty("Name") != null)
 		{
@@ -167,7 +172,7 @@ public class UpdateEquipmentTransaction extends Transaction
 	}
 	
 	//------------------------------------------------------------------------
-	private void modifyEquipmentHelper(Properties props)
+	protected void modifyEquipmentHelper(Properties props)
 	{
 		
 		myEquipment.stateChangeRequest("Name", props.getProperty("Name"));

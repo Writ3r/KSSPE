@@ -97,6 +97,30 @@ public class AddWorkerTransaction extends Transaction
 			}
 			return false;
 		}
+		else if (key.equals("FirstName") == true)
+		{
+			if(myWorker != null)
+				return myWorker.getState("FirstName");
+			return null;
+		}
+		else if (key.equals("LastName") == true)
+		{
+			if(myWorker != null)
+				return myWorker.getState("LastName");
+			return null;
+		}
+		else if (key.equals("Email") == true)
+		{
+			if(myWorker != null)
+				return myWorker.getState("Email");
+			return null;
+		}
+		else if (key.equals("PhoneNumber") == true)
+		{
+			if(myWorker != null)
+				return myWorker.getState("PhoneNumber");
+			return null;
+		}
 		else
 		{
 			String val = (String)myWorker.getState(key);
@@ -129,11 +153,12 @@ public class AddWorkerTransaction extends Transaction
 				
 				if(myWorker.getState("Status").equals("Active"))
 				{
-					errorMessage = "ERROR: Worker with id " + ((Properties)value).getProperty("BannerId") + " already exists!";
+					errorMessage = "Worker with id " + ((Properties)value).getProperty("BannerId") + " already exists!";
 				}
 				else
 				{
 					errorMessage = "Former Worker with id " + ((Properties)value).getProperty("BannerId") +  " found!";
+					
 				}
 			}
 			catch(Exception ex)
@@ -144,14 +169,12 @@ public class AddWorkerTransaction extends Transaction
 					
 					Properties wProp = new Properties();
 					wProp.setProperty("BannerId", (String)b.getState("BannerId"));
-					wProp.setProperty("Password", "Default"); //this is overwritten when the user enters it. 
+					wProp.setProperty("Password", "Default");
 					wProp.setProperty("Credential", "Ordinary");
 					wProp.setProperty("Status", "Active");
 					wProp.setProperty("DateAdded", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 					wProp.setProperty("DateLastUpdated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 					myWorker = new Worker(wProp, true);
-					
-					errorMessage = "Person with id " + ((Properties)value).getProperty("BannerId") + " found!";
 					
 				}
 				catch (Exception excep)

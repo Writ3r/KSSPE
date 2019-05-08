@@ -19,7 +19,6 @@ import userinterface.View;
 import userinterface.ViewFactory;
 import model.Category;
 import model.Equipment;
-import model.EquipmentCollection;
 
 /** The class containing the AddArticleTypeTransaction for the Professional Clothes Closet application */
 //==============================================================
@@ -43,23 +42,13 @@ public class AddEquipmentTransaction extends Transaction
 		{
 			Equipment e = new Equipment(props);
 			
-			errorMessage = "ERROR: Equipment with id: " + e.getState("Barcode") + " already exists! Choose a new Barcode.";	
+			errorMessage = "ERROR: Equipment with id: " + e.getState("Barcode") + " already exists!";	
 		}
 		catch (InvalidPrimaryKeyException ex) 
 		{
 			
 			try
 			{
-				EquipmentCollection e = new EquipmentCollection();
-				e.findExactName(props.getProperty("Name"));
-				
-				if (e.getSize() > 0)
-				{
-					errorMessage = "ERROR: Equipment with name: " + props.getProperty("Name") + " already Exists! Update it instead.";
-					return;
-				}
-
-
 				String poorCount = props.getProperty("PoorCount");
 				String goodCount = props.getProperty("GoodCount");
 				String fairCount = props.getProperty("FairCount");

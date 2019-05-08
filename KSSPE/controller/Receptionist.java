@@ -149,7 +149,7 @@ public class Receptionist extends Transaction
 			(key.equals("AddBorrower") == true) || (key.equals("ModifyBorrower") == true) ||
 			(key.equals("AddCategory") == true) || (key.equals("ModifyCategory") == true) || 
 			(key.equals("RemoveCategory") == true) || (key.equals("RemoveBorrower") == true) || 
-			(key.equals("AddEquipment") == true) || (key.equals("ModifyEquipment") == true) ||
+			(key.equals("AddEquipment") == true) || (key.equals("UpdateEquipment") == true) ||
 			(key.equals("RemoveEquipment") == true) || (key.equals("ReserveEquipment") == true) ||
 			(key.equals("ReturnEquipment") == true) || (key.equals("ListAllInventory") == true) || 
 			(key.equals("ListAvailableInventory") == true) ||

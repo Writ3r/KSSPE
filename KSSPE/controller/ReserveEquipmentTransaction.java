@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.util.Vector;
 import java.util.Enumeration;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 
@@ -188,20 +189,21 @@ public class ReserveEquipmentTransaction extends Transaction
 			{
 				myCurrentEquipment = new Equipment((Properties)value);
 				
-				errorMessage = "Equipment: [" + myCurrentEquipment.getState("Name") + "] found!";
+				errorMessage = "Equipment with Barcode: " + ((Properties)value).getProperty("Barcode") +  " found!";
 			}
 			catch(Exception ex)
 			{
-				errorMessage = "ERROR: Equipment with Barcode: " + ((Properties)value).getProperty("Barcode") +  " does not Exist!";
+				errorMessage = "ERROR: No Equipment matching Barcode: " + ((Properties)value).getProperty("Barcode") +  " found!";
 			}
 		}
 		if (key.equals("CancelBorrowerList") == true)
 		{
-			Scene oldScene = createView();
+			Scene oldScene = createView();	
 			swapToView(oldScene);
 		}
 		if (key.equals("CancelTransactionAndMakeReceipt") == true)
 		{
+			
 			if(!reservedEquipment.isEmpty())
 			{
 			
@@ -234,7 +236,7 @@ public class ReserveEquipmentTransaction extends Transaction
 		setChanged();
         notifyObservers(errorMessage);
 	}
-	
+
 	//--------------------------------------------------------------
 	private boolean checkForPenaltiesAndBlocks()
 	{
@@ -292,19 +294,29 @@ public class ReserveEquipmentTransaction extends Transaction
 			
 			if(stock - taken >= 0)
 			{
+				Calendar cal = Calendar.getInstance();
+				Date rightNow = cal.getTime();
+				
 				props.setProperty("BannerId", (String)getState("BorrowerBannerId"));
 				props.setProperty("TotalUnitsReturned", "0");
-				props.setProperty("RentDate", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+				props.setProperty("RentDate", new SimpleDateFormat("yyyy-MM-dd").format(rightNow));
 				props.setProperty("CheckOutWorkerID", myWorkerId);
 				
 				CheckOut checkOut = new CheckOut(props);
 				checkOut.save();
 				
 				myCurrentEquipment.stateChangeRequest("InStockCount", Integer.toString(stock - taken));
+				myCurrentEquipment.stateChangeRequest("DateLastUsed", new SimpleDateFormat("yyyy-MM-dd").format(rightNow));
 				
 				myCurrentEquipment.save();
 				
 				errorMessage = (String)checkOut.getState("UpdateStatusMessage");
+				// DEBUG System.out.println("Lucas error message: " + errorMessage);
+				if (errorMessage.startsWith("ERR") == false)
+				{
+					errorMessage = "Item successfully reserved!";
+				}
+				// DEBUG System.out.println("Liam error message: " + errorMessage);
 				
 				//receipt code
 				Properties sendData = new Properties();

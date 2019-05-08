@@ -24,6 +24,7 @@ import model.CheckOutCollection;
 import model.Equipment;
 import model.BorrowerCollection;
 import model.CheckIn;
+import utilities.ReturnReceipt;
 
 /** The class containing the ReturnEquipmentTransaction for the KSSPE application */
 //==============================================================
@@ -287,7 +288,30 @@ public class ReturnEquipmentTransaction extends Transaction
 		}
 		if (key.equals("CancelTransaction") == true)
 		{
-			myReceptionist.stateChangeRequest("CancelTransaction", null);
+			if(!returnedEquipment.isEmpty())
+			{
+			
+				Properties props = new Properties();
+				props.setProperty("WorkerName", (String)myReceptionist.getState("Name"));
+				props.setProperty("WorkerBannerId", myWorkerId);
+				props.setProperty("BorrowerName", (String)this.getState("FirstName") +
+					" " + (String)this.getState("LastName"));
+				props.setProperty("BorrowerBannerId", (String)this.getState("BannerId"));
+				/*
+				try
+				{
+					new ReturnReceipt(props, returnedEquipment);
+					errorMessage = "";
+				}
+				catch(Exception ex)
+				{
+					errorMessage = ex.getMessage();
+				}*/
+					
+				myReceptionist.stateChangeRequest("CancelTransaction", null);
+			}
+			else
+				myReceptionist.stateChangeRequest("CancelTransaction", null);
 		}
 		if (key.equals("CancelTransactionAfterLoad") == true)
 		{
@@ -390,7 +414,6 @@ public class ReturnEquipmentTransaction extends Transaction
 			
 			//receipt code
 			Properties sendData = new Properties();
-			sendData.setProperty("Name", (String)myCurrentEquipment.getState("Name"));
 			sendData.setProperty("Barcode", (String)myCurrentEquipment.getState("Barcode"));
 			sendData.setProperty("EquipmentName", (String)myCurrentEquipment.getState("Name"));
 			sendData.setProperty("Count", props.getProperty("UnitsReturned"));

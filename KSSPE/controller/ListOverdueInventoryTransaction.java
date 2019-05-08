@@ -17,21 +17,21 @@ import exception.MultiplePrimaryKeysException;
 
 import userinterface.View;
 import userinterface.ViewFactory;
-import model.Equipment;
-import model.EquipmentCollection;
+import model.CheckOut;
+import model.CheckOutCollection;
 
-/** The class containing the ListAllInventoryTransaction for the KSSPE application */
+/** The class containing the ListOverDueInventoryTransaction for the KSSPE application */
 //==============================================================
-public class ListAllInventoryTransaction extends Transaction
+public class ListOverdueInventoryTransaction extends Transaction
 {
 	private String errorMessage = "";
 	private Receptionist myReceptionist;
-	private Equipment myEquipment;
-	private EquipmentCollection myEquipmentList;
+	private CheckOut myCheckOut;
+	private CheckOutCollection myCheckOutList;
 
 
 	//------------------------------------------------------------
-	public ListAllInventoryTransaction() throws Exception
+	public ListOverdueInventoryTransaction() throws Exception
 	{
 		super();
 		processTransaction();
@@ -40,8 +40,8 @@ public class ListAllInventoryTransaction extends Transaction
 	//------------------------------------------------------------
 	public void processTransaction()
 	{
-		myEquipmentList = new EquipmentCollection();
-		myEquipmentList.findAllEverRecorded();
+		myCheckOutList = new CheckOutCollection();
+		myCheckOutList.findAllOverdue();
 		
 		try
 		{	
@@ -66,9 +66,9 @@ public class ListAllInventoryTransaction extends Transaction
 		{
 			return true;
 		}
-		else if (key.equals("EquipmentList") == true)
+		else if (key.equals("CheckOutList") == true)
 		{
-			return myEquipmentList;
+			return myCheckOutList;
 		}
 		else
 			return null;
@@ -86,9 +86,9 @@ public class ListAllInventoryTransaction extends Transaction
 		}
 		else if(key.equals("clearState") == true)
 		{
-			myEquipment = null;
+			myCheckOut = null;
 		}
-		else if (key.equals("CancelEquipmentList") == true)
+		else if (key.equals("CancelCheckOutList") == true)
 		{
 			myReceptionist.stateChangeRequest("CancelTransaction", null);
 		}
@@ -102,7 +102,7 @@ public class ListAllInventoryTransaction extends Transaction
 	{
 		Scene currentScene;
 
-		View newView = ViewFactory.createView("EquipmentCollectionReportView", this);
+		View newView = ViewFactory.createView("CheckOutCollectionReportView", this);
 		currentScene = new Scene(newView);
 
 		return currentScene;
