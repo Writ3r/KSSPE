@@ -14,7 +14,7 @@ import exception.InvalidPrimaryKeyException;
 import exception.PasswordMismatchException;
 import database.*;
 
-/** The class containing the Person for the KSSPE application */
+/** The class containing the Equipment for the KSSPE application */
 //==============================================================
 public class Equipment extends EntityBase
 {
@@ -68,7 +68,7 @@ public class Equipment extends EntityBase
 				oldFlag = true;
 			}
 		}
-		// If no Person found for this user name, throw an exception
+		// If no Equipment found for this user name, throw an exception
 		else
 		{
 			throw new InvalidPrimaryKeyException("ERROR: No Equipment found for Barcode: " + idToQuery);
@@ -111,30 +111,11 @@ public class Equipment extends EntityBase
 		return persistentState.getProperty(key);
 	}
 
-	//-------------------------------------------------------------------
-	public Vector<String> getEntryListView()
-	{
-		Vector<String> v = new Vector<String>();
-		
-		v.addElement((String)this.getState("Barcode"));
-		v.addElement((String)this.getState("Name"));
-		v.addElement((String)this.getState("CategoryName"));
-		v.addElement((String)this.getState("Notes"));
-		v.addElement((String)this.getState("GoodCount"));
-		v.addElement((String)this.getState("FairCount"));
-		v.addElement((String)this.getState("PoorCount"));
-		v.addElement((String)this.getState("AvailableCount"));
-		v.addElement((String)this.getState("InStockCount"));
-		v.addElement((String)this.getState("DateAdded"));
-		v.addElement((String)this.getState("DateLastUsed"));
-		
-		return v;
-	}
-
 	//----------------------------------------------------------------
 	public void stateChangeRequest(String key, Object value)
 	{
 		persistentState.setProperty(key, (String)value);
+
 	}
 	
 	//-----------------------------------------------------------------------------------
@@ -178,6 +159,29 @@ public class Equipment extends EntityBase
 		}
 			
 	}
+
+	//-------------------------------------------------------------------
+	public Vector<String> getEntryListView()
+	{
+		Vector<String> v = new Vector<String>();
+
+		v.addElement(persistentState.getProperty("Barcode"));
+		v.addElement(persistentState.getProperty("Name"));
+		v.addElement(persistentState.getProperty("CategoryName"));
+		v.addElement(persistentState.getProperty("Notes"));
+		v.addElement(persistentState.getProperty("GoodCount"));
+		v.addElement(persistentState.getProperty("FairCount"));
+		v.addElement(persistentState.getProperty("PoorCount"));
+		v.addElement(persistentState.getProperty("AvailableCount"));
+		v.addElement(persistentState.getProperty("InStockCount"));
+		v.addElement(persistentState.getProperty("DateAdded"));
+		v.addElement(persistentState.getProperty("DateLastUsed"));
+		//v.addElement(persistentState.getProperty("Status"));
+
+		return v;
+	}
+	
+	
 	
 	//------------------------------------------------------------------
 	protected void initializeSchema(String tableName)

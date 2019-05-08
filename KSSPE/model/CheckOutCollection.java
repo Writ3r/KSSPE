@@ -3,8 +3,10 @@ package model;
 
 // system imports
 import utilities.GlobalVariables;
+import java.util.Date;
 import java.util.Properties;
 import java.util.Vector;
+import java.text.SimpleDateFormat;
 import javafx.scene.Scene;
 
 // project imports
@@ -81,14 +83,16 @@ public class CheckOutCollection extends EntityBase
 	//-----------------------------------------------------------
 	public void findOverdueByBannerId(String bannerId)
 	{
-		String query = "....";
+		String query = "SELECT * FROM " + myTableName + " WHERE ((BannerId = '" + bannerId + "' AND (TotalUnitsReturned < UnitsTaken) AND (DueDate < '" + 
+			new SimpleDateFormat("yyyy-MM-dd").format(new Date()) +"'))";
 		populateCollectionHelper(query);
 	}
 	
 	//-----------------------------------------------------------
 	public void findAllOverdue( )
 	{
-		String query = "...."; // Liam query
+		String query = "SELECT * FROM " + myTableName + " WHERE ((TotalUnitsReturned < UnitsTaken) AND (DueDate < '" + 
+			new SimpleDateFormat("yyyy-MM-dd").format(new Date()) +"'))"; // Liam query
 		populateCollectionHelper(query);
 	}
 

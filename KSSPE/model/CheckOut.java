@@ -162,7 +162,7 @@ public class CheckOut extends EntityBase
 		v.addElement(persistentState.getProperty("TotalUnitsReturned"));
 		v.addElement(persistentState.getProperty("DueDate"));
 		v.addElement(persistentState.getProperty("RentDate"));
-		v.addElement(persistentState.getProperty("CheckOutWorkerId"));
+		v.addElement(persistentState.getProperty("CheckOutWorkerID"));
 		if (myEquipment != null)
 			v.addElement((String)myEquipment.getState("Name"));
 		else

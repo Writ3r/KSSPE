@@ -121,6 +121,7 @@ public class Borrower extends EntityBase
 			oldFlag = false;
 		}
 		
+		
 	}
 	
 	//---------------------------------------------------------------
@@ -131,17 +132,17 @@ public class Borrower extends EntityBase
 
 		return aVal.compareTo(bVal);
 	}
-	
+
 	//----------------------------------------------------------------
-	public Object getState(String key)
+	 public Object getState(String key)
     {
        
          if (key.equals("IsOld") == true)
 		{
 			if (oldFlag == true)
-				return "true";
+				return "Yes";
 			else
-				return "false";
+				return "No";
 		}
 		else
 		if (key.equals("UpdateStatusMessage") == true)
@@ -164,6 +165,7 @@ public class Borrower extends EntityBase
     }
 	
 	//------------------------------------------------------------------
+	
 	public void save()
 	{
 		updateStateInDatabase();
@@ -227,6 +229,7 @@ public class Borrower extends EntityBase
 	}
 	
 	//-------------------------------------------------------------------
+	
 	public void stateChangeRequest(String key, Object value)
 	{
 		if(key.equals("BannerId") || key.equals("BlockStatus") || key.equals("Penalty") || key.equals("Notes") || key.equals("Status") || key.equals("DateAdded") || key.equals("DateLastUpdated"))
@@ -239,7 +242,7 @@ public class Borrower extends EntityBase
 		}
 	}
 	
-	//-------------------------------------------------------------------
+	//------------------------------------------------------------------
 	protected void initializeSchema(String tableName)
 	{
 		if (mySchema == null)
