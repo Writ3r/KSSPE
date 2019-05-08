@@ -17,7 +17,9 @@ import exception.MultiplePrimaryKeysException;
 
 import userinterface.View;
 import userinterface.ViewFactory;
+import model.Category;
 import model.Equipment;
+import model.EquipmentCollection;
 
 /** The class containing the AddArticleTypeTransaction for the Professional Clothes Closet application */
 //==============================================================
@@ -26,6 +28,7 @@ public class AddEquipmentTransaction extends Transaction
 	private String errorMessage = "";
 	private Receptionist myReceptionist;
 	private Equipment myEquipment;
+	private Category selectedCategory;
 
 	//----------------------------------------------------------------------------
 	public AddEquipmentTransaction() throws Exception
@@ -40,13 +43,31 @@ public class AddEquipmentTransaction extends Transaction
 		{
 			Equipment e = new Equipment(props);
 			
-			errorMessage = "ERROR: Equipment with id: " + e.getState("Barcode") + " already exists!";	
+			errorMessage = "ERROR: Equipment with id: " + e.getState("Barcode") + " already exists! Choose a new Barcode.";	
 		}
 		catch (InvalidPrimaryKeyException ex) 
 		{
 			
 			try
 			{
+				EquipmentCollection e = new EquipmentCollection();
+				e.findExactName(props.getProperty("Name"));
+				
+				if (e.getSize() > 0)
+				{
+					errorMessage = "ERROR: Equipment with name: " + props.getProperty("Name") + " already Exists! Update it instead.";
+					return;
+				}
+
+
+				String poorCount = props.getProperty("PoorCount");
+				String goodCount = props.getProperty("GoodCount");
+				String fairCount = props.getProperty("FairCount");
+				
+				int availableCount = Integer.parseInt(poorCount) + Integer.parseInt(fairCount) + Integer.parseInt(goodCount);
+				int inStockCount = availableCount;
+				props.setProperty("AvailableCount", Integer.toString(availableCount));
+				props.setProperty("InStockCount", Integer.toString(inStockCount));
 				props.setProperty("DateAdded", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 				props.setProperty("DateLastUsed", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 				
@@ -57,7 +78,11 @@ public class AddEquipmentTransaction extends Transaction
 			}
 			catch (InvalidPrimaryKeyException ex2) 
 			{
-				errorMessage = ex2.getMessage();
+				errorMessage = "ERROR: " + ex2.getMessage();
+			}
+			catch (Exception ex3)
+			{
+				errorMessage = "ERROR: " + ex3.getMessage();
 			}
 			
 		}
@@ -66,6 +91,18 @@ public class AddEquipmentTransaction extends Transaction
 	//-----------------------------------------------------------
 	public Object getState(String key)
 	{
+		if (key.equals("CategoryName") == true)
+		{
+			if (selectedCategory != null)
+			{
+				return selectedCategory.getState("Name");
+			}
+			else
+			{
+				return "None";
+			}
+		}
+		else
 		if (key.equals("Error") == true)
 		{
 			return errorMessage;
@@ -84,6 +121,24 @@ public class AddEquipmentTransaction extends Transaction
 		{
 			myReceptionist = (Receptionist)value;
 			doYourJob();
+		}
+		if (key.equals("Barcode") == true)
+		{
+			String sentBarcode = (String)value;
+			String barcodePrefx = sentBarcode.substring(0, 3);
+			Properties p = new Properties();
+			p.setProperty("BarcodePrefix", barcodePrefx);
+			try
+			{
+				selectedCategory = new Category(p);
+				errorMessage = "CategorySelected";
+				
+			}
+			catch (Exception ex)
+			{
+				selectedCategory = null;
+				errorMessage = "CategorySelected";
+			}
 		}
 		if (key.equals("EquipmentData") == true)
 		{
