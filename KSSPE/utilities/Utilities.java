@@ -85,50 +85,6 @@ public class Utilities
 	}
 	
 	//--------------------------------------------------------------------------
-	public static boolean checkPoorCount(String poorCount)
-	{
-		if(poorCount.length() != 0)
-		{
-			try {
-				int num = Integer.parseInt(poorCount);
-
-				if(num < GlobalVariables.EQUIPMENT_COUNT_LENGTH)
-					return true;
-				else
-					return false;
-			}
-			catch(NumberFormatException e)
-			{
-				return false;
-			}
-		}
-		else
-			return false;
-	}
-	
-	//------------------------------------------------------------------------
-	public static boolean checkFairCount(String fairCount)
-	{
-		if(fairCount.length() != 0)
-		{
-			try {
-				int num = Integer.parseInt(fairCount);
-
-				if(num < GlobalVariables.EQUIPMENT_COUNT_LENGTH)
-					return true;
-				else
-					return false;
-			}
-			catch(NumberFormatException e)
-			{
-				return false;
-			}
-		}
-		else
-			return false;
-	}
-	
-	//------------------------------------------------------------
 	public static boolean checkGoodCount(String goodCount)
 	{
 		if(goodCount.length() != 0)
@@ -136,7 +92,7 @@ public class Utilities
 			try {
 				int num = Integer.parseInt(goodCount);
 
-				if(num < GlobalVariables.EQUIPMENT_COUNT_LENGTH)
+				if(num >= 0 && num < GlobalVariables.EQUIPMENT_COUNT_LENGTH)
 					return true;
 				else
 					return false;
@@ -148,6 +104,18 @@ public class Utilities
 		}
 		else
 			return false;
+	}
+	
+	//-----------------------------------------------------------
+	public static boolean checkFairCount(String fairCount)
+	{
+		return checkGoodCount(fairCount);
+	}
+	
+	//-----------------------------------------------------------
+	public static boolean checkPoorCount(String poorCount)
+	{
+		return checkGoodCount(poorCount);
 	}
 	
 	//-----------------------------------------------------------
