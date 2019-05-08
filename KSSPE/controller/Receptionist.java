@@ -72,20 +72,42 @@ public class Receptionist extends Transaction
 			else
 				return "Undefined";
 		}
+		else
+		if (key.equals("FirstName") == true)
+		{
+			if (currentWorker != null)
+			{
+				return currentWorker.getState("FirstName");
+			}
+			else
+				return "Undefined";
+		}
+		else
+		if (key.equals("LastName") == true)
+		{
+			if (currentWorker != null)
+			{
+				return currentWorker.getState("LastName");
+			}
+			else
+				return "Undefined";
+		}
+		else
+		if (key.equals("Name") == true)
+		{
+			if (currentWorker != null)
+			{
+				return (String)(currentWorker.getState("FirstName") + " " + (String)currentWorker.getState("LastName"));
+			}
+			else
+				return "Undefined";
+		}
+		else
 		if (key.equals("Credential") == true)
 		{
 			if (currentWorker != null)
 			{
 				return currentWorker.getState("Credential");
-			}
-			else
-				return "Undefined";
-		}
-		if (key.equals("Name") == true)
-		{
-			if (currentWorker != null)
-			{
-				return (String)currentWorker.getState("FirstName") + " " + (String)currentWorker.getState("LastName");
 			}
 			else
 				return "Undefined";
@@ -127,23 +149,28 @@ public class Receptionist extends Transaction
 			(key.equals("AddBorrower") == true) || (key.equals("ModifyBorrower") == true) ||
 			(key.equals("AddCategory") == true) || (key.equals("ModifyCategory") == true) || 
 			(key.equals("RemoveCategory") == true) || (key.equals("RemoveBorrower") == true) || 
-			(key.equals("AddEquipment") == true) || (key.equals("ReserveEquipment") == true) ||
-			(key.equals("ListAllInventory") == true) || (key.equals("ListAvailableInventory") == true) ||
-			(key.equals("ListReservedInventory") == true) || (key.equals("ListOverDueInventory") == true))
+			(key.equals("AddEquipment") == true) || (key.equals("UpdateEquipment") == true) ||
+			(key.equals("RemoveEquipment") == true) || (key.equals("ReserveEquipment") == true) ||
+			(key.equals("ReturnEquipment") == true) || (key.equals("ListAllInventory") == true) || 
+			(key.equals("ListAvailableInventory") == true) ||
+			(key.equals("ListReservedInventory") == true) || (key.equals("ListOverdueInventory") == true))
 			{
 				String transType = key;
 					
+				// DEBUG System.out.println(transType);
+				
 				if (currentWorker != null)
 				{
-					if(key.equals("AddWorker") && !currentWorker.getState("Credential").equals("Admin") || key.equals("ModifyWorker") && !currentWorker.getState("Credential").equals("Admin") || key.equals("RemoveWorker") && !currentWorker.getState("Credential").equals("Admin")){
-						errorMessage = "You must be 'Admin' to do this.";
-					}
-					else
+					// Given changes to the GUI, this if-statement will NEVER execute
+					//if(key.equals("AddWorker") && !currentWorker.getState("Credential").equals("Admin")){
+					//	errorMessage = "You must be 'Admin' to do this.";
+					//}
+					//else
 						doTransaction(transType);
 				}
 				else
 				{
-					errorMessage = "Transaction impossible: Login not identified";
+					errorMessage = "Transaction impossible: No worker logged in";
 				}
 			}
 		else
@@ -169,8 +196,7 @@ public class Receptionist extends Transaction
 		try
 		{
 			currentWorker = new Worker(props);
-			
-			if (((String)currentWorker.getState("Status")).equals("Active"))
+			if ( ((String)currentWorker.getState("Status")).equals("Active"))
 			{
 				try
 				{
@@ -222,6 +248,7 @@ public class Receptionist extends Transaction
         swapToView(createView());
 	}
 	
+	//--------------------------------------------------------------
 	private void createAndShowLoginView()
 	{
 		Scene currentScene = (Scene)myViews.get("LoginView");
@@ -237,6 +264,7 @@ public class Receptionist extends Transaction
 		
 	}
 
+	//--------------------------------------------------------------------------------------
 	protected Scene createView()
 	{
 		Scene currentScene = (Scene)myViews.get("ReceptionistView");

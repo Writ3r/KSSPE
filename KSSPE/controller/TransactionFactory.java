@@ -61,26 +61,38 @@ public class TransactionFactory
 		{
 			retValue = new AddEquipmentTransaction();
 		} 
+		if (transType.equals("UpdateEquipment") == true)
+		{
+			retValue = new UpdateEquipmentTransaction();
+		} 
+		if (transType.equals("RemoveEquipment") == true)
+		{
+			retValue = new RemoveEquipmentTransaction();
+		} 
 		if (transType.equals("ReserveEquipment") == true)
 		{
 			retValue = new ReserveEquipmentTransaction();
 		}
+		if (transType.equals("ReturnEquipment") == true)
+		{
+			retValue = new ReturnEquipmentTransaction();
+		}
 		if (transType.equals("ListAllInventory") == true)
 		{
 			retValue = new ListAllInventoryTransaction();
-		} 
+		}
 		if (transType.equals("ListAvailableInventory") == true)
 		{
 			retValue = new ListAvailableInventoryTransaction();
-		} 
+		}
 		if (transType.equals("ListReservedInventory") == true)
 		{
 			retValue = new ListReservedInventoryTransaction();
-		} 
-		if (transType.equals("ListOverDueInventory") == true)
+		}
+		if (transType.equals("ListOverdueInventory") == true)
 		{
-			retValue = new ListOverDueInventoryTransaction();
-		} 
+			retValue = new ListOverdueInventoryTransaction();
+		}
 		return retValue;
 	}
 }
