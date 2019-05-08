@@ -514,7 +514,7 @@ public class ReceptionistView extends View implements Observer
 			modifyEquipmentButton.setMinWidth(85);
 			modifyEquipmentButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
 			modifyEquipmentButton.setOnAction((ActionEvent e) -> {
-				myController.stateChangeRequest("FulfillRequest", null);
+				myController.stateChangeRequest("ModifyEquipment", null);
 			});
 			modifyEquipmentButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
 			modifyEquipmentButton.setEffect(shadow);
@@ -533,7 +533,7 @@ public class ReceptionistView extends View implements Observer
 		removeEquipmentButton = new Button("Remove",icon);
 			removeEquipmentButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
 			removeEquipmentButton.setOnAction((ActionEvent e) -> {
-				myController.stateChangeRequest("RemoveRequest", null);
+				myController.stateChangeRequest("RemoveEquipment", null);
 			});
 			removeEquipmentButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
 				removeEquipmentButton.setEffect(shadow);
