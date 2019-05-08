@@ -41,18 +41,18 @@ import javafx.util.StringConverter;
 
 import controller.Transaction;
 
-/** The class containing the Update Equipment View  for the KSSPE
+/** The class containing the Remove Equipment View  for the KSSPE
  *  application 
  */
 //==============================================================
-public class UpdateEquipmentView extends AddEquipmentView
+public class RemoveEquipmentView extends UpdateEquipmentView
 {
 
 	//
 
 	// constructor for this class -- takes a model object
 	//----------------------------------------------------------
-	public UpdateEquipmentView(Transaction t)
+	public RemoveEquipmentView(Transaction t)
 	{
 		super(t);
 	}
@@ -60,7 +60,7 @@ public class UpdateEquipmentView extends AddEquipmentView
 	//-------------------------------------------------------------
 	protected String getActionText()
 	{
-		return "** UPDATING EQUIPMENT **";
+		return "** REMOVING EQUIPMENT **";
 	}
 
 	//-------------------------------------------------------------
@@ -78,57 +78,37 @@ public class UpdateEquipmentView extends AddEquipmentView
 		if (nameText != null)
 		{
 			equipmentName.setText(nameText);
+			equipmentName.setDisable(true);
 		}
 		String catText = (String)myController.getState("CategoryName");
 		if (catText != null)
 		{
 			category.setValue(catText);
+			category.setDisable(true);
 		}
 		String noteText = (String)myController.getState("Notes");
 		if (noteText != null)
 		{
 			notes.setText(noteText);
-		}
-		String poorCountText = (String)myController.getState("PoorCount");
-		if (poorCountText != null)
-		{
-			poor.setText(poorCountText);
-		}
-		String fairCountText = (String)myController.getState("FairCount");
-		if (fairCountText != null)
-		{
-			fair.setText(fairCountText);
-		}
-		String goodCountText = (String)myController.getState("GoodCount");
-		if (goodCountText != null)
-		{
-			good.setText(goodCountText);
+			notes.setDisable(true);
 		}
 		
+		poor.setText("0");
+		poor.setDisable(true);
+		fair.setText("0");
+		fair.setDisable(true);
+		good.setText("0");
+		good.setDisable(true);
 		
-		submitButton.setText("Update"); //fix submitbutton
+		
+		submitButton.setText("Confirm Remove"); //fix submitbutton
 		ImageView icon = new ImageView(new Image("/images/savecolor.png"));
 		icon.setFitHeight(15);
 		icon.setFitWidth(15);
 		submitButton.setGraphic(icon);
 	}
 
-	//------------------------------------------------------------------------
-	public void clearValues(){
-
-	}
 	
-	//----------------------------------------------------------------------
-	protected void removeDisables()
-	{
-		equipmentName.setDisable(false);
-		poor.setDisable(false);
-		category.setDisable(false);
-		fair.setDisable(false);
-		good.setDisable(false);
-		notes.setDisable(false);
-	}
-
 }
 
 //---------------------------------------------------------------

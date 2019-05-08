@@ -115,11 +115,11 @@ public class AddBorrowerView extends View implements Observer
 		Properties props = new Properties();
 		props.setProperty("BannerId", BannerId);
 		
-		myController.stateChangeRequest("clearState", props); //clears state of controller
+		myController.stateChangeRequest("clearState", props); //clears state of controller.
 		
 		myController.stateChangeRequest("processBannerId", props);
 		
-		checkForFormerBorrowerOrPerson(BannerId);
+		
 	}
 
 	// Create the title container
@@ -198,8 +198,8 @@ public class AddBorrowerView extends View implements Observer
 				
 				if(Utilities.checkBannerId(bannerId.getText()))
 				{
+					removeDisables();
 					processBannerId(bannerId.getText());
-					
 				}
 				else
 				{
@@ -467,48 +467,6 @@ public class AddBorrowerView extends View implements Observer
 	}
 	
 	
-	private void checkForFormerBorrowerOrPerson(String BannerId)
-	{
-		if((Boolean)myController.getState("TestBorrower"))
-		{
-			if(((String)myController.getState("Status")).equals("Inactive") || ((String)myController.getState("IsOld")).equals("false")) //There is an existing person or old borrower to be reinstated. 
-			{
-				removeDisables();
-				
-				String firstNameState = (String)myController.getState("FirstName"); 
-				String lastNameState = (String)myController.getState("LastName");
-				String emailState = (String)myController.getState("Email");
-				String phoneState = (String)myController.getState("PhoneNumber");
-				String penaltyState = (String)myController.getState("Penalty");
-				String blockState = (String)myController.getState("BlockStatus");
-				String notesState = (String)myController.getState("Notes");
-				
-				bannerId.setText(BannerId);
-				firstName.setText(firstNameState);
-				lastName.setText(lastNameState);
-				email.setText(emailState);
-				phoneNumber.setText(phoneState);
-				penalty.setText(penaltyState);
-				blockStatus.setValue(blockState);
-				notes.setText(notesState);
-				
-				notes.requestFocus();
-			}
-			else //worker exists and is active
-			{
-				clearValues();
-				setDisables();
-			}
-		}
-		else
-		{
-			removeDisables();
-			bannerId.setText(BannerId);
-			firstName.requestFocus();
-		}
-	}
-	
-	
 	//-------------------------------------------------------------
 	protected MessageView createStatusLog(String initialMessage)
 	{
@@ -525,9 +483,8 @@ public class AddBorrowerView extends View implements Observer
 		lastName.clear();
 		email.clear();
 		phoneNumber.clear();
-		notes.clear();
 		penalty.clear();
-		blockStatus.setValue("Unblocked");
+		notes.clear();
 	}
 	
 	//----------------------------------------------------------------------------------------
@@ -537,6 +494,7 @@ public class AddBorrowerView extends View implements Observer
 		lastName.clear();
 		email.clear();
 		phoneNumber.clear();
+		penalty.clear();
 		notes.clear();
 	}
 	
@@ -548,7 +506,6 @@ public class AddBorrowerView extends View implements Observer
 		email.setDisable(false);
 		phoneNumber.setDisable(false);
 		penalty.setDisable(false);
-		blockStatus.setDisable(false);
 		notes.setDisable(false);
 	}
 	
@@ -560,7 +517,6 @@ public class AddBorrowerView extends View implements Observer
 		email.setDisable(true);
 		phoneNumber.setDisable(true);
 		penalty.setDisable(true);
-		blockStatus.setDisable(true);
 		notes.setDisable(true);
 	}
 
@@ -572,6 +528,8 @@ public class AddBorrowerView extends View implements Observer
 		lastName.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
 		email.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
 		phoneNumber.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
+		penalty.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");
+		blockStatus.setStyle("-fx-border-color: transparent;  -fx-focus-color: green;");
 		notes.setStyle("-fx-border-color: transparent;  -fx-focus-color: darkgreen;");
 	}
 
@@ -583,6 +541,44 @@ public class AddBorrowerView extends View implements Observer
 	public void update(Observable o, Object value)
 	{
 		clearErrorMessage();
+		
+		if((Boolean)myController.getState("TestBorrower"))
+		{
+			removeDisables();
+			
+			String bannerIdState = (String)myController.getState("BannerId");
+			String firstNameState = (String)myController.getState("FirstName"); 
+			String lastNameState = (String)myController.getState("LastName");
+			String emailState = (String)myController.getState("Email");
+			String phoneState = (String)myController.getState("PhoneNumber");
+			String penaltyState = (String)myController.getState("Penalty");
+			String notesState = (String)myController.getState("Notes");
+			String blockStatusState = (String)myController.getState("BlockStatus");
+			
+			firstName.setText(firstNameState);
+			lastName.setText(lastNameState);
+			email.setText(emailState);
+			phoneNumber.setText(phoneState);
+			penalty.setText(penaltyState);
+			notes.setText(notesState);
+			blockStatus.setValue(blockStatusState);
+			bannerId.setText(bannerIdState);	
+			
+			String oldBorrower = (String)myController.getState("IsOld");
+			if (oldBorrower != null)
+			{
+				if (oldBorrower.equals("Yes"))
+				{
+					bannerId.setDisable(true);
+				}
+				else
+				{
+				}
+			}
+		
+			firstName.requestFocus();
+			
+		}
 
 		String val = (String)value;
 		if (val.startsWith("ERR") == true)
@@ -591,7 +587,6 @@ public class AddBorrowerView extends View implements Observer
 		}
 		else
 		{
-			clearValues();
 			displayMessage(val);
 		}
 		

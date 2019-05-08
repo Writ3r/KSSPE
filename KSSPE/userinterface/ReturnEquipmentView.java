@@ -390,7 +390,6 @@ public class ReturnEquipmentView extends View implements Observer
 	 * Update method
 	 */
 	//---------------------------------------------------------
-	
 	public void update(Observable o, Object value)
 	{
 		clearErrorMessage();

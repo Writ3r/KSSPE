@@ -47,7 +47,7 @@ import javafx.util.StringConverter;
 
 import controller.Transaction;
 
-/** The class containing the Reserve Equipment View View for the KSSPE
+/** The class containing the Reserve Equipment View for the KSSPE
  *  application 
  */
 //==============================================================
@@ -57,7 +57,6 @@ public class ReserveEquipmentView extends View implements Observer
 	// GUI components
 	protected TextField barcode;
 	protected TextField count;
-	protected TextField dueDate;
 	protected DatePicker datePicker;
 	
 	protected GridPane grid;
@@ -91,6 +90,9 @@ public class ReserveEquipmentView extends View implements Observer
 		getChildren().add(container);
 		
 		populateFields();
+		
+		// This is BUSINESS LOGIC. Should belong in controller
+		//checkForPenaltiesAndBlocks(); //checks if the user has penalties/blocks. Puts up an alert if so. 
 
 		myController.addObserver(this);
 	}
@@ -185,8 +187,7 @@ public class ReserveEquipmentView extends View implements Observer
 			blankText.setTextAlignment(TextAlignment.CENTER);
 			blankText.setFill(Color.WHITE);
 		vbox.getChildren().add(blankText);
-		
-		
+			
 		grid = new GridPane();
 			grid.setHgap(15);
 			grid.setVgap(15);
@@ -235,7 +236,6 @@ public class ReserveEquipmentView extends View implements Observer
 			dueLabel.setFont(myFont);
 			dueLabel.setTextAlignment(TextAlignment.RIGHT);
 		grid.add(dueLabel, 0, 3);
-		
 		
 		datePicker = new DatePicker();
 			datePicker.setMinWidth(110);
@@ -327,7 +327,7 @@ public class ReserveEquipmentView extends View implements Observer
 				else
 				{
 					displayErrorMessage("Please enter a valid date in the form yyyy-mm-dd");
-					dueDate.requestFocus();
+					datePicker.requestFocus();
 				}
 			}
 			else
@@ -343,6 +343,8 @@ public class ReserveEquipmentView extends View implements Observer
 		}
 	}
 	
+	
+	
 	//-------------------------------------------------------------
 	protected MessageView createStatusLog(String initialMessage)
 	{
@@ -356,6 +358,7 @@ public class ReserveEquipmentView extends View implements Observer
 	{
 		barcode.clear();
 		count.clear();
+		
 	}
 	
 	//------------------------------------------------------------------------------------------
@@ -372,6 +375,7 @@ public class ReserveEquipmentView extends View implements Observer
 		datePicker.setDisable(true);
 	}
 	
+	//-----------------------------------------------------------------------------------------
 	private void clearValuesExceptDue()
 	{
 		barcode.clear();

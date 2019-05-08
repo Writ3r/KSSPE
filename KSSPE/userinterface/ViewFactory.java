@@ -99,6 +99,10 @@ public class ViewFactory {
 		{
 			return new CheckOutCollectionView(t);
 		}
+		else if(viewName.equals("CheckOutCollectionReportView") == true)
+		{
+			return new CheckOutCollectionReportView(t);
+		}
 		else if(viewName.equals("ReturnEquipmentView") == true)
 		{
 			return new ReturnEquipmentView(t);

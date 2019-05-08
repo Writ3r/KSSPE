@@ -117,7 +117,7 @@ public class AddWorkerView extends View implements Observer
 		
 		myController.stateChangeRequest("processBannerId", props);
 		
-		checkForFormerWorkerOrPerson(BannerId);
+		
 		
 	}
 
@@ -197,8 +197,8 @@ public class AddWorkerView extends View implements Observer
 				
 				if(Utilities.checkBannerId(bannerId.getText()))
 				{
+					removeDisables();
 					processBannerId(bannerId.getText());
-					
 				}
 				else
 				{
@@ -468,7 +468,6 @@ public class AddWorkerView extends View implements Observer
 		email.clear();
 		phoneNumber.clear();
 		password.clear();
-		credential.setValue("Ordinary");
 	}
 	
 	//-------------------------------------------------------------
@@ -479,7 +478,6 @@ public class AddWorkerView extends View implements Observer
 		email.setDisable(false);
 		phoneNumber.setDisable(false);
 		password.setDisable(false);
-		credential.setDisable(false);
 	}
 	
 	//-------------------------------------------------------------
@@ -490,7 +488,6 @@ public class AddWorkerView extends View implements Observer
 		email.setDisable(true);
 		phoneNumber.setDisable(true);
 		password.setDisable(true);
-		credential.setDisable(true);
 	}
 
 	//-------------------------------------------------------------
@@ -513,6 +510,40 @@ public class AddWorkerView extends View implements Observer
 	{
 		clearErrorMessage();
 
+		if((Boolean)myController.getState("TestWorker"))
+		{
+			removeDisables();
+			
+			String bannerIdState = (String)myController.getState("BannerId");
+			String firstNameState = (String)myController.getState("FirstName"); 
+			String lastNameState = (String)myController.getState("LastName");
+			String emailState = (String)myController.getState("Email");
+			String phoneState = (String)myController.getState("PhoneNumber");
+			String credentialState = (String)myController.getState("Credential");
+			
+			firstName.setText(firstNameState);
+			lastName.setText(lastNameState);
+			email.setText(emailState);
+			phoneNumber.setText(phoneState);
+			credential.setValue(credentialState);
+			bannerId.setText(bannerIdState);	
+			
+			
+			String oldWorker = (String)myController.getState("IsOld");
+			if (oldWorker != null)
+			{
+				if (oldWorker.equals("Yes"))
+				{
+					bannerId.setDisable(true);
+				}
+				else
+				{
+				}
+			}
+		
+			password.requestFocus();
+			
+		}
 		String val = (String)value;
 		if (val.startsWith("ERR") == true)
 		{
@@ -520,47 +551,9 @@ public class AddWorkerView extends View implements Observer
 		}
 		else
 		{
-			clearValues();
 			displayMessage(val);
 		}
 		
-	}
-	
-	private void checkForFormerWorkerOrPerson(String BannerId)
-	{
-		if((Boolean)myController.getState("TestWorker"))
-		{
-			if(((String)myController.getState("Status")).equals("Inactive") || ((String)myController.getState("IsOld")).equals("false")) //Old inactive worker to be reinstated, or an existing person.
-			{
-				removeDisables();
-				
-				String firstNameState = (String)myController.getState("FirstName"); 
-				String lastNameState = (String)myController.getState("LastName");
-				String emailState = (String)myController.getState("Email");
-				String phoneState = (String)myController.getState("PhoneNumber");
-				String credentialState = (String)myController.getState("Credential");
-				
-				bannerId.setText(BannerId);
-				firstName.setText(firstNameState);
-				lastName.setText(lastNameState);
-				email.setText(emailState);
-				phoneNumber.setText(phoneState);
-				credential.setValue(credentialState);
-				
-				password.requestFocus();
-			}
-			else //worker exists and is active
-			{
-				clearValues();
-				setDisables();
-			}
-		}
-		else
-		{
-			removeDisables();
-			bannerId.setText(BannerId);
-			firstName.requestFocus();
-		}
 	}
 
 	/**

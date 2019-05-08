@@ -544,7 +544,7 @@ public class AddEquipmentView extends View implements Observer
 		fair.clear();
 		fair.setText("0");
 		good.clear();
-		good.setText("0");
+		good.setText("1");
 		notes.clear();
 		category.getSelectionModel().select(null);
 	}

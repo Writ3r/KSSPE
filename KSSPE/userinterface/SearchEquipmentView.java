@@ -41,7 +41,7 @@ import javafx.util.StringConverter;
 
 import controller.Transaction;
 
-/** The class containing the Search Category View for the KSSPE
+/** The class containing the Search Equipment View for the KSSPE
  *  application 
  */
 //==============================================================
@@ -89,14 +89,15 @@ public class SearchEquipmentView extends View implements Observer
 		return "** SEARCH FOR EQUIPMENT **";
 	}
 
+	//-------------------------------------------------------------
 	public void populateFields()
 	{
-		//get current autoinc for category
+		//
 	}
 
 	// Create the title container
 	//-------------------------------------------------------------
-	private Node createTitle()
+	protected Node createTitle()
 	{
 		VBox container = new VBox(10);
 		container.setPadding(new Insets(1, 10, 1, 10));
@@ -135,7 +136,7 @@ public class SearchEquipmentView extends View implements Observer
 
 	// Create the main form content
 	//-------------------------------------------------------------
-	private VBox createFormContent()
+	protected VBox createFormContent()
 	{
 		VBox vbox = new VBox(10);
 		vbox.setAlignment(Pos.CENTER);
@@ -263,7 +264,8 @@ public class SearchEquipmentView extends View implements Observer
 		return vbox;
 	}
 
-	private void sendToController()
+	//------------------------------------------------------------------
+	protected void sendToController()
 	{
 		clearErrorMessage();
 		
@@ -312,12 +314,14 @@ public class SearchEquipmentView extends View implements Observer
 		return statusLog;
 	}
 
+	//-------------------------------------------------------------
 	public void clearValues()
 	{
 		barcode.clear();
 		name.clear();
 	}
 
+	//-------------------------------------------------------------
 	private void setOutlines()
 	{
 		barcode.setStyle("-fx-border-color: transparent; -fx-focus-color: green;");

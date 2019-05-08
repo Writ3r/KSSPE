@@ -46,20 +46,28 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
+import model.Borrower;
 import model.CheckOut;
+import model.Worker;
 import model.CheckOutCollection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 //==============================================================================
-public class CheckOutCollectionView extends View implements Observer
+public class CheckOutCollectionReportView extends CheckOutCollectionView
 {
-	protected TableView<CheckOutTableModel> tableOfCheckOuts;
-	protected Button cancelButton;
-	protected Button submitButton;
-	protected MessageView statusLog;
-	protected Text actionText; 
+	
+	protected Button saveToFileButton;
+ 
         
 	//--------------------------------------------------------------------------
-	public CheckOutCollectionView(Transaction t)
+	public CheckOutCollectionReportView(Transaction t)
 	{
 		super(t);
 
@@ -81,7 +89,6 @@ public class CheckOutCollectionView extends View implements Observer
 		
 		myController.addObserver(this);
 		
-		tableOfCheckOuts.getSelectionModel().select(0); //autoselect first element
 	}
 
 	//--------------------------------------------------------------------------
@@ -119,9 +126,9 @@ public class CheckOutCollectionView extends View implements Observer
 
 				}
 				if(entryList.size() == 1)
-					actionText.setText(entryList.size()+" Reservation Found! Select to Return.");
+					actionText.setText(entryList.size()+" Reservation Matching Criteria Found!");
 				else 
-					actionText.setText(entryList.size()+" Reservations Found! Select one to Return.");
+					actionText.setText(entryList.size()+" Reservations Matching Criteria Found! ");
 
 				actionText.setFill(Color.LIGHTGREEN);
 			}
@@ -141,49 +148,11 @@ public class CheckOutCollectionView extends View implements Observer
 
 	}
 
-	// Create the title container
-	//-------------------------------------------------------------
-	protected Node createTitle()
-	{
-		VBox container = new VBox(10);
-		container.setPadding(new Insets(1, 10, 12, 10));
-		
-        Text clientText = new Text("KSSPE DEPARTMENT");
-			clientText.setFont(Font.font("Copperplate", FontWeight.EXTRA_BOLD, 36));
-			clientText.setEffect(new DropShadow());
-			clientText.setTextAlignment(TextAlignment.CENTER);
-			clientText.setFill(Color.WHITESMOKE);
-		container.getChildren().add(clientText);
-
-		Text titleText = new Text(" Reservation Management System ");
-			titleText.setFont(Font.font("Copperplate", FontWeight.THIN, 28));
-			titleText.setTextAlignment(TextAlignment.CENTER);
-			titleText.setFill(Color.GOLD);
-		container.getChildren().add(titleText);
-
-		Text blankText = new Text("  ");
-			blankText.setFont(Font.font("Arial", FontWeight.BOLD, 15));
-			blankText.setWrappingWidth(350);
-			blankText.setTextAlignment(TextAlignment.CENTER);
-			blankText.setFill(Color.WHITE);
-		container.getChildren().add(blankText);
-
-		actionText = new Text("     " + getActionText() + "       ");
-			actionText.setFont(Font.font("Copperplate", FontWeight.BOLD, 22));
-			actionText.setWrappingWidth(450);
-			actionText.setTextAlignment(TextAlignment.CENTER);
-			actionText.setFill(Color.DARKGREEN);
-		container.getChildren().add(actionText);
-		
-		container.setAlignment(Pos.CENTER);
-
-		return container;
-	}
 	
 	//--------------------------------------------------------------
 	protected String getActionText()
 	{
-		return "** RESERVATIONS TO RETURN **";
+		return "** LIST OF RESERVATIONS **";
 	}
 
 	// Create the main form content
@@ -243,26 +212,21 @@ public class CheckOutCollectionView extends View implements Observer
 
 		tableOfCheckOuts.getColumns().addAll(bannerColumn, barcodePrefixColumn, equipNameColumn, takenColumn, returnedColumn, dueColumn, rentColumn);
 
-		tableOfCheckOuts.setOnMousePressed((MouseEvent event) -> {
-			if (event.isPrimaryButtonDown() && event.getClickCount() >=2 ){
-				processCheckOutSelected();
-			}
-		});
 		ImageView icon = new ImageView(new Image("/images/check.png"));
 		icon.setFitHeight(15);
 		icon.setFitWidth(15);
-		submitButton = new Button("Select",icon);
-		submitButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
-		submitButton.requestFocus();
-		submitButton.setOnAction((ActionEvent e) -> {
+		saveToFileButton = new Button("Save To File",icon);
+		saveToFileButton.setFont(Font.font("Comic Sans", FontWeight.THIN, 14));
+		saveToFileButton.requestFocus();
+		saveToFileButton.setOnAction((ActionEvent e) -> {
 			clearErrorMessage();
-			processCheckOutSelected();
+			saveToExcelFile();
 		});
-		submitButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-			submitButton.setEffect(new DropShadow());
+		saveToFileButton.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+			saveToFileButton.setEffect(new DropShadow());
 		});
-		submitButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-			submitButton.setEffect(null);
+		saveToFileButton.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+			saveToFileButton.setEffect(null);
 		});
 		icon = new ImageView(new Image("/images/return.png"));
 		icon.setFitHeight(15);
@@ -288,14 +252,14 @@ public class CheckOutCollectionView extends View implements Observer
                 btnContainer.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
                     btnContainer.setStyle("-fx-background-color: SLATEGREY");
 		});
-		btnContainer.getChildren().add(submitButton);
+		btnContainer.getChildren().add(saveToFileButton);
 		btnContainer.getChildren().add(cancelButton);
 
 		tableOfCheckOuts.setPrefHeight(275);
         tableOfCheckOuts.setMaxWidth(550);
 		
 		ScrollPane scrollPane = new ScrollPane();
-		scrollPane.setPrefSize(450, 150);
+		scrollPane.setPrefSize(550, 150);
 		scrollPane.setContent(tableOfCheckOuts); // should we use this? (Probably not - FX tables come with their own scroll pane)
 		
 		vbox.getChildren().add(tableOfCheckOuts);
@@ -306,85 +270,116 @@ public class CheckOutCollectionView extends View implements Observer
 		return vbox;
 	}
 
-	//--------------------------------------------------------------------------
-	protected void processCheckOutSelected()
-	{
-		CheckOutTableModel selectedItem = tableOfCheckOuts.getSelectionModel().getSelectedItem();
+	//-------------------------------------------------------------
+	protected void writeToFile(String fName)
+    {
+    	Vector allColumnNames = new Vector();
 
-		if(selectedItem != null)
-		{
-			String reservationId = selectedItem.getId();
+        try
+        {
+    	    FileWriter outFile = new FileWriter(fName);
+            PrintWriter out = new PrintWriter(outFile);
+            CheckOutCollection CheckOutCollection = 
+					(CheckOutCollection)myController.getState("CheckOutList");
 
-			myController.stateChangeRequest("CheckOutSelected", reservationId);
-		}
-	}
-	
-    //---------------------------------------------------------------------------
-	// private void displayRemoveAlert(){
-	// 	clearErrorMessage();
-	// 	Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"BannerId: "+tableOfBorrowers.getSelectionModel().getSelectedItem().getBannerId()
-	// 			+"\nFirstName: "+tableOfBorrowers.getSelectionModel().getSelectedItem().getFirstName()
-	// 			+"\nLastName: "+tableOfBorrowers.getSelectionModel().getSelectedItem().getLastName(), ButtonType.YES, ButtonType.NO);
-	// 	alert.setHeaderText(null);
-	// 	alert.setTitle("Remove Borrower");
-	// 	alert.setHeaderText("Are you sure want to remove this Borrower?");
-	// 	((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(new Image("images/BPT_LOGO_All-In-One_Color.png"));
-	// 	alert.showAndWait();
+			Vector entryList = (Vector)CheckOutCollection.getState("CheckOuts");
 
-	// 	if (alert.getResult() == ButtonType.YES) {
-	// 		processBorrowerSelected();
-	// 	}
-	// }
+            if ((entryList == null) || (entryList.size() == 0))
+                return;
+
+            allColumnNames.addElement("BannnerId");
+			allColumnNames.addElement("BorrowerName");
+            allColumnNames.addElement("Barcode");
+            allColumnNames.addElement("EquipmentName");
+            allColumnNames.addElement("UnitsTaken");
+            allColumnNames.addElement("TotalUnitsReturned");
+            allColumnNames.addElement("RentDate");
+            allColumnNames.addElement("DueDate");
+            allColumnNames.addElement("CheckOutWorkerID");
        
-	//--------------------------------------------------------------------------
-	protected MessageView createStatusLog(String initialMessage)
-	{
-		statusLog = new MessageView(initialMessage);
 
-		return statusLog;
-	}
-	
-	//--------------------------------------------------------------------------
-	public void update(Observable o, Object value)
-	{
-		clearErrorMessage();
+            String line = "BannerId, BorrowerName, Barcode, EquipmentName, UnitsTaken, TotalUnitsReturned, DueDate, RentDate, " 
+            					+ "CheckOutWorkerID, CheckOutWorkerName";
 
-		String val = (String)value;
-		if (val.startsWith("ERR") == true)
-		{
-			displayErrorMessage(val);
-			getEntryTableModelValues();
-		}
-		else
-		{
-			displayMessage(val);
-			getEntryTableModelValues();
-		}
-	}
-	/**
-	 * Display info message
-	 */
-	//----------------------------------------------------------
-	public void displayMessage(String message)
-	{
-		statusLog.displayMessage(message);
-	}
-	
-	//------------------------------------------------------------
-	public void displayErrorMessage(String message)
-	{
-		statusLog.displayErrorMessage(message);
-	}
+            out.println(line);
 
+            for (int k = 0; k < entryList.size(); k++)
+            {
+                String valuesLine = "";
+                CheckOut nextE = (CheckOut)entryList.elementAt(k);
+                Vector<String> nextRow = nextE.getEntryListView();
+				valuesLine += nextRow.elementAt(1) + ", ";
+				try
+				{
+					Properties p = new Properties();
+					p.setProperty("BannerId", nextRow.elementAt(1));
+					Borrower b = new Borrower(p);
+					valuesLine += (b.getState("FirstName") + " " + b.getState("LastName")) + ", ";
+				}
+				catch (Exception ex)
+				{
+					valuesLine += "Unknown Borrower" + ", ";
+				}
+				valuesLine += nextRow.elementAt(2) + ", ";
+				valuesLine += nextRow.elementAt(8) + ", ";
+				valuesLine += nextRow.elementAt(3) + ", ";
+				valuesLine += nextRow.elementAt(4) + ", ";
+				valuesLine += nextRow.elementAt(5) + ", ";
+				valuesLine += nextRow.elementAt(6) + ", ";
+				valuesLine += nextRow.elementAt(7) + ", ";
+				
+				try
+				{
+					Properties p = new Properties();
+					p.setProperty("BannerId", nextRow.elementAt(7));
+					Worker w = new Worker(p);
+					valuesLine += (w.getState("FirstName") + " " + w.getState("LastName")) + ", ";
+				}
+				catch (Exception ex)
+				{
+					valuesLine += "Unknown Worker" + ", ";
+				}
 
-	/**
-	 * Clear error message
-	 */
-	//----------------------------------------------------------
-	public void clearErrorMessage()
-	{
-		statusLog.clearErrorMessage();
-	}
+                /*for (int j = 0; j < allColumnNames.size()-1; j++)
+                {
+                    String nextValue = nextRow.elementAt(j);
+                    if(nextValue != null)
+                            valuesLine += nextValue + ", ";
+                }*/
+				
+                out.println(valuesLine);
+            }
+
+            // Also print the shift count and filter type
+            out.println("\nTotal number of CheckOut Items: " + entryList.size());
+
+            // Finally, print the time-stamp
+            DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+            DateFormat timeFormat = new SimpleDateFormat("hh:mm aaa");
+            Date date = new Date();
+            String timeStamp = dateFormat.format(date) + " " +
+                    timeFormat.format(date);
+
+            out.println("CheckOut Report created on " + timeStamp);
+
+            out.close();
+
+            // Acknowledge successful completion to user with JOptionPane
+            //JOptionPane.showMessageDialog(null, "Report data saved successfully to selected file");
+            }
+
+            catch (FileNotFoundException e)
+            {
+            //     JOptionPane.showMessageDialog(null, "Could not access file to save: "
+            //             + fName, "Save Error", JOptionPane.ERROR_MESSAGE );
+            }
+            catch (IOException e)
+            {
+            //     JOptionPane.showMessageDialog(null, "Error in saving to file: "
+            //             + e.toString(), "Save Error", JOptionPane.ERROR_MESSAGE );
+
+            }
+    }
 
 
 }
