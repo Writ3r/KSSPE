@@ -12,7 +12,7 @@ import utilities.Utilities;
 import model.Equipment;
 
 //===========================================================================
-public class ReserveReceipt
+public class ReturnReceipt
 {
 	// Declare a home directory to save receipts in at the top of the class
 	private static final String receiptHomeDirectory = 
@@ -29,18 +29,20 @@ public class ReserveReceipt
 	// For example, if the KSSPE people want the worker name and banner id to be printed as part of the receipt,
 	// so they must be put in the receipt
 	//------------------------------------------------------------------------------
-	public ReserveReceipt(Properties p, Vector rentals) throws Exception
+	public ReturnReceipt(Properties p, Vector returns) throws Exception
 	{
 		receipt.put("WorkerName", p.getProperty("WorkerName"));
 		receipt.put("WorkerBannerId", p.getProperty("WorkerBannerId"));
 		receipt.put("BorrowerName", p.getProperty("BorrowerName"));
 		receipt.put("BorrowerBannerId", p.getProperty("BorrowerBannerId"));
-		receipt.put("Rentals", rentals);
+		receipt.put("Returns", returns);
 		
 		CHECKIN_TIME_HOUR = 12;
 		CHECKIN_TIME_MINUTE = 0;
 		
+		System.out.println("Nick was here");
 		printReceipt();
+		System.out.println("Lucas was here");
 	}
 
 	//----------------------------------------------------------------
@@ -59,7 +61,7 @@ public class ReserveReceipt
 		String monthName = Utilities.mapMonthToString(nowMonth);
 			
 		String receiptDirectoryName = receiptHomeDirectory + File.separator +
-				"CheckoutReceipts" + File.separator + yearValue + File.separator +
+				"CheckinReceipts" + File.separator + yearValue + File.separator +
 				monthName; 
 				
 		String nowTimeText = dateFormatter.format(cal.getTime());
@@ -78,17 +80,17 @@ public class ReserveReceipt
 			if (flag == true)
 			{
 				receiptFileName = receiptDirectoryName + File.separator + 
-						 borrowerName + "Checkout" + nowTimeText2 + ".txt";
+						 borrowerName + "Checkin" + nowTimeText2 + ".txt";
 			}
 			else
 			{
-				throw new Exception("Could not create directory to store checkout receipt"); 
+				throw new Exception("Could not create directory to store checkin receipt"); 
 			}
 		}
 		else
 		{
 			receiptFileName = receiptDirectoryName + File.separator + 
-				borrowerName + "Checkout" + nowTimeText2 + ".txt";
+				borrowerName + "Checkin" + nowTimeText2 + ".txt";
 		}
 
 		writeReceiptDataToFile(receiptFileName);
@@ -108,7 +110,7 @@ public class ReserveReceipt
 				outputFile.write("                                KSSPE DEPARTMENT");
 				outputFile.newLine();
 				outputFile.newLine();
-				outputFile.write("                           EQUIPMENT CHECK-OUT RECEIPT");
+				outputFile.write("                           EQUIPMENT CHECK-IN RECEIPT");
 				outputFile.newLine();
 				outputFile.newLine();
 				outputFile.newLine();
@@ -122,29 +124,29 @@ public class ReserveReceipt
 				outputFile.newLine();
 				outputFile.newLine();
 				outputFile.newLine();
-				outputFile.write(String.format("%20s %25s %20s %20s \r\n", "Barcode", "Name", "Count", "Due Date"));
+				outputFile.write(String.format("%20s %25s %20s %20s \r\n", "Barcode", "Name", "Count", "Return Date"));
 				outputFile.write("-----------------------------------------------------------------------------------------");
 				outputFile.newLine();
 				
-				// Put all the rentals in
-				// Your rentals (aka RESERVATIONS) should be in a COLLECTION (Vector, ArrayList, ....)
-				Vector allRentalsInReceipt = (Vector)receipt.get("Rentals");
-				if (allRentalsInReceipt != null)
+				// Put all the returns in
+				// Your returns should be in a COLLECTION (Vector, ArrayList, ....)
+				Vector allReturnsInReceipt = (Vector)receipt.get("Returns");
+				if (allReturnsInReceipt != null)
 				{
-					for (int cnt = 0; cnt < allRentalsInReceipt.size(); cnt++)
+					for (int cnt = 0; cnt < allReturnsInReceipt.size(); cnt++)
 					{
-						Properties rentalInfo = (Properties)allRentalsInReceipt.elementAt(cnt);
-							String barcodeID = (String)rentalInfo.getProperty("Barcode");
-							String itemName = (String)rentalInfo.getProperty("Name");
-							String count = (String)rentalInfo.getProperty("Count");
-							String dueDate = (String)rentalInfo.getProperty("DueDate");
+						Properties returnInfo = (Properties)allReturnsInReceipt.elementAt(cnt);
+							String barcodeID = (String)returnInfo.getProperty("Barcode");
+							String itemName = (String)returnInfo.getProperty("EquipmentName");
+							String count = (String)returnInfo.getProperty("Count");
+							String returnDate = (String)returnInfo.getProperty("ReturnDate");
 						
 						if (itemName.length() > 25)
 						{
 							itemName = itemName.substring(0,25);
 						}
 						
-						outputFile.write(String.format("%20s %25s %20s %20s \r\n", barcodeID, itemName, count, dueDate));
+						outputFile.write(String.format("%20s %25s %20s %20s \r\n", barcodeID, itemName, count, returnDate));
 					}
 				}
 				
@@ -157,11 +159,6 @@ public class ReserveReceipt
 				outputFile.newLine();
 				outputFile.newLine();
 				
-				String returnTimeString = "All items must be returned by " + nowTimeText + " on the due date shown above.";
-				outputFile.write(returnTimeString);
-				outputFile.newLine();
-				outputFile.newLine();
-				
 				cal.setTime(new Date());
 				cal.add(cal.MINUTE, 15);
 				String futureTimeText = dateFormatter.format(cal.getTime());
@@ -169,8 +166,7 @@ public class ReserveReceipt
 				outputFile.newLine();
 				outputFile.newLine();
 				
-				String tailMessage = "IMPORTANT NOTE: Double check that all the items on your receipt" +
-				" are there and in good condition.";
+				String tailMessage = "Thank you!";
 					
 				outputFile.write(tailMessage);
 				outputFile.newLine();
