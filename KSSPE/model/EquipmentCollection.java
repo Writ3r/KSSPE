@@ -74,13 +74,6 @@ public class EquipmentCollection extends EntityBase
 	//-----------------------------------------------------------
 	public void findAll()
 	{
-		String query = "SELECT * FROM " + myTableName;
-		populateCollectionHelper(query);
-	}
-
-	//-----------------------------------------------------------
-	public void findAllAvailable()
-	{
 		String query = "SELECT * FROM " + myTableName + " WHERE (AvailableCount > 0)";
 		populateCollectionHelper(query);
 	}
@@ -89,6 +82,12 @@ public class EquipmentCollection extends EntityBase
 	public void findByName(String name)
 	{
 		String query = "SELECT * FROM " + myTableName + " WHERE ((AvailableCount > 0) AND (Name LIKE '%" + name + "%'))";
+		populateCollectionHelper(query);
+	}
+	//-----------------------------------------------------------
+	public void findExactName(String name)
+	{
+		String query = "SELECT * FROM " + myTableName + " WHERE ((AvailableCount > 0) AND (Name = '" + name + "'))";
 		populateCollectionHelper(query);
 	}
 
@@ -145,7 +144,7 @@ public class EquipmentCollection extends EntityBase
 	//----------------------------------------------------------
 	public Object getState(String key)
 	{
-		if (key.equals("Equipment"))
+		if (key.equals("AllEquipment"))
 			return equipmentList;
 		else
 			if (key.equals("EquipmentList"))
@@ -189,6 +188,16 @@ public class EquipmentCollection extends EntityBase
 				equipmentList.remove(cnt);
 			}
 		}
+	}
+	
+	//--------------------------------------------------------------
+	public int getSize()
+	{
+		int numElems = 0;
+		if (equipmentList != null)
+			numElems = equipmentList.size();
+		
+		return numElems;
 	}
 	
 	//----------------------------------------------------------
