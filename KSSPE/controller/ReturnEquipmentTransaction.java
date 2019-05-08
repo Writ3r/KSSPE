@@ -297,7 +297,7 @@ public class ReturnEquipmentTransaction extends Transaction
 				props.setProperty("BorrowerName", (String)this.getState("FirstName") +
 					" " + (String)this.getState("LastName"));
 				props.setProperty("BorrowerBannerId", (String)this.getState("BannerId"));
-				/*
+				
 				try
 				{
 					new ReturnReceipt(props, returnedEquipment);
@@ -306,7 +306,7 @@ public class ReturnEquipmentTransaction extends Transaction
 				catch(Exception ex)
 				{
 					errorMessage = ex.getMessage();
-				}*/
+				}
 					
 				myReceptionist.stateChangeRequest("CancelTransaction", null);
 			}
